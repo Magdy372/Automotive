@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:car_rental_project/screens/home_screen.dart';
+import 'package:car_rental_project/controller/login.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
+
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final LoginController _loginController = LoginController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +20,7 @@ class LoginScreen extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height /
-                2, // Half the screen height
+            height: MediaQuery.of(context).size.height / 2, // Half the screen height
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -31,8 +35,7 @@ class LoginScreen extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height /
-                2, // Half the screen height
+            height: MediaQuery.of(context).size.height / 2, // Half the screen height
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -66,6 +69,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   child: Form(
+                    key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -79,6 +83,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
+                          controller: _emailController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
@@ -107,6 +112,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
+                          controller: _passwordController,
                           obscureText: true,
                           obscuringCharacter: '*',
                           validator: (value) {
@@ -141,12 +147,13 @@ class LoginScreen extends StatelessWidget {
                           height: 54,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (e) => const HomeScreen(),
-                                ),
-                              );
+                              if (_formKey.currentState!.validate()) {
+                                _loginController.login(
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                  context: context,
+                                );
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

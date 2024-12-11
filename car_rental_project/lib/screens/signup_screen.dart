@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:car_rental_project/controller/signup.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -13,44 +11,16 @@ class SignupScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Function to save user data to Firestore
-  Future<void> _saveToFirestore(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseFirestore.instance.collection('users').add({
-          'name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text.trim(),
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User registered successfully!')),
-        );
-
-        // Clear the form fields after successful registration
-        _nameController.clear();
-        _emailController.clear();
-        _passwordController.clear();
-
-          Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-  }
+  // Instance of AuthController
+  final Signup _authController = Signup();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Set background color to black
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Background image container - only showing the top half of the image
+          // Background image container
           Positioned(
             top: 0,
             left: 0,
@@ -65,7 +35,7 @@ class SignupScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Gradient overlay on the image
+          // Gradient overlay
           Positioned(
             top: 0,
             left: 0,
@@ -136,6 +106,10 @@ class SignupScreen extends StatelessWidget {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
                             }
+                            if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                .hasMatch(value)) {
+                              return 'Please enter a valid email';
+                            }
                             return null;
                           },
                           decoration: InputDecoration(
@@ -156,6 +130,9 @@ class SignupScreen extends StatelessWidget {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
                             }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters long';
+                            }
                             return null;
                           },
                           decoration: InputDecoration(
@@ -172,7 +149,16 @@ class SignupScreen extends StatelessWidget {
                           width: double.infinity,
                           height: 54,
                           child: ElevatedButton(
-                            onPressed: () => _saveToFirestore(context),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _authController.signup(
+                                  name: _nameController.text,
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                  context: context,
+                                );
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.black,
@@ -180,8 +166,6 @@ class SignupScreen extends StatelessWidget {
                             child: const Text('Sign up'),
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        // ... (rest of the UI remains unchanged)
                       ],
                     ),
                   ),
