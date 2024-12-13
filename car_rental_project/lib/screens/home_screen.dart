@@ -7,7 +7,7 @@ import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
 import 'package:car_rental_project/tabs/notification_tab.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +19,27 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
   final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
+  String? _userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
+  }
+
+  // Get the logged-in user's data from Firebase
+  Future<void> _getUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Fetch user info from Firestore (assuming users collection exists)
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _userName = userDoc.data()?['name'] ?? 'User'; // Default to 'User' if no name
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,19 +79,19 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Hello, Rana",
-                    style: TextStyle(
+                    "Hello, $_userName", // Display user name here
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                  const SizedBox(height: 5),
+                  const Text(
                     "Find your dream car",
                     style: TextStyle(
                       fontSize: 16,
@@ -79,29 +100,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            GestureDetector(
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const NotificationTab()),
-    );
-  },
-  child: Container(
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: Colors.white.withOpacity(0.2),
-    ),
-    child: const Padding(
-      padding: EdgeInsets.all(8),
-      child: Icon(
-        Icons.notifications_none_rounded,
-        color: Colors.white,
-        size: 28,
-      ),
-    ),
-  ),
-)
-
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const NotificationTab()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.2),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -215,249 +235,248 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- // Featured Cars Section
-Widget _buildFeaturedCars() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Featured Cars",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+  // Featured Cars Section
+  Widget _buildFeaturedCars() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Featured Cars",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection('Cars').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(child: Text("Error fetching cars!"));
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text("No featured cars available."));
-            }
-
-            final cars = snapshot.data!.docs
-                .map((doc) => Car.fromMap(doc.data()))
-                .toList();
-
-            return SizedBox(
-              height: 350,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: cars.length,
-                itemBuilder: (context, index) {
-                  return _buildCarCard(cars[index]);
-                },
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
-
-// Popular Deals Section
-Widget _buildPopularDeals() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "Popular Deals",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // You can implement the "View All" functionality here
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "View All",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        SizedBox(
-          height: 300, // Fixed height for car cards
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: FirebaseFirestore.instance
-                .collection('Cars')
-                .orderBy('rating', descending: true) // Show popular cars first
-                .limit(5) // Limit to top 5 cars for this section
-                .snapshots(),
+          const SizedBox(height: 15),
+          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(  
+            stream: FirebaseFirestore.instance.collection('Cars').snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
-                return const Center(child: Text("Error fetching popular cars!"));
+                return const Center(child: Text("Error fetching cars!"));
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text("No popular cars available."));
+                return const Center(child: Text("No featured cars available."));
               }
 
-              final popularCars = snapshot.data!.docs
+              final cars = snapshot.data!.docs
                   .map((doc) => Car.fromMap(doc.data()))
                   .toList();
 
-              return ListView.separated(
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: popularCars.length, // Use the length of fetched cars
-                separatorBuilder: (context, index) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CarDetailScreen(
-                            car: popularCars[index],
-                          ),
-                        ),
-                      );
-                    },
-                    child: _buildCarCard(popularCars[index]),
-                  );
-                },
+              return SizedBox(
+                height: 350,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: cars.length,
+                  itemBuilder: (context, index) {
+                    return _buildCarCard(cars[index]);
+                  },
+                ),
               );
             },
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-// Car Card Widget
-Widget _buildCarCard(Car car) {
-  return GestureDetector(
-    child: Container(
-      width: 240,
-      margin: const EdgeInsets.only(right: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
         ],
       ),
+    );
+  }
+
+  // Popular Deals Section
+  Widget _buildPopularDeals() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top side - Image
-          Container(
-            height: 180,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Popular Deals",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            child: Center(
-              child: Image.asset(
-                car.image,
-                height: 160,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          // Bottom side - Car details
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  car.brand,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  car.name,
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 36, 32, 32),
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      car.rating.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 36, 32, 32),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '\$${car.price}/day',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+              TextButton(
+                onPressed: () {
+                  // You can implement the "View All" functionality here
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  decoration: BoxDecoration(
                     color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "View All",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          SizedBox(
+            height: 300, // Fixed height for car cards
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>( 
+              stream: FirebaseFirestore.instance
+                  .collection('Cars')
+                  .orderBy('rating', descending: true) // Show popular cars first
+                  .limit(5) // Limit to top 5 cars for this section
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return const Center(child: Text("Error fetching popular cars!"));
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("No popular cars available."));
+                }
+
+                final popularCars = snapshot.data!.docs
+                    .map((doc) => Car.fromMap(doc.data()))
+                    .toList();
+
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: popularCars.length, // Use the length of fetched cars
+                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CarDetailScreen(
+                              car: popularCars[index],
+                            ),
+                          ),
+                        );
+                      },
+                      child: _buildCarCard(popularCars[index]),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
       ),
-    ),
-  );
-}
+    );
+  }
+
+  // Car Card Widget
+  Widget _buildCarCard(Car car) {
+    return GestureDetector(
+      child: Container(
+        width: 240,
+        margin: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Top side - Image
+            Container(
+              height: 180,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Center(
+                child: Image.asset(
+                  car.image,
+                  height: 160,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            // Bottom side - Car details
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    car.brand,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    car.name,
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 36, 32, 32),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star,
+                        color: Colors.yellow,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        car.rating.toString(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 36, 32, 32),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '\$${car.price}/day',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   // Bottom Navigation Bar
   Widget _buildBottomNavBar() {
@@ -492,7 +511,7 @@ Widget _buildCarCard(Car car) {
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                MaterialPageRoute(builder: (context) =>  ProfileScreen()),
               );
               break;
             case 3:
