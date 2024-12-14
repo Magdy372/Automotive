@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:car_rental_project/data/car_data.dart';
@@ -5,7 +6,6 @@ import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
-import 'package:car_rental_project/tabs/notification_tab.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const NotificationTab()),
+                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
                   );
                 },
                 child: Container(
@@ -509,13 +509,13 @@ class _HomeScreenState extends State<HomeScreen> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationTab()),
+                MaterialPageRoute(builder: (context) => const NotificationScreen()),
               );
               break;
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) =>  ProfileScreen()),
+                MaterialPageRoute(builder: (context) =>  const ProfileScreen()),
               );
               break;
             case 3:

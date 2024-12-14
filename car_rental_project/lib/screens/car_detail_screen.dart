@@ -1,10 +1,10 @@
+import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
-import 'package:car_rental_project/tabs/notification_tab.dart';
 
 class CarDetailScreen extends StatefulWidget {
   final Car car;
@@ -286,7 +286,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationTab()),
+                MaterialPageRoute(builder: (context) => const NotificationScreen()),
               );
               break;
             case 2:

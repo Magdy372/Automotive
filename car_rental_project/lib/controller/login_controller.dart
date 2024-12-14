@@ -37,12 +37,12 @@ class LoginController {
       if (role == 'admin') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AdminDashboardScreen()),
+          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
         );
       } else if (role == 'user') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
         throw Exception("Invalid role assigned to user.");

@@ -42,6 +42,8 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             home: initialScreen,
+            debugShowCheckedModeBanner: false,
+
             routes: {
               '/onboarding': (context) => const Onboarding(),
               '/admin': (context) => const AdminDashboardScreen(),

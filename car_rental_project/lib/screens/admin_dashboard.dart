@@ -12,8 +12,8 @@ class AdminDashboardScreen extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.teal,
-        scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
-        cardColor: Color(0xFF1F1F1F),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        cardColor: const Color(0xFF1F1F1F),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
           bodyMedium: TextStyle(color: Color(0xFFB0BEC5)),
@@ -107,7 +107,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 300,
                 child: BarChart(
                   BarChartData(
@@ -156,7 +156,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ],
                     titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
+                      leftTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: true),
                       ),
                       bottomTitles: AxisTitles(
@@ -187,8 +187,8 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Legend(color: Colors.grey, label: 'Cars Rented'),
                   SizedBox(width: 16),
                   Legend(color: Colors.black, label: 'Cars Uploaded'),
@@ -204,7 +204,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 300,
                 child: PieChart(
                   PieChartData(
@@ -286,7 +286,7 @@ class StatsCard extends StatelessWidget {
   final Color textColor;
   final Color backgroundColor;
 
-  const StatsCard({
+  const StatsCard({super.key, 
     required this.title,
     required this.count,
     required this.icon,
@@ -342,7 +342,7 @@ class RentalCard extends StatelessWidget {
   final String imageAsset;
   final Color textColor;
 
-  const RentalCard({
+  const RentalCard({super.key, 
     required this.carModel,
     required this.renterName,
     required this.rentalDate,
@@ -400,7 +400,7 @@ class Legend extends StatelessWidget {
   final Color color;
   final String label;
 
-  const Legend({required this.color, required this.label});
+  const Legend({super.key, required this.color, required this.label});
 
   @override
   Widget build(BuildContext context) {

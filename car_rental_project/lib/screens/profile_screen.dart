@@ -33,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
         ),
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white).copyWith(background: Colors.white),
+        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white).copyWith(surface: Colors.white),
       ),
       home: UserProfilePage(),
     );
@@ -41,6 +41,8 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class UserProfilePage extends StatefulWidget {
+  const UserProfilePage({super.key});
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -105,10 +107,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white),
+            icon: const Icon(Icons.edit, color: Color.fromARGB(255, 0, 0, 0)),
             onPressed: () {
               // Handle edit action, e.g., navigate to edit profile page
             },

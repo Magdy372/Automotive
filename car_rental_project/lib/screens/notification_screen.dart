@@ -6,14 +6,14 @@ import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
 
-class NotificationTab extends StatefulWidget {
-  const NotificationTab({super.key});
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({super.key});
 
   @override
-  _NotificationTabState createState() => _NotificationTabState();
+  _NotificationScreenState createState() => _NotificationScreenState();
 }
 
-class _NotificationTabState extends State<NotificationTab> {
+class _NotificationScreenState extends State<NotificationScreen> {
   List<NotificationItem> notifications = [
     NotificationItem(
         "New notification 1", DateTime.now(), NotificationStatus.newItem),
@@ -21,104 +21,91 @@ class _NotificationTabState extends State<NotificationTab> {
         "Yesterday's notification",
         DateTime.now().subtract(const Duration(days: 1)),
         NotificationStatus.yesterday),
-    NotificationItem("Older notification",
-        DateTime.now().subtract(const Duration(days: 3)), NotificationStatus.older),
+    NotificationItem(
+        "Older notification",
+        DateTime.now().subtract(const Duration(days: 3)),
+        NotificationStatus.older),
     NotificationItem(
         "Another new notification", DateTime.now(), NotificationStatus.newItem),
-    NotificationItem("Some older notification",
-        DateTime.now().subtract(const Duration(days: 5)), NotificationStatus.older),
+    NotificationItem(
+        "Some older notification",
+        DateTime.now().subtract(const Duration(days: 5)),
+        NotificationStatus.older),
   ];
 
-  List<NotificationItem> getNotificationsForToday() {
+  // Filter notifications based on the status
+  List<NotificationItem> filterNotifications(NotificationStatus status) {
     DateTime today = DateTime.now();
-    return notifications.where((notification) {
-      return notification.date.year == today.year &&
-          notification.date.month == today.month &&
-          notification.date.day == today.day;
-    }).toList();
-  }
-
-  List<NotificationItem> getNotificationsForYesterday() {
     DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return notifications.where((notification) {
-      return notification.date.year == yesterday.year &&
-          notification.date.month == yesterday.month &&
-          notification.date.day == yesterday.day;
-    }).toList();
+
+    switch (status) {
+      case NotificationStatus.newItem:
+        return notifications.where((notification) =>
+            notification.date.year == today.year &&
+            notification.date.month == today.month &&
+            notification.date.day == today.day).toList();
+      case NotificationStatus.yesterday:
+        return notifications.where((notification) =>
+            notification.date.year == yesterday.year &&
+            notification.date.month == yesterday.month &&
+            notification.date.day == yesterday.day).toList();
+      case NotificationStatus.older:
+        return notifications.where((notification) =>
+            notification.date.isBefore(yesterday)).toList();
+      default:
+        return [];
+    }
   }
 
-  List<NotificationItem> getNotificationsForOlder() {
-    DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return notifications.where((notification) {
-      return notification.date.isBefore(yesterday);
-    }).toList();
-  }
-
-  String getFormattedDate(DateTime date) {
+  String formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  String getFormattedTime(DateTime date) {
+  String formatTime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
   }
 
   // Header Section
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
+    return AppBar(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
-      child: const Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Notifications",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
+      title: const Text(
+        'Notifications',
+        style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
       ),
+      centerTitle: true,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Notification List View
           ListView(
-            padding: const EdgeInsets.only(
-                bottom: 70), // Leave space for the bottom nav bar
+            padding: const EdgeInsets.only(bottom: 70), // Leave space for the bottom nav bar
             children: [
               _buildHeader(), // Display the header here
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-              ),
-              if (getNotificationsForToday().isNotEmpty) ...[
+              const Padding(padding: EdgeInsets.all(8.0)),
+              if (filterNotifications(NotificationStatus.newItem).isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Today",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text("Today", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
-                ...getNotificationsForToday().map((notification) {
-                  int index = notifications.indexOf(notification);
+                ...filterNotifications(NotificationStatus.newItem).map((notification) {
                   return Dismissible(
                     key: Key(notification.message),
                     onDismissed: (direction) {
                       setState(() {
-                        notifications.removeAt(index);
+                        notifications.remove(notification);
                       });
                     },
                     background: Container(color: Colors.grey),
@@ -126,20 +113,17 @@ class _NotificationTabState extends State<NotificationTab> {
                   );
                 }),
               ],
-              if (getNotificationsForYesterday().isNotEmpty) ...[
+              if (filterNotifications(NotificationStatus.yesterday).isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Yesterday",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text("Yesterday", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
-                ...getNotificationsForYesterday().map((notification) {
-                  int index = notifications.indexOf(notification);
+                ...filterNotifications(NotificationStatus.yesterday).map((notification) {
                   return Dismissible(
                     key: Key(notification.message),
                     onDismissed: (direction) {
                       setState(() {
-                        notifications.removeAt(index);
+                        notifications.remove(notification);
                       });
                     },
                     background: Container(color: Colors.grey),
@@ -147,20 +131,17 @@ class _NotificationTabState extends State<NotificationTab> {
                   );
                 }),
               ],
-              if (getNotificationsForOlder().isNotEmpty) ...[
+              if (filterNotifications(NotificationStatus.older).isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text("Older",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text("Older", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
-                ...getNotificationsForOlder().map((notification) {
-                  int index = notifications.indexOf(notification);
+                ...filterNotifications(NotificationStatus.older).map((notification) {
                   return Dismissible(
                     key: Key(notification.message),
                     onDismissed: (direction) {
                       setState(() {
-                        notifications.removeAt(index);
+                        notifications.remove(notification);
                       });
                     },
                     background: Container(color: Colors.grey),
@@ -170,7 +151,6 @@ class _NotificationTabState extends State<NotificationTab> {
               ],
             ],
           ),
-          // Bottom Navigation Bar positioned at the bottom
           Positioned(
             bottom: 0,
             left: 0,
@@ -182,7 +162,6 @@ class _NotificationTabState extends State<NotificationTab> {
     );
   }
 
-  // Bottom Navigation Bar
   Widget _buildBottomNavBar() {
     return Container(
       decoration: BoxDecoration(
@@ -198,8 +177,7 @@ class _NotificationTabState extends State<NotificationTab> {
           tabBackgroundColor: const Color.fromARGB(255, 66, 66, 66),
           padding: const EdgeInsets.all(16),
           gap: 8,
-          selectedIndex:
-              1, // Set the default selected index to 1 (Notifications tab)
+          selectedIndex: 1, // Set the default selected index to 1 (Notifications tab)
           onTabChange: (index) {
             switch (index) {
               case 0:
@@ -211,7 +189,7 @@ class _NotificationTabState extends State<NotificationTab> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NotificationTab()),
+                  MaterialPageRoute(builder: (context) => const NotificationScreen()),
                 );
                 break;
               case 2:
@@ -240,7 +218,6 @@ class _NotificationTabState extends State<NotificationTab> {
   }
 }
 
-
 class NotificationCard extends StatelessWidget {
   final NotificationItem notification;
 
@@ -253,35 +230,30 @@ class NotificationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Use Row to display date on the left and time on the right
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                getFormattedDate(notification.date),
+                formatDate(notification.date),
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               Text(
-                getFormattedTime(notification.date),
+                formatTime(notification.date),
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          // Notification container with black background and filling the screen width
           Container(
-            width: double.infinity, // Fills the available width
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(
-                  255, 24, 24, 24), // Black background for the notification
-              borderRadius: BorderRadius.circular(30), // Border radius of 30
-              border: Border.all(color: const Color.fromARGB(255, 24, 24, 24)),
+              color: const Color.fromARGB(255, 24, 24, 24),
+              borderRadius: BorderRadius.circular(30),
             ),
             child: Text(
               notification.message,
-              style:
-                  const TextStyle(color: Colors.white), // White text for the message
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -289,11 +261,11 @@ class NotificationCard extends StatelessWidget {
     );
   }
 
-  String getFormattedDate(DateTime date) {
+  String formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  String getFormattedTime(DateTime date) {
+  String formatTime(DateTime date) {
     return DateFormat('hh:mm a').format(date);
   }
 }

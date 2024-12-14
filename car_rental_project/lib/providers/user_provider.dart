@@ -66,8 +66,8 @@ class UserProvider with ChangeNotifier {
       // Navigate based on role
       String role = _currentUser!.role;
       Widget targetScreen = (role == 'admin')
-          ? AdminDashboardScreen()
-          : HomeScreen();
+          ? const AdminDashboardScreen()
+          : const HomeScreen();
 
       Navigator.pushReplacement(
         context,
