@@ -13,11 +13,13 @@ class UserModel {
 
   // Factory method to create UserModel from Firestore data (Map)
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    print("555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555");
+    print(json);
     return UserModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      role: json['role'] as String,
+       id: json['id'] != null ? json['id'] as String : '',
+      name: json['name'] != null ? json['name'] as String : 'Unknown',
+      email: json['email'] != null ? json['email'] as String : 'Unknown',
+      role: json['role'] != null ? json['role'] as String : 'user',
     );
   }
 

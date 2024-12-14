@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:car_rental_project/controller/signup.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -11,11 +12,10 @@ class SignupScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Instance of AuthController
-  final Signup _authController = Signup();
-
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -151,7 +151,7 @@ class SignupScreen extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                _authController.signup(
+                                userProvider.signup(
                                   name: _nameController.text,
                                   email: _emailController.text,
                                   password: _passwordController.text,
@@ -163,7 +163,11 @@ class SignupScreen extends StatelessWidget {
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.black,
                             ),
-                            child: const Text('Sign up'),
+                            child: userProvider.isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const Text('Sign up'),
                           ),
                         ),
                       ],

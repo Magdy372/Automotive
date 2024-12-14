@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:car_rental_project/controller/login.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -8,10 +9,11 @@ class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final LoginController _loginController = LoginController();
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.black, // Set background color to black
       body: Stack(
@@ -148,7 +150,7 @@ class LoginScreen extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                _loginController.login(
+                                userProvider.login(
                                   email: _emailController.text,
                                   password: _passwordController.text,
                                   context: context,
@@ -159,7 +161,11 @@ class LoginScreen extends StatelessWidget {
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.black,
                             ),
-                            child: const Text('Login'),
+                            child: userProvider.isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const Text('Login'),
                           ),
                         ),
                         const SizedBox(height: 20),

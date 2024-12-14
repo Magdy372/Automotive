@@ -9,6 +9,9 @@ import 'package:car_rental_project/tabs/notification_tab.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -19,28 +22,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
   final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
-  String? _userName = '';
+  
 
-  @override
-  void initState() {
-    super.initState();
-    _getUserData();
-  }
-
-  // Get the logged-in user's data from Firebase
-  Future<void> _getUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // Fetch user info from Firestore (assuming users collection exists)
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
-        setState(() {
-          _userName = userDoc.data()?['name'] ?? 'User'; // Default to 'User' if no name
-        });
-      }
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(context),
               _buildCategories(),
               _buildFeaturedCars(),
               _buildPopularDeals(),
@@ -63,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Header Section
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -83,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Hello, $_userName", // Display user name here
+                    "Hello, ${userProvider.currentUser?.name}", // Display user name here
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -116,6 +101,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.all(8),
                     child: Icon(
                       Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  userProvider.logout(context);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.2),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.logout,
                       color: Colors.white,
                       size: 28,
                     ),
