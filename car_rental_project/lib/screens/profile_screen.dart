@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:car_rental_project/screens/edit_profile_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -67,6 +70,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
 
+
+
   // Function to handle the car upload process
   void _uploadCarForRent() {
     if (makeController.text.isEmpty ||
@@ -105,6 +110,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -113,6 +121,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
             icon: const Icon(Icons.edit, color: Color.fromARGB(255, 0, 0, 0)),
             onPressed: () {
               // Handle edit action, e.g., navigate to edit profile page
+              Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditProfileScreen()),
+                  );
             },
           ),
         ],
@@ -120,9 +132,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildProfileHeader(),
+          _buildProfileHeader(user!.name , user!.email ),
           const SizedBox(height: 20),
-          _buildUserInfo(),
+          _buildUserInfo(user.phone ?? "", user.address ?? ""),
           const SizedBox(height: 20),
           _buildUserCars(),
           const SizedBox(height: 20),
@@ -156,23 +168,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   // Profile header with user photo, name, and email
- Widget _buildProfileHeader() {
-  return const Center(
+ Widget _buildProfileHeader(String name, String email) {
+  return Center(
     child: Column(
       children: [
-        Icon(
+        const Icon(
           Icons.account_circle, // Profile icon
           size: 120, // Icon size
           color: Colors.grey, // Icon color
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Text(
-          'Nada Mohamed',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black),
+          name, // Use the passed name
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         Text(
-          'Nada211@gmail.com',
-          style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 0, 0, 0)),
+          email, // Use the passed email
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
         ),
       ],
     ),
@@ -180,42 +199,67 @@ class _UserProfilePageState extends State<UserProfilePage> {
 }
 
 
-  // Display user information such as phone number and address
-  Widget _buildUserInfo() {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
-      child: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "User Information",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+Widget _buildUserInfo(String phone, String address) {
+  return Card(
+    elevation: 5,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    color: Colors.white,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "User Information",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Phone Number", style: TextStyle(color: Colors.black54)),
-                Text("+1 234 567 890", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              ],
-            ),
-            Divider(color: Colors.black26),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Address", style: TextStyle(color: Colors.black54)),
-                Text("123 Main St, City, Country", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              ],
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Phone Number",
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                phone.isNotEmpty ? phone : "N/A",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          const Divider(color: Colors.black26),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Address",
+                style: TextStyle(color: Colors.black54),
+              ),
+              Flexible(
+                child: Text(
+                  address.isNotEmpty ? address : "N/A",
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   // Display the list of cars owned by the user
   Widget _buildUserCars() {

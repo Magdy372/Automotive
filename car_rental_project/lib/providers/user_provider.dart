@@ -169,8 +169,78 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+
+
+  Future<void> editUserInfo({
+  required String name,
+  required String email,
+  String? role,
+  String? address,
+  String? phone,
+  required BuildContext context,
+}) async {
+  if (_currentUser == null) {
+    _showError(context, 'No user is logged in.');
+    return;
+  }
+
+  _isLoading = true;
+  notifyListeners();
+
+  // Validate phone (example validation)
+  if (phone != null && !RegExp(r'^\+?[0-9]{7,15}$').hasMatch(phone)) {
+    _showError(context, 'Invalid phone number format.');
+    _isLoading = false;
+    notifyListeners();
+    return;
+  }
+
+  try {
+    await _firestore.collection('users').doc(_currentUser!.id).update({
+      'name': name.trim(),
+      'email': email.trim(),
+      if (role != null) 'role': role.trim(),
+      if (address != null) 'address': address.trim(),
+      if (phone != null) 'phone': phone.trim(),
+    });
+
+    if (_auth.currentUser != null && _auth.currentUser!.email != email.trim()) {
+      await _auth.currentUser!.updateEmail(email.trim());
+    }
+
+    _currentUser = UserModel(
+      id: _currentUser!.id,
+      name: name.trim(),
+      email: email.trim(),
+      role: role ?? _currentUser!.role,
+      address: address ?? _currentUser!.address,
+      phone: phone ?? _currentUser!.phone,
+    );
+    notifyListeners();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User information updated successfully!')),
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    _showError(context, 'Error: $e');
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
+
+
+
+
+
   // Helper: Show Error Messages
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    print(UserProvider()._currentUser);
+    print('333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
+    print(message);
   }
 }

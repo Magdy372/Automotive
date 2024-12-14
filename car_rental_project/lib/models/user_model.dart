@@ -3,12 +3,16 @@ class UserModel {
   final String name;
   final String email;
   final String role;
+  final String? address; // Optional
+  final String? phone;   // Optional
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
+    this.address,
+    this.phone,
   });
 
   // Factory method to create UserModel from Firestore data (Map)
@@ -20,6 +24,9 @@ class UserModel {
       name: json['name'] != null ? json['name'] as String : 'Unknown',
       email: json['email'] != null ? json['email'] as String : 'Unknown',
       role: json['role'] != null ? json['role'] as String : 'user',
+      address: json['address'] !=null? json['address'] as String : 'unknown',
+      phone: json['phone'] !=null? json['phone'] as String : 'unknown'
+
     );
   }
 
@@ -30,6 +37,8 @@ class UserModel {
       'name': name,
       'email': email,
       'role': role,
+      'address' : address,
+      'phone' : phone
     };
   }
 }
