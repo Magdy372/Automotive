@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/providers/car_provider.dart';
+import 'package:car_rental_project/providers/rental_provider.dart';  // Added RentalProvider
 import 'package:car_rental_project/screens/onboarding_screen.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => CarProvider()),
+        ChangeNotifierProvider(create: (_) => RentalProvider()),  // Added RentalProvider
       ],
       child: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
@@ -46,14 +48,12 @@ class MyApp extends StatelessWidget {
             ),
             home: initialScreen,
             debugShowCheckedModeBanner: false,
-
             routes: {
               '/onboarding': (context) => const Onboarding(),
               '/admin': (context) => const AdminDashboardScreen(),
               '/home': (context) => const HomeScreen(),
-              '/login': (context) =>  LoginScreen(),
-              '/profile': (context) => const  ProfileScreen(),
-
+              '/login': (context) => LoginScreen(),
+              '/profile': (context) => const ProfileScreen(),
             },
           );
         },
@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 
 /* import 'package:car_rental_project/screens/onboarding_screen.dart';

@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
  // Popular Deals Section
   Widget _buildPopularDeals(CarProvider carsProvider) {
     final Cars = carsProvider.cars
-    .where((car) => car.rating >= 4.5) // Filter based on high ratings
+    .where((car) => car.rating >= 0) // Filter based on high ratings
     .toList();
 
     Cars.sort((a, b) => b.rating.compareTo(a.rating)); // Sort by rating in descending order

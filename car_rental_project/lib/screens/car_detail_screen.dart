@@ -5,6 +5,7 @@ import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
+import 'package:car_rental_project/screens/booking_screen.dart'; // Import the BookingScreen
 
 class CarDetailScreen extends StatefulWidget {
   final Car car;
@@ -231,7 +232,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+
+Widget _buildFooter(BuildContext context) {
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 20),
@@ -239,18 +241,19 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 15),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
-      // onPressed: () => {
-      //  Navigator.push(
-      //           context,
-      //           MaterialPageRoute(builder: (context) => const CreditCardScreen()),
-      //  )
-      // },
-      onPressed: () {  },
+      // Navigate to the booking screen when the button is pressed and pass the car data
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingScreen(car: widget.car), // Pass the car to the BookingScreen
+          ),
+        );
+      },
       child: const Padding(
-        padding: EdgeInsets.all(12), 
+        padding: EdgeInsets.all(12),
         child: Text(
           "Book Now",
           style: TextStyle(fontSize: 16, color: Colors.white),

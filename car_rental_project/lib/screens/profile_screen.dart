@@ -1,13 +1,16 @@
-import 'package:car_rental_project/screens/home_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:car_rental_project/screens/edit_profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
 import '../models/car_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,7 +36,8 @@ class ProfileScreen extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color.fromARGB(255, 0, 0, 0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -56,7 +60,7 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   // Sample recent rental data
   final List<String> recentRentals = [
-    "Toyota Camry - Rented forr 3 days",
+    "Toyota Camry - Rented for 3 days",
     "Honda Civic - Rented for 5 days",
     "Ford Mustang - Rented for 2 days",
   ];
@@ -73,68 +77,76 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
 
-
-
-  // Function to handle the car upload process
   // Function to handle the car upload process using Provider
-void _uploadCarForRent(BuildContext context) {
-  if (brandController.text.isEmpty ||
-      nameController.text.isEmpty ||
-      priceController.text.isEmpty) {
-    // Show error if any field is empty
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Please fill in all fields'),
-      backgroundColor: Colors.red,
-    ));
-    return;
-  }
+  void _uploadCarForRent(BuildContext context) {
+    if (brandController.text.isEmpty ||
+        nameController.text.isEmpty ||
+        priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please fill in all fields'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
 
-  // Create a new Car instance
-  final newCar = Car(
-    id: '', // ID will be assigned by Firestore
-    name: nameController.text,
-    brand: brandController.text,
-    price: double.tryParse(priceController.text) ?? 0.0,
-    image: 'assets/images/car_placholder.jpeg', // Placeholder or default image URL
-    rating: 0.0, // Default rating
-  );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser; // Fetch current user
 
-  // Add the new car using CarProvider
-  final carProvider = Provider.of<CarProvider>(context, listen: false);
-  carProvider.addCar(newCar).then((_) {
-    // Clear the text fields
-    brandController.clear();
-    nameController.clear();
-    priceController.clear();
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('You need to be logged in to upload a car for rent'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+    // Get a reference to the seller (the user who is logged in) as a DocumentReference
+final sellerRef = FirebaseFirestore.instance.collection('Users').doc(user.id);
 
-    
-    
-    // Close the dialog
-    Navigator.pop(context);
-    Navigator.pop(context);
-      //   Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const HomeScreen()),
-      // );
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
+// Use uuid package to generate a unique ID for the car
+    var uuid = Uuid();
+    final uniqueCarId = uuid.v4();  // Generate a unique ID
+    final newCar = Car(
+      id: uniqueCarId, // ID will be assigned by Firestore
+      name: nameController.text,
+      brand: brandController.text,
+      price: double.tryParse(priceController.text) ?? 0.0,
+      image: 'assets/images/car_placeholder.jpeg',
+      rating: 0.0,
+      seller: sellerRef,
+    );
+
+    final carProvider = Provider.of<CarProvider>(context, listen: false);
+    carProvider.addCar(newCar).then((_) {
+      // Clear the text fields
+      brandController.clear();
+      nameController.clear();
+      priceController.clear();
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Car uploaded successfully')),
       );
-    
-  }).catchError((error) {
-    // Show error message
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Error uploading car: $error'),
-      backgroundColor: Colors.red,
-    ));
-  });
-}
-
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error uploading car: $error'),
+        backgroundColor: Colors.red,
+      ));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final user = userProvider.currentUser;
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Profile")),
+        body: const Center(child: Text("User not logged in")),
+      );
+    }
+
 
     return Scaffold(
       appBar: AppBar(

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Car {
   String id;
   final String name;
@@ -5,6 +7,7 @@ class Car {
   final double price;
   final String image;
   final double rating;
+  DocumentReference seller; // Reference to the User document (seller)
 
   Car({
     required this.id,
@@ -13,10 +16,11 @@ class Car {
     required this.price,
     required this.image,
     required this.rating,
+    required this.seller, // Reference to seller (User)
   });
 
-  // Convert Firestore data to Car object
-  factory Car.fromMap(Map<String, dynamic> data) {
+  // Factory constructor to create a Car from Firestore data
+  factory Car.fromMap(Map<String, dynamic> data, DocumentReference reference) {
     return Car(
       id: data['id'] ?? '',
       name: data['name'] ?? '',
@@ -24,17 +28,20 @@ class Car {
       price: (data['price'] ?? 0).toDouble(),
       image: data['image'] ?? '',
       rating: (data['rating'] ?? 0).toDouble(),
+      seller: reference, // Reference to the User document
     );
   }
 
-  // Convert Car object to Firestore format (optional)
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'brand': brand,
       'price': price,
       'image': image,
       'rating': rating,
+      // Store just the reference to the user in Firestore
+      'seller': seller,
     };
   }
 }
