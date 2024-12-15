@@ -24,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
   final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
 
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -33,13 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
       carsProvider.fetchCars();
     });
   }
+
   @override
   Widget build(BuildContext context) {
-
     final carsProvider = Provider.of<CarProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
 
-    
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 247, 247),
       body: SafeArea(
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildHeader(userProvider),
               _buildCategories(),
+              _buildSearchResults(carsProvider),
               _buildFeaturedCars(carsProvider),
               _buildPopularDeals(carsProvider),
             ],
@@ -101,7 +103,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const NotificationScreen()),
                   );
                 },
                 child: Container(
@@ -166,10 +169,15 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const Icon(Icons.search, color: Colors.grey),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: TextField(
-              style: TextStyle(color: Colors.black),
-              decoration: InputDecoration(
+              controller: _searchController,
+              onChanged: (query) {
+                Provider.of<CarProvider>(context, listen: false)
+                    .filterCars(query);
+              },
+              style: const TextStyle(color: Colors.black),
+              decoration: const InputDecoration(
                 hintText: 'Search for your dream car',
                 hintStyle: TextStyle(color: Colors.grey),
                 border: InputBorder.none,
@@ -177,16 +185,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
+          GestureDetector(
+            onTap: () {
+              _searchController.clear();
+              Provider.of<CarProvider>(context, listen: false).filterCars('');
+            },
             child: const Icon(
-              Icons.tune,
+              Icons.close,
               color: Colors.grey,
-              size: 20,
             ),
           ),
         ],
@@ -251,10 +257,59 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildSearchResults(CarProvider carsProvider) {
+    final cars = carsProvider.filtercars;
+
+    // If no search query, return empty widget
+    if (_searchController.text.isEmpty) return const SizedBox();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Search Results",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 15),
+          cars.isEmpty
+              ? const Text('No cars found') // Show message if no cars match
+              : SizedBox(
+                  height: 350, // Match the height of Featured Cars
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cars.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  CarDetailScreen(car: cars[index]),
+                            ),
+                          );
+                        },
+                        child: _buildCarCard(cars[index]),
+                      );
+                    },
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
   // Featured Cars Section
-   Widget _buildFeaturedCars(CarProvider carsProvider) {
+  Widget _buildFeaturedCars(CarProvider carsProvider) {
     final cars = carsProvider.cars;
-    print("22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
+    print(
+        "22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
     print(cars);
 
     return Padding(
@@ -288,21 +343,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- // Popular Deals Section
+  // Popular Deals Section
   Widget _buildPopularDeals(CarProvider carsProvider) {
     final Cars = carsProvider.cars
-    .where((car) => car.rating >= 0) // Filter based on high ratings
-    .toList();
+        .where((car) => car.rating >= 0) // Filter based on high ratings
+        .toList();
 
-    Cars.sort((a, b) => b.rating.compareTo(a.rating)); // Sort by rating in descending order
-
+    Cars.sort((a, b) =>
+        b.rating.compareTo(a.rating)); // Sort by rating in descending order
 
     final popularCars = Cars.take(5).toList(); // Take the top 5 cars
 
-
-
-        print("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-        print(popularCars);
+    print(
+        "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+    print(popularCars);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -325,7 +379,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   // You can implement the "View All" functionality here
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(20),
@@ -353,7 +408,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: popularCars.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {
@@ -487,34 +543,37 @@ class _HomeScreenState extends State<HomeScreen> {
           tabBackgroundColor: const Color.fromARGB(255, 66, 66, 66),
           padding: const EdgeInsets.all(16),
           gap: 8,
-         onTabChange: (index) {
-          switch (index) {
-            case 0:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-              );
-              break;
-            case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NotificationScreen()),
-              );
-              break;
-            case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  const ProfileScreen()),
-              );
-              break;
-            case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-              break;
-          }
-        },
+          onTabChange: (index) {
+            switch (index) {
+              case 0:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                );
+                break;
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
+                );
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen()),
+                );
+                break;
+            }
+          },
           tabs: const [
             GButton(icon: Icons.home, text: 'Home'),
             GButton(icon: Icons.notifications, text: 'Notifications'),

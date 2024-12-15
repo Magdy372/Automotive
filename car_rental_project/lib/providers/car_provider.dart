@@ -8,7 +8,9 @@ class CarProvider with ChangeNotifier {
   List<Car> _cars = [];
   List<Car> _filteredCars = [];
 
-  List<Car> get cars => _filteredCars.isEmpty ? _cars : _filteredCars;
+  List<Car> get cars => _cars;
+  List<Car> get filtercars => _filteredCars;
+
 
   // Fetch cars from Firestore (with user reference)
   Future<void> fetchCars() async {
@@ -17,6 +19,7 @@ class CarProvider with ChangeNotifier {
       _cars = snapshot.docs.map((doc) {
         return Car.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
       }).toList();
+      _filteredCars = _cars;
       notifyListeners();
     } catch (e) {
       print("Error fetching cars: $e");
@@ -63,13 +66,32 @@ class CarProvider with ChangeNotifier {
   }
 
   // Filter cars by search query
+  // void filterCars(String query) {
+  //   _filteredCars = _cars.where((car) {
+  //     return car.name.toLowerCase().contains(query.toLowerCase()) ||
+  //         car.brand.toLowerCase().contains(query.toLowerCase());
+  //   }).toList();
+  //   notifyListeners();
+  // }
+
   void filterCars(String query) {
+    if (query.isEmpty) {
+      _filteredCars = _cars; // Reset to show all cars
+      notifyListeners();
+    } else {
     _filteredCars = _cars.where((car) {
-      return car.name.toLowerCase().contains(query.toLowerCase()) ||
-          car.brand.toLowerCase().contains(query.toLowerCase());
+      final carName = car.name.toLowerCase();
+      //final carBrand = car.brand.toLowerCase();
+      final searchQuery = query.toLowerCase();
+      //return carName.contains(searchQuery) || carBrand.contains(searchQuery);
+      return carName.contains(searchQuery);
     }).toList();
+    print("22333344444444444444444444477777777777777777777777777777777777777777777777777777777777777777");
+    print(_filteredCars);
     notifyListeners();
-  }
+    }
+}
+
 
   // Clear filters
   void clearFilters() {
