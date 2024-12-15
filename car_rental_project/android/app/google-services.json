@@ -12,7 +12,12 @@
           "package_name": "com.example.car_rental_project"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "693873028377-sg6v902294b9kvsdurc850f6ad2u67tg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAtnGVFG2AdG6bWjOr2kw8No9ModnFa8NE"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693873028377-sg6v902294b9kvsdurc850f6ad2u67tg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

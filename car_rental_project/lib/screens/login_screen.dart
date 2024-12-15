@@ -203,9 +203,14 @@ class LoginScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Facebook icon in a circle
-                            Container(
+                             GestureDetector(
+                              onTap: () {
+                                // Call the Google sign-in function from UserProvider
+                                userProvider.signInWithFacebook(context);
+                              },
+                            child: Container(
                               decoration: const BoxDecoration(
-                                color: Colors.black,
+                                color: Color(0xFF1877F2),
                                 shape: BoxShape.circle,
                               ),
                               padding: const EdgeInsets.all(16.0),
@@ -215,20 +220,28 @@ class LoginScreen extends StatelessWidget {
                                 size: 24.0,
                               ),
                             ),
+                             ),
                             const SizedBox(width: 20),
                             // Google icon in a circle
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: const Icon(
-                                FontAwesomeIcons.google,
-                                color: Colors.white,
-                                size: 24.0,
+                            GestureDetector(
+                              onTap: () {
+                                // Call the Google sign-in function from UserProvider
+                                userProvider.signInWithGoogle(context);
+                              },
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: const Icon(
+                                  FontAwesomeIcons.google,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
                               ),
                             ),
+                             
                           ],
                         ),
                       ],
