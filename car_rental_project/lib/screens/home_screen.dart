@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../providers/car_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,11 +23,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
   final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
-  
 
-  
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the cars once when the widget is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final carsProvider = Provider.of<CarProvider>(context, listen: false);
+      carsProvider.fetchCars();
+    });
+  }
   @override
   Widget build(BuildContext context) {
+
+    final carsProvider = Provider.of<CarProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+
+    
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 247, 247),
       body: SafeArea(
@@ -34,10 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _buildHeader(userProvider),
               _buildCategories(),
-              _buildFeaturedCars(),
-              _buildPopularDeals(),
+              _buildFeaturedCars(carsProvider),
+              _buildPopularDeals(carsProvider),
             ],
           ),
         ),
@@ -47,8 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Header Section
-  Widget _buildHeader(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+  Widget _buildHeader(UserProvider userProvider) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -240,7 +252,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Featured Cars Section
-  Widget _buildFeaturedCars() {
+   Widget _buildFeaturedCars(CarProvider carsProvider) {
+    final cars = carsProvider.cars;
+    print("22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
+    print(cars);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
@@ -255,42 +271,39 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 15),
-          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(  
-            stream: FirebaseFirestore.instance.collection('Cars').snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Center(child: Text("Error fetching cars!"));
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text("No featured cars available."));
-              }
-
-              final cars = snapshot.data!.docs
-                  .map((doc) => Car.fromMap(doc.data()))
-                  .toList();
-
-              return SizedBox(
-                height: 350,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: cars.length,
-                  itemBuilder: (context, index) {
-                    return _buildCarCard(cars[index]);
-                  },
+          cars.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : SizedBox(
+                  height: 350,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cars.length,
+                    itemBuilder: (context, index) {
+                      return _buildCarCard(cars[index]);
+                    },
+                  ),
                 ),
-              );
-            },
-          ),
         ],
       ),
     );
   }
 
-  // Popular Deals Section
-  Widget _buildPopularDeals() {
+ // Popular Deals Section
+  Widget _buildPopularDeals(CarProvider carsProvider) {
+    final Cars = carsProvider.cars
+    .where((car) => car.rating >= 4.5) // Filter based on high ratings
+    .toList();
+
+    Cars.sort((a, b) => b.rating.compareTo(a.rating)); // Sort by rating in descending order
+
+
+    final popularCars = Cars.take(5).toList(); // Take the top 5 cars
+
+
+
+        print("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        print(popularCars);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
@@ -334,33 +347,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 15),
-          SizedBox(
-            height: 300, // Fixed height for car cards
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>( 
-              stream: FirebaseFirestore.instance
-                  .collection('Cars')
-                  .orderBy('rating', descending: true) // Show popular cars first
-                  .limit(5) // Limit to top 5 cars for this section
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return const Center(child: Text("Error fetching popular cars!"));
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text("No popular cars available."));
-                }
-
-                final popularCars = snapshot.data!.docs
-                    .map((doc) => Car.fromMap(doc.data()))
-                    .toList();
-
-                return ListView.separated(
+          popularCars.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.separated(
                   shrinkWrap: true,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: popularCars.length, // Use the length of fetched cars
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: popularCars.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     return InkWell(
@@ -377,10 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: _buildCarCard(popularCars[index]),
                     );
                   },
-                );
-              },
-            ),
-          ),
+                ),
         ],
       ),
     );

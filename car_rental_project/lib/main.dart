@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
+import 'package:car_rental_project/providers/car_provider.dart';
 import 'package:car_rental_project/screens/onboarding_screen.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CarProvider()),
       ],
       child: Consumer<UserProvider>(
         builder: (context, userProvider, _) {

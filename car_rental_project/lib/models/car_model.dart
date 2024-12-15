@@ -1,4 +1,5 @@
 class Car {
+  String id;
   final String name;
   final String brand;
   final double price;
@@ -6,6 +7,7 @@ class Car {
   final double rating;
 
   Car({
+    required this.id,
     required this.name,
     required this.brand,
     required this.price,
@@ -16,6 +18,7 @@ class Car {
   // Convert Firestore data to Car object
   factory Car.fromMap(Map<String, dynamic> data) {
     return Car(
+      id: data['id'] ?? '',
       name: data['name'] ?? '',
       brand: data['brand'] ?? '',
       price: (data['price'] ?? 0).toDouble(),
