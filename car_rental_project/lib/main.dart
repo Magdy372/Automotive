@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +52,8 @@ class MyApp extends StatelessWidget {
               '/admin': (context) => const AdminDashboardScreen(),
               '/home': (context) => const HomeScreen(),
               '/login': (context) =>  LoginScreen(),
+              '/profile': (context) => const  ProfileScreen(),
+
             },
           );
         },

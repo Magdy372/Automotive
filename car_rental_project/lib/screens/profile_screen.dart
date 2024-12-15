@@ -1,7 +1,10 @@
+import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:car_rental_project/screens/edit_profile_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../providers/car_provider.dart';
+import '../models/car_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -66,47 +69,67 @@ class _UserProfilePageState extends State<UserProfilePage> {
   ];
 
   // Controllers for the car upload form
-  final TextEditingController makeController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController brandController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
 
 
 
   // Function to handle the car upload process
-  void _uploadCarForRent() {
-    if (makeController.text.isEmpty ||
-        descriptionController.text.isEmpty ||
-        priceController.text.isEmpty) {
-      // Show error if any field is empty
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please fill in all fields'),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
+  // Function to handle the car upload process using Provider
+void _uploadCarForRent(BuildContext context) {
+  if (brandController.text.isEmpty ||
+      nameController.text.isEmpty ||
+      priceController.text.isEmpty) {
+    // Show error if any field is empty
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Please fill in all fields'),
+      backgroundColor: Colors.red,
+    ));
+    return;
+  }
 
-    // Add the new car to the list of user cars
-    setState(() {
-      userCars.add({
-        "make": makeController.text,
-        "status": "Available",
-      });
-    });
+  // Create a new Car instance
+  final newCar = Car(
+    id: '', // ID will be assigned by Firestore
+    name: nameController.text,
+    brand: brandController.text,
+    price: double.tryParse(priceController.text) ?? 0.0,
+    image: 'assets/images/car_placholder.jpeg', // Placeholder or default image URL
+    rating: 0.0, // Default rating
+  );
 
+  // Add the new car using CarProvider
+  final carProvider = Provider.of<CarProvider>(context, listen: false);
+  carProvider.addCar(newCar).then((_) {
     // Clear the text fields
-    makeController.clear();
-    descriptionController.clear();
+    brandController.clear();
+    nameController.clear();
     priceController.clear();
 
+    
+    
     // Close the dialog
     Navigator.pop(context);
-
+    Navigator.pop(context);
+      //   Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+      // );
     // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Car uploaded successfully'),
-      backgroundColor: Colors.green,
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Car uploaded successfully')),
+      );
+    
+  }).catchError((error) {
+    // Show error message
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Error uploading car: $error'),
+      backgroundColor: Colors.red,
     ));
-  }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -352,13 +375,13 @@ Widget _buildUserInfo(String phone, String address) {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: makeController,
-                decoration: const InputDecoration(labelText: "Car Make & Model", labelStyle: TextStyle(color: Colors.black)),
+                controller: brandController,
+                decoration: const InputDecoration(labelText: "Car brand", labelStyle: TextStyle(color: Colors.black)),
                 style: const TextStyle(color: Colors.black),
               ),
               TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(labelText: "Car Description", labelStyle: TextStyle(color: Colors.black)),
+                controller: nameController,
+                decoration: const InputDecoration(labelText: "Car name", labelStyle: TextStyle(color: Colors.black)),
                 style: const TextStyle(color: Colors.black),
               ),
               TextField(
@@ -369,7 +392,7 @@ Widget _buildUserInfo(String phone, String address) {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _uploadCarForRent,
+                onPressed: () => _uploadCarForRent(context),
                 child: const Text("Upload"),
               ),
             ],
