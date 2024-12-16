@@ -1,8 +1,11 @@
+import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart'; // For graph plotting
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 class AdminDashboardScreen extends StatelessWidget {
-  const AdminDashboardScreen({super.key});
+const AdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +71,7 @@ class DashboardScreen extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 children: const [
                   StatsCard(
-                    title: 'Total Cars',
+                    title: 'Total Carss',
                     count: '50',
                     icon: Icons.directions_car,
                     textColor: Colors.white,
@@ -98,18 +101,59 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              const Text(
+              // Users List Button
+          Container(
+  width: double.infinity, // Makes the button full width
+  margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16), // Adds margin to give some space around the button
+  child: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserListingScreen()),
+      );
+    },
+    style: ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: const Color.fromARGB(255, 0, 0, 0), // Button background color
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30), // Pill shape for the button
+      ),
+      elevation: 6, // Adds a shadow for a lifted effect
+      shadowColor: const Color.fromARGB(255, 0, 0, 0), // Custom shadow color
+      textStyle: const TextStyle(
+        fontSize: 18, // Larger font size
+        fontWeight: FontWeight.bold, // Bold text for emphasis
+      ),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center, // Centers the content horizontally
+      children: const [
+        Icon(
+          Icons.arrow_forward, // Arrow icon
+          color: Colors.white,
+        ),
+        SizedBox(width: 12), // Space between the icon and the text
+        Text(
+          'View Users List',
+          style: TextStyle(color: Colors.white),
+        ),
+      ],
+    ),
+  ),
+),
+
+              const SizedBox(height: 20),
+              /*const Text(
                 'Cars Rented & Uploaded Per Month',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 73, 72, 72),
                 ),
-              ),
+              ),*/
               const SizedBox(height: 10),
               SizedBox(
-                height: 300,
-                child: BarChart(
+                height: 3,
+              /* child: BarChart(
                   BarChartData(
                     barGroups: [
                       BarChartGroupData(
@@ -184,16 +228,16 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
+                ),*/
               ),
-              const SizedBox(height: 10),
+             /* const SizedBox(height: 10),
               const Row(
                 children: [
                   Legend(color: Colors.grey, label: 'Cars Rented'),
                   SizedBox(width: 16),
                   Legend(color: Colors.black, label: 'Cars Uploaded'),
                 ],
-              ),
+              ),*/
               const SizedBox(height: 20),
               const Text(
                 'Average Rental Duration',
@@ -257,7 +301,7 @@ class DashboardScreen extends StatelessWidget {
                       carModel: 'Tesla Model 3',
                       renterName: 'John Doe',
                       rentalDate: '2024-12-01',
-                      imageAsset: 'assets/images/tesla_model.png',
+                      imageAsset: 'assets/images/tesla_model_3.png',
                       textColor: Colors.white,
                     );
                   } else {
