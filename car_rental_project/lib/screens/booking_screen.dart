@@ -98,15 +98,14 @@ class _BookingScreenState extends State<BookingScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.currentUser; // Fetch current user
     final buyerRef = FirebaseFirestore.instance.collection('Users').doc(user?.id);
-    var uuid = Uuid();
-    final uniquRentId = uuid.v4();
+ 
     if (_formKey.currentState!.validate() && _startDate != null && _endDate != null) {
       final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
       try {
         // Add new rental to Firestore
         await rentalProvider.addRental(
           RentalModel(
-            id: uniquRentId, // Auto-generated in Firestore
+            
             car: widget.car.seller, // Seller reference to User
             buyer: buyerRef, // Current logged-in user as buyer
             startDate: _startDate!,

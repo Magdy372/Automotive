@@ -34,7 +34,7 @@ Future<void> fetchCars() async {
     notifyListeners();
   } catch (e) {
     debugPrint('Error fetching cars: $e');
-    rethrow;  // Re-throw the exception to allow more investigation
+     // Re-throw the exception to allow more investigation
   }
 }
 
@@ -75,7 +75,40 @@ Future<void> fetchCars() async {
       debugPrint('Error deleting car: $e');
     }
   }
+ /// Fetch the cars uploaded by a specific user
+  Future<void> getUserCars(String userId) async {
+    try {
+      // Query Firestore for cars where the seller's ID matches the userId
+      QuerySnapshot snapshot = await _firestore
+          .collection('Cars')
+          .where('seller', isEqualTo: _firestore.doc('Users/$userId'))
+          .get();
 
+      if (snapshot.docs.isEmpty) {
+        throw Exception('No cars found for this user');
+      }
+
+      // Map documents to Car objects and update the cars list
+      _cars = await Future.wait(snapshot.docs.map((doc) async {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // Debugging the doc data
+        debugPrint('Fetched user car data: $data');
+
+        return Car.fromMap(data, doc.reference);
+      }).toList());
+
+      // Clear the filtered cars after fetching user cars
+      _filteredCars = [];
+
+      // Notify listeners to update the UI
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error fetching user cars: $e');
+      rethrow; // Rethrow the exception for further handling
+    }
+  }
+  
   void filterCars(String query) {
     if (query.isEmpty) {
       _filteredCars = _cars; // Reset to show all cars

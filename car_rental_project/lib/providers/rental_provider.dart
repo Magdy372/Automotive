@@ -1,72 +1,95 @@
-import 'package:car_rental_project/models/rental_model.dart';
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:car_rental_project/models/rental_model.dart';
 
 class RentalProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // List to store rental data locally
   List<RentalModel> _rentals = [];
+  bool _isLoading = false;
 
-  // Getter to get the rentals
   List<RentalModel> get rentals => _rentals;
+  bool get isLoading => _isLoading;
 
-  // Fetch rentals from Firestore
-  Future<void> fetchRentals() async {
-    try {
-      QuerySnapshot snapshot = await _firestore.collection('Rentals').get();
-      _rentals = snapshot.docs.map((doc) {
-        return RentalModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
-      }).toList();
-      notifyListeners();  // Notify listeners that rentals have been updated
-    } catch (e) {
-      print("Error fetching rentals: $e");
+  // Fetch rentals from Firestore for a specific user
+Future<void> fetchRentalsByUser(String userId) async {
+  try {
+    // Query Firestore for rentals where the buyer matches the userId (buyer is stored as DocumentReference)
+    QuerySnapshot snapshot = await _firestore
+        .collection('Rentals')
+        .where('buyer', isEqualTo: _firestore.doc('Users/$userId')) // Ensure buyer is stored as DocumentReference
+        .get();
+
+    // Handle the case of empty results
+    if (snapshot.docs.isEmpty) {
+      debugPrint('No rentals found for user: $userId');
+      _rentals = []; // Set an empty list if no results
+    } else {
+      // Map documents to RentalModel objects, ensuring references are fetched properly
+      _rentals = await Future.wait(snapshot.docs.map((doc) async {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // Debugging fetched rental data to inspect structure
+        debugPrint('Fetched rental data: $data');
+
+        // Convert the DocumentSnapshot into a RentalModel
+        return await RentalModel.fromDocumentSnapshot(doc);
+      }).toList());
     }
-  }
 
-  // Add a new rental to Firestore
-  Future<void> addRental(RentalModel rental) async {
-    try {
-      // Add rental document to Firestore
-      DocumentReference docRef = await _firestore.collection('Rentals').add(rental.toMap());
-      rental.id = docRef.id;  // Set the document ID from Firestore to rental
-      _rentals.add(rental);  // Add the rental to local list
-      notifyListeners();  // Notify listeners that a new rental has been added
-    } catch (e) {
-      debugPrint("Error adding rental: $e");
-    }
-  }
-
-  // Update an existing rental in Firestore
-  Future<void> updateRental(String rentalId, RentalModel updatedRental) async {
-    try {
-      await _firestore.collection('Rentals').doc(rentalId).update(updatedRental.toMap());
-      int index = _rentals.indexWhere((rental) => rental.id == rentalId);
-      if (index != -1) {
-        _rentals[index] = updatedRental;  // Update the local rental data
-        notifyListeners();  // Notify listeners about the update
-      }
-    } catch (e) {
-      debugPrint("Error updating rental: $e");
-    }
-  }
-
-  // Delete a rental from Firestore
-  Future<void> deleteRental(String rentalId) async {
-    try {
-      await _firestore.collection('Rentals').doc(rentalId).delete();
-      _rentals.removeWhere((rental) => rental.id == rentalId);  // Remove rental locally
-      notifyListeners();  // Notify listeners about the change
-    } catch (e) {
-      debugPrint("Error deleting rental: $e");
-    }
-  }
-
-
-
-  // Clear filters
-  void clearFilters() {
-    fetchRentals();  // Fetch rentals again to show the unfiltered list
-    notifyListeners();  // Notify listeners after clearing filters
+    // Notify listeners to update the UI after fetching rentals
+    notifyListeners();
+  } catch (e) {
+    debugPrint('Error fetching rentals for user: $e');
+    rethrow; // Rethrow the exception for further handling if needed
   }
 }
+
+
+ // Add a new rental to Firestore
+ Future<void> addRental(RentalModel rental) async {
+  try {
+    // Add the rental to Firestore
+   
+        await _firestore.collection('Rentals').add(rental.toMap());
+
+    // Add the rental to the local list
+    _rentals.add(rental);
+
+    // Notify listeners to update the UI
+    notifyListeners();
+    debugPrint('Rental added successfully ');
+  } catch (e) {
+    debugPrint('Error adding rental: $e');
+  }
+}
+
+  // Optionally, fetch all rentals (if no user is specified or for admins)
+  Future<void> fetchAllRentals() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('Rentals').get();
+
+      _rentals = await Future.wait(snapshot.docs.map((doc) async {
+        return await RentalModel.fromDocumentSnapshot(doc);
+      }));
+
+    } catch (e) {
+      debugPrint('Error fetching all rentals: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Ensure UI is updated
+    }
+  }
+
+  // Clear rentals or reset after filter
+  void clearFilters() {
+    _rentals = [];
+    notifyListeners();
+  }
+}
+

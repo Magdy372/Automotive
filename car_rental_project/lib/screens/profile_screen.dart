@@ -1,3 +1,4 @@
+import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/screens/edit_profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -58,19 +59,18 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  // Sample recent rental data
-  final List<String> recentRentals = [
-    "Toyota Camry - Rented for 3 days",
-    "Honda Civic - Rented for 5 days",
-    "Ford Mustang - Rented for 2 days",
-  ];
+@override
+  void initState() {
+    super.initState();
+    // Get user ID from UserProvider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.currentUser?.id ?? ''; // Ensure the user is logged in and has an ID
 
-  // List of cars owned by the user
-  List<Map<String, String>> userCars = [
-    {"make": "Tesla Model S", "status": "Available"},
-    {"make": "BMW X5", "status": "Rented"},
-    {"make": "Audi Q7", "status": "Available"},
-  ];
+    if (userId.isNotEmpty) {
+      final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
+      rentalProvider.fetchRentalsByUser(userId); // Fetch rentals data
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -233,72 +233,151 @@ Widget _buildUserInfo(String phone, String address) {
 }
 
 
-  // Display the list of cars owned by the user
   Widget _buildUserCars() {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Your Cars",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 10),
-            for (var car in userCars)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(car["make"]!, style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    Text(
-                      car["status"]!,
-                      style: TextStyle(
-                        color: car["status"] == "Available" ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
+  return Consumer<CarProvider>(
+    builder: (context, carProvider, child) {
+      final userCars = carProvider.cars;
+
+      if (userCars.isEmpty) {
+        return const Center(child: Text("You have no cars uploaded."));
+      }
+
+      return Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Your Cars",
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              // Display cars owned by the user
+              for (var car in userCars)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Car brand and name
+                      Text(
+                        "${car.brand.toString().split('.').last} - ${car.name}",
+                        style: const TextStyle(fontSize: 16, color: Colors.black),
                       ),
-                    ),
-                  ],
+                      // Car availability status
+                      Text(
+                        car.isBooked ? "Booked" : "Available",
+                        style: TextStyle(
+                          color: car.isBooked ? Colors.red : Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Recent Rentals Display
+  Widget _buildRecentRentals() {
+  return Consumer<RentalProvider>(
+    builder: (context, rentalProvider, child) {
+      final recentRentals = rentalProvider.rentals;
+
+      if (recentRentals.isEmpty) {
+        return const Center(child: Text("No recent rentals found."));
+      }
+
+      return Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Recent Rentals",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
+              const SizedBox(height: 10),
+              // Loop through rentals and display relevant details
+              for (var rental in recentRentals)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Label and car name
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Car Name',  // Label for car name
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            rental.carName ?? 'Unknown Car',  // Display car name
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
 
-  // Display recent rentals history
-  Widget _buildRecentRentals() {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Recent Rentals",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 10),
-            for (var rental in recentRentals)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: Text(rental, style: const TextStyle(fontSize: 16, color: Colors.black)),
-              ),
-          ],
+                      // Label and rental duration
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Number of Days',  // Label for the number of days
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            "${rental.endDate.difference(rental.startDate).inDays} days",  // Display the number of days
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
+      );
+    },
+  );
+}
 
 
   // Helper function to create settings options
