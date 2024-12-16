@@ -228,7 +228,7 @@ class LoginScreen extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                userProvider.signInWithFacebook(context);
+                               // userProvider.signInWithFacebook(context);
                               },
                               child: Container(
                                 decoration: const BoxDecoration(
@@ -246,7 +246,7 @@ class LoginScreen extends StatelessWidget {
                             const SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
-                                userProvider.signInWithGoogle(context);
+                                //userProvider.signInWithGoogle(context);
                               },
                               child: Container(
                                 decoration: const BoxDecoration(

@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/CarForm.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -66,13 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Header Section
   Widget _buildHeader(UserProvider userProvider, ThemeData theme) {
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final backgroundColor = theme.appBarTheme.backgroundColor;
+    final textColor = theme.colorScheme.onPrimary;
     final activeTabColor = theme.colorScheme.primary;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -88,11 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Welcome Message
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Hello, ${userProvider.currentUser?.name}", // Display user name here
+                    "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -109,48 +109,61 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const NotificationScreen()),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.ButtonBackLight.withOpacity(0.2),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(
-                      Icons.notifications_none_rounded,
-                      color: AppColors.textColorLight,
-                      size: 28,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.end, // Align icons at the end
+                  children: [
+                    // Notification Icon
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.ButtonBackLight.withOpacity(0.2),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: AppColors.textColorLight,
+                          size: 28,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    // Sell Your Car Icon
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CarUploadScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.ButtonBackLight.withOpacity(0.2),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.directions_car_filled_rounded,
+                          color: AppColors.textColorLight,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              // GestureDetector(
-              //   onTap: () {
-              //     userProvider.logout(context);
-              //   },
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //       shape: BoxShape.circle,
-              //       color: AppColors.ButtonBackLight.withOpacity(0.2),
-              //     ),
-              //     child: const Padding(
-              //       padding: EdgeInsets.all(8),
-              //       child: Icon(
-              //         Icons.logout,
-              //         color: AppColors.textColorLight,
-              //         size: 28,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           const SizedBox(height: 20),
@@ -512,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    car.brand,
+                    car.brand.toString().split('.').last,
                     style: const TextStyle(
                       color: Colors.black38,
                       fontSize: 14,

@@ -72,69 +72,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     {"make": "Audi Q7", "status": "Available"},
   ];
 
-  // Controllers for the car upload form
-  final TextEditingController brandController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
-
-  // Function to handle the car upload process using Provider
-  void _uploadCarForRent(BuildContext context) {
-    if (brandController.text.isEmpty ||
-        nameController.text.isEmpty ||
-        priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please fill in all fields'),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.currentUser; // Fetch current user
-
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('You need to be logged in to upload a car for rent'),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-    // Get a reference to the seller (the user who is logged in) as a DocumentReference
-final sellerRef = FirebaseFirestore.instance.collection('Users').doc(user.id);
-
-// Use uuid package to generate a unique ID for the car
-    var uuid = Uuid();
-    final uniqueCarId = uuid.v4();  // Generate a unique ID
-    final newCar = Car(
-      id: uniqueCarId, // ID will be assigned by Firestore
-      name: nameController.text,
-      brand: brandController.text,
-      price: double.tryParse(priceController.text) ?? 0.0,
-      image: 'assets/images/car_placeholder.jpeg',
-      rating: 0.0,
-      seller: sellerRef,
-    );
-
-    final carProvider = Provider.of<CarProvider>(context, listen: false);
-    carProvider.addCar(newCar).then((_) {
-      // Clear the text fields
-      brandController.clear();
-      nameController.clear();
-      priceController.clear();
-
-      Navigator.pop(context);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Car uploaded successfully')),
-      );
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error uploading car: $error'),
-        backgroundColor: Colors.red,
-      ));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -175,7 +112,7 @@ final sellerRef = FirebaseFirestore.instance.collection('Users').doc(user.id);
           const SizedBox(height: 20),
           _buildRecentRentals(),
           const SizedBox(height: 20),
-          _buildUploadCarForRentButton(context),
+         
           
           const SizedBox(height: 20),
           // Cards Section
@@ -359,58 +296,6 @@ Widget _buildUserInfo(String phone, String address) {
           ],
         ),
       ),
-    );
-  }
-
-  // Button to trigger car upload form
-  Widget _buildUploadCarForRentButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        _showUploadCarDialog(context);
-      },
-      child: const Text(
-        "Upload Car for Rent",
-        style: TextStyle(fontSize: 16),
-      ),
-    );
-  }
-
-  // Show dialog to upload a car for rent
-  void _showUploadCarDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Upload Car for Rent", style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
-          backgroundColor: Colors.white,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: brandController,
-                decoration: const InputDecoration(labelText: "Car brand", labelStyle: TextStyle(color: Colors.black)),
-                style: const TextStyle(color: Colors.black),
-              ),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Car name", labelStyle: TextStyle(color: Colors.black)),
-                style: const TextStyle(color: Colors.black),
-              ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: "Price per Day", labelStyle: TextStyle(color: Colors.black)),
-                style: const TextStyle(color: Colors.black),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => _uploadCarForRent(context),
-                child: const Text("Upload"),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 

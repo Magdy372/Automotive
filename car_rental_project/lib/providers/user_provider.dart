@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+//import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-  import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+  //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 
 class UserProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final GoogleSignIn _googleSignIn = GoogleSignIn();
+   // final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   UserModel? _currentUser;
   bool _isLoading = false;
@@ -39,7 +39,7 @@ class UserProvider with ChangeNotifier {
   }
   
 
-
+/*
 // Facebook Login Function
 Future<void> signInWithFacebook(BuildContext context) async {
   _isLoading = true;
@@ -188,6 +188,7 @@ Future<void> signInWithFacebook(BuildContext context) async {
       notifyListeners();
     }
   }
+*/
 // Login Function
   Future<void> login({
     required String email,

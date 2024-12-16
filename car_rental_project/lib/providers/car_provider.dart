@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/car_model.dart';
-import '../models/user_model.dart';
+import '../models/rental_model.dart';
 
 class CarProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -12,46 +12,46 @@ class CarProvider with ChangeNotifier {
   List<Car> get filtercars => _filteredCars;
 
 
-  // Fetch cars from Firestore (with user reference)
-  Future<void> fetchCars() async {
-    try {
-      QuerySnapshot snapshot = await _firestore.collection('Cars').get();
-      _cars = snapshot.docs.map((doc) {
-        return Car.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
-      }).toList();
-      _filteredCars = _cars;
-      notifyListeners();
-    } catch (e) {
-      print("Error fetching cars: $e");
+  /// Fetch cars from Firestore and update their booking status
+Future<void> fetchCars() async {
+  try {
+    QuerySnapshot snapshot = await _firestore.collection('Cars').get();
+    
+    if (snapshot.docs.isEmpty) {
+      throw Exception('No cars found in Firestore');
     }
-  }
 
-  // Add a new car with a seller reference
+    _cars = await Future.wait(snapshot.docs.map((doc) async {
+      final data = doc.data() as Map<String, dynamic>;
+
+      // Debugging the doc data
+      debugPrint('Fetched car data: $data');
+
+      return Car.fromMap(data, doc.reference);
+    }).toList());
+
+    _filteredCars = []; // Clear filters after fetching
+    notifyListeners();
+  } catch (e) {
+    debugPrint('Error fetching cars: $e');
+    rethrow;  // Re-throw the exception to allow more investigation
+  }
+}
+
+
+  /// Add a new car to Firestore and the local list
   Future<void> addCar(Car car) async {
     try {
       DocumentReference docRef = await _firestore.collection('Cars').add(car.toMap());
       car.id = docRef.id; // Assign Firestore document ID to the car
-      _cars.add(car); // Add to local list
+      _cars.add(car); // Update the local list
       notifyListeners();
     } catch (e) {
-      debugPrint("Error adding car: $e");
+      debugPrint('Error adding car: $e');
     }
   }
 
-  // Get the seller data for a car
-  Future<UserModel> getSellerData(DocumentReference sellerReference) async {
-    try {
-      DocumentSnapshot sellerSnapshot = await sellerReference.get();
-      if (sellerSnapshot.exists) {
-        return UserModel.fromJson(sellerSnapshot.data() as Map<String, dynamic>);
-      }
-      throw Exception('Seller not found');
-    } catch (e) {
-      throw Exception('Error fetching seller data: $e');
-    }
-  }
-
-  // Update car details
+  /// Update a car's details in Firestore and the local list
   Future<void> updateCar(String carId, Car updatedCar) async {
     try {
       await _firestore.collection('Cars').doc(carId).update(updatedCar.toMap());
@@ -61,18 +61,20 @@ class CarProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint("Error updating car: $e");
+      debugPrint('Error updating car: $e');
     }
   }
 
-  // Filter cars by search query
-  // void filterCars(String query) {
-  //   _filteredCars = _cars.where((car) {
-  //     return car.name.toLowerCase().contains(query.toLowerCase()) ||
-  //         car.brand.toLowerCase().contains(query.toLowerCase());
-  //   }).toList();
-  //   notifyListeners();
-  // }
+  /// Remove a car from Firestore and the local list
+  Future<void> deleteCar(String carId) async {
+    try {
+      await _firestore.collection('Cars').doc(carId).delete();
+      _cars.removeWhere((car) => car.id == carId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting car: $e');
+    }
+  }
 
   void filterCars(String query) {
     if (query.isEmpty) {
