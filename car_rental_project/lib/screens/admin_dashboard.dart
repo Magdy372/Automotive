@@ -13,14 +13,16 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   List<UserModel> lastTwoUsers = [];
+  int totalUsers = 0; // To store the real number of users
 
   @override
   void initState() {
     super.initState();
     fetchLastTwoUsers();
+    fetchTotalUsers();
   }
 
-  // Fetch last two users from Firestore
+ // Fetch last two users from Firestore
   Future<void> fetchLastTwoUsers() async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -38,6 +40,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       print("Error fetching users: $e");
     }
   }
+
+  // Fetch the total number of users
+  Future<void> fetchTotalUsers() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('users').get();
+      setState(() {
+        totalUsers = snapshot.docs.length; // Get the total count of documents in the 'users' collection
+      });
+    } catch (e) {
+      print("Error fetching total users: $e");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,44 +84,56 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               
               const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.5,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: const [
-                  StatsCard(
-                    title: 'Total Carrs',
-                    count: '50',
-                    icon: Icons.directions_car,
-                    textColor: Colors.white,
-                    backgroundColor: Color.fromARGB(255, 0, 0, 0),
+             GridView.count(
+  crossAxisCount: 2,
+  crossAxisSpacing: 16,
+  mainAxisSpacing: 16,
+  childAspectRatio: 1.5,
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+  children: [
+    const StatsCard(
+      title: 'Total Cars',
+      count: '50',
+      icon: Icons.directions_car,
+      textColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 0, 0, 0),
+    ),
+    const StatsCard(
+      title: 'Rented Cars',
+      count: '15',
+      icon: Icons.car_repair,
+      textColor: Colors.white,
+      backgroundColor: Colors.grey,
+    ),
+    // Updated Total Users Card with tap functionality
+    GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const UserListingScreen(),
+          ),
+        );
+      },
+       child: StatsCard(
+                      title: 'Total Users',
+                      count: totalUsers.toString(), // Dynamic user count
+                      icon: Icons.group,
+                      textColor: Colors.white,
+                      backgroundColor: Colors.grey,
+                    ),
                   ),
-                  StatsCard(
-                    title: 'Rented Carrs',
-                    count: '15',
-                    icon: Icons.car_repair,
-                    textColor: Colors.white,
-                    backgroundColor: Colors.grey,
-                  ),
-                  StatsCard(
-                    title: 'Total Users',
-                    count: '120',
-                    icon: Icons.group,
-                    textColor: Colors.white,
-                    backgroundColor: Colors.grey,
-                  ),
-                  StatsCard(
-                    title: 'Clients',
-                    count: '75',
-                    icon: Icons.people,
-                    textColor: Colors.white,
-                    backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                ],
-              ),
+    const StatsCard(
+      title: 'Clients',
+      count: '75',
+      icon: Icons.people,
+      textColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 0, 0, 0),
+    ),
+  ],
+),
+
               
 
 
