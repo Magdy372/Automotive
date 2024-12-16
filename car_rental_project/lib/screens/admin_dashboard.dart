@@ -1,3 +1,5 @@
+import 'package:car_rental_project/screens/car_listing_screen.dart';
+import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,12 +16,43 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   List<UserModel> lastTwoUsers = [];
   int totalUsers = 0; // To store the real number of users
+  int totalCars = 0;
+   bool isDataLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    fetchLastTwoUsers();
-    fetchTotalUsers();
+    if (!isDataLoaded) {
+      fetchData();
+    } // Fetch the total number of cars
+  }
+
+// Function to fetch all data
+  Future<void> fetchData() async {
+    try {
+      await Future.wait([
+        fetchLastTwoUsers(),
+        fetchTotalUsers(),
+        fetchTotalCars(),
+      ]);
+      setState(() {
+        isDataLoaded = true; // Ensure isDataLoaded is set after fetching data
+      });
+    } catch (e) {
+      print("Error fetching data: $e");
+    }
+  }
+
+    // Fetch the total number of cars from Firestore
+  Future<void> fetchTotalCars() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('cars').get(); // Assuming 'cars' is the collection name
+      setState(() {
+        totalCars = snapshot.docs.length; // Get the total count of documents in the 'cars' collection
+      });
+    } catch (e) {
+      print("Error fetching total cars: $e");
+    }
   }
 
  // Fetch last two users from Firestore
@@ -84,21 +117,31 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               
               const SizedBox(height: 20),
-             GridView.count(
-  crossAxisCount: 2,
-  crossAxisSpacing: 16,
-  mainAxisSpacing: 16,
-  childAspectRatio: 1.5,
-  shrinkWrap: true,
-  physics: const NeverScrollableScrollPhysics(),
-  children: [
-    const StatsCard(
-      title: 'Total Cars',
-      count: '50',
-      icon: Icons.directions_car,
-      textColor: Colors.white,
-      backgroundColor: Color.fromARGB(255, 0, 0, 0),
-    ),
+              GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.5,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CarListingScreen(),
+                        ),
+                      );
+                    },
+                    child: StatsCard(
+                      title: 'Total Cars',
+                      count: totalCars.toString(), // Display the actual number of cars
+                      icon: Icons.directions_car,
+                      textColor: Colors.white,
+                      backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),
     const StatsCard(
       title: 'Rented Cars',
       count: '15',

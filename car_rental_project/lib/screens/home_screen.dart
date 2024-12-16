@@ -1,4 +1,5 @@
 import 'package:car_rental_project/screens/CarForm.dart';
+import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -429,13 +430,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "View All",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                     Align(
+  alignment: Alignment.centerRight,
+  child: GestureDetector(
+    onTap: () {
+      // Navigate to CarListingScreen when tapped
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>  CarListingScreen()),
+      );
+    },
+    child: const Text(
+      'View All',
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.blue, // You can change this color if you want
+      ),
+    ),
+  ),
+)
+
                     ],
                   ),
                 ),
