@@ -8,7 +8,7 @@ import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:car_rental_project/constants.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
@@ -23,7 +23,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
   final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
-
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -38,36 +37,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
     final carsProvider = Provider.of<CarProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 247, 247),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(userProvider),
-              _buildCategories(),
+              _buildHeader(userProvider, theme),
+              _buildCategories(theme),
               _buildSearchResults(carsProvider),
-              _buildFeaturedCars(carsProvider),
-              _buildPopularDeals(carsProvider),
+              _buildFeaturedCars(carsProvider, theme),
+              _buildPopularDeals(carsProvider, theme),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: _buildBottomNavBar(context),
     );
   }
 
   // Header Section
-  Widget _buildHeader(UserProvider userProvider) {
+  Widget _buildHeader(UserProvider userProvider, ThemeData theme) {
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
         ),
@@ -86,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.textColorLight,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -94,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     "Find your dream car",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white,
+                      color: AppColors.textColorLight,
                     ),
                   ),
                 ],
@@ -110,37 +120,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.2),
+                    color: AppColors.ButtonBackLight.withOpacity(0.2),
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(8),
                     child: Icon(
                       Icons.notifications_none_rounded,
-                      color: Colors.white,
+                      color: AppColors.textColorLight,
                       size: 28,
                     ),
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  userProvider.logout(context);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.2),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(
-                      Icons.logout,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     userProvider.logout(context);
+              //   },
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //       shape: BoxShape.circle,
+              //       color: AppColors.ButtonBackLight.withOpacity(0.2),
+              //     ),
+              //     child: const Padding(
+              //       padding: EdgeInsets.all(8),
+              //       child: Icon(
+              //         Icons.logout,
+              //         color: AppColors.textColorLight,
+              //         size: 28,
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 20),
@@ -155,11 +165,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.ButtonBackLight,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.textColorLight.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -167,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.grey),
+          const Icon(Icons.search, color: AppColors.NavAndHeaderLight),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
@@ -176,10 +186,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Provider.of<CarProvider>(context, listen: false)
                     .filterCars(query);
               },
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(color: AppColors.primaryColorLight),
               decoration: const InputDecoration(
                 hintText: 'Search for your dream car',
-                hintStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: AppColors.primaryColorLight),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 15),
               ),
@@ -192,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: const Icon(
               Icons.close,
-              color: Colors.grey,
+              color: AppColors.NavAndHeaderLight,
             ),
           ),
         ],
@@ -201,18 +211,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Categories Section
-  Widget _buildCategories() {
+  Widget _buildCategories(ThemeData theme) {
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
+    final restButtonColor = theme.colorScheme.secondary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 30),
-          const Text(
+          Text(
             'Categories',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.black,
+              color: textColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -234,15 +250,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         horizontal: 15, vertical: 10),
                     decoration: BoxDecoration(
                       color: _selectedCategory == index
-                          ? Colors.black
-                          : Colors.black.withOpacity(0.1),
+                          ? activeTabColor
+                          : restButtonColor.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       categories[index],
                       style: TextStyle(
                         color: _selectedCategory == index
-                            ? Colors.white
+                            ? AppColors.backgroundColorLight
                             : Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
@@ -273,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: AppColors.NavAndHeaderLight,
             ),
           ),
           const SizedBox(height: 15),
@@ -295,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         },
-                        child: _buildCarCard(cars[index]),
+                        child: _buildCarCard(cars[index], context),
                       );
                     },
                   ),
@@ -306,7 +322,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Featured Cars Section
-  Widget _buildFeaturedCars(CarProvider carsProvider) {
+  Widget _buildFeaturedCars(CarProvider carsProvider, ThemeData theme) {
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
+    final restButtonColor = theme.colorScheme.secondary;
     final cars = carsProvider.cars;
     print(
         "22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
@@ -317,12 +339,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Featured Cars",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 15),
@@ -334,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: cars.length,
                     itemBuilder: (context, index) {
-                      return _buildCarCard(cars[index]);
+                      return _buildCarCard(cars[index], context);
                     },
                   ),
                 ),
@@ -344,7 +366,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Popular Deals Section
-  Widget _buildPopularDeals(CarProvider carsProvider) {
+  Widget _buildPopularDeals(CarProvider carsProvider, ThemeData theme) {
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
+    final restButtonColor = theme.colorScheme.secondary;
     final Cars = carsProvider.cars
         .where((car) => car.rating >= 0) // Filter based on high ratings
         .toList();
@@ -366,12 +394,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Popular Deals",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: textColor,
                 ),
               ),
               TextButton(
@@ -382,10 +410,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: backgroundColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
@@ -422,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      child: _buildCarCard(popularCars[index]),
+                      child: _buildCarCard(popularCars[index], context),
                     );
                   },
                 ),
@@ -432,17 +460,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Car Card Widget
-  Widget _buildCarCard(Car car) {
+  Widget _buildCarCard(Car car, BuildContext context) {
+    final theme = Theme.of(context);
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor = theme.colorScheme.primary;
+    final secondary = theme.colorScheme.secondary;
+    // final buttonColor = theme.elevatedButtonTheme.style?.backgroundColor?.resolve({MaterialState.selected}) ?? theme.primaryColor;
     return GestureDetector(
       child: Container(
         width: 240,
         margin: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: secondary,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.textColorLight.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -455,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 180,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: secondary,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -478,15 +514,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     car.brand,
                     style: const TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black38,
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     car.name,
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 36, 32, 32),
+                    style: TextStyle(
+                      color: Colors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -496,7 +532,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Icon(
                         Icons.star,
-                        color: Colors.yellow,
+                        color: Colors.black,
                         size: 18,
                       ),
                       const SizedBox(width: 5),
@@ -504,7 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         car.rating.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 36, 32, 32),
+                          color: Colors.black38,
                         ),
                       ),
                     ],
@@ -528,19 +564,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Bottom Navigation Bar
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
+    // Access the current theme's colors dynamically
+    final theme = Theme.of(context);
+    final backgroundColor = theme
+        .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    final textColor = theme
+        .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    final activeTabColor =
+        theme.colorScheme.primary; // Active tab background color
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(50),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(30),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
         child: GNav(
-          backgroundColor: Colors.black,
+          backgroundColor: backgroundColor!,
           color: Colors.white,
           activeColor: Colors.white,
-          tabBackgroundColor: const Color.fromARGB(255, 66, 66, 66),
+          tabBackgroundColor: activeTabColor.withOpacity(0.5),
           padding: const EdgeInsets.all(16),
           gap: 8,
           onTabChange: (index) {
