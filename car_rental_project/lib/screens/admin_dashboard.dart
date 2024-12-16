@@ -78,81 +78,235 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: const [
                   StatsCard(
-                    title: 'Total Cars',
+                    title: 'Total Carrs',
                     count: '50',
                     icon: Icons.directions_car,
                     textColor: Colors.white,
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color.fromARGB(255, 0, 0, 0),
                   ),
                   StatsCard(
-                    title: 'Rented Cars',
+                    title: 'Rented Carrs',
                     count: '15',
                     icon: Icons.car_repair,
                     textColor: Colors.white,
-                    backgroundColor: Colors.deepOrange,
+                    backgroundColor: Colors.grey,
                   ),
                   StatsCard(
                     title: 'Total Users',
                     count: '120',
                     icon: Icons.group,
                     textColor: Colors.white,
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.grey,
                   ),
                   StatsCard(
                     title: 'Clients',
                     count: '75',
                     icon: Icons.people,
                     textColor: Colors.white,
-                    backgroundColor: Colors.green,
+                    backgroundColor: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Average Rental Duration',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 73, 72, 72),
+              
+
+
+
+
+
+
+
+
+
+
+
+
+
+const SizedBox(height: 20),
+const Text(
+  'App Growth Over Time',
+  style: TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: Color.fromARGB(255, 73, 72, 72),
+  ),
+),
+const SizedBox(height: 10),
+SizedBox(
+  height: 300,
+  child: LineChart(
+    LineChartData(
+      gridData: FlGridData(show: true),
+      titlesData: FlTitlesData(
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 40,
+            interval: 1,
+            getTitlesWidget: (value, meta) {
+              return Text(
+                value.toStringAsFixed(0), // Display as integer
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
                 ),
+                textAlign: TextAlign.center,
+              );
+            },
+          ),
+        ),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 40,
+            interval: 1,
+            getTitlesWidget: (value, meta) {
+              switch (value.toInt()) {
+                case 0:
+                  return const Text('Jan');
+                case 1:
+                  return const Text('Feb');
+                case 2:
+                  return const Text('Mar');
+                case 3:
+                  return const Text('Apr');
+                case 4:
+                  return const Text('May');
+                case 5:
+                  return const Text('Jun');
+                default:
+                  return const Text('');
+              }
+            },
+          ),
+        ),
+      ),
+      borderData: FlBorderData(
+        show: true,
+        border: Border.all(color: const Color(0xff37434d), width: 1),
+      ),
+      lineBarsData: [
+        LineChartBarData(
+          spots: [
+            FlSpot(0, 1),  // Jan
+            FlSpot(1, 1.5), // Feb
+            FlSpot(2, 1.8), // Mar
+            FlSpot(3, 2),  // Apr
+            FlSpot(4, 2.5), // May
+            FlSpot(5, 3),  // Jun
+          ],
+          isCurved: true,
+          color: Colors.blue,  // Correct color usage
+          barWidth: 4,
+          belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.2)), // Correct color usage
+        ),
+      ],
+    ),
+  ),
+),      
+             const SizedBox(height: 10),
+const SizedBox(height: 10),
+SizedBox(
+  height: 300,
+  child: PieChart(
+    PieChartData(
+      sections: [
+        PieChartSectionData(
+          value: 40,
+          color: Colors.teal,
+          title: '',
+          titleStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          radius: 50,
+          badgeWidget: Transform.rotate(
+            angle: -0.1, // Adjust the rotation angle to curve the text
+            child: const Text(
+              '1-3 Days',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 300,
-                child: PieChart(
-                  PieChartData(
-                    sections: [
-                      PieChartSectionData(
-                        value: 40,
-                        color: Colors.teal,
-                        title: '1-3 Days',
-                        titleStyle: const TextStyle(color: Colors.black),
-                      ),
-                      PieChartSectionData(
-                        value: 30,
-                        color: Colors.orange,
-                        title: '4-7 Days',
-                        titleStyle: const TextStyle(color: Colors.black),
-                      ),
-                      PieChartSectionData(
-                        value: 20,
-                        color: Colors.blue,
-                        title: '8-14 Days',
-                        titleStyle: const TextStyle(color: Colors.black),
-                      ),
-                      PieChartSectionData(
-                        value: 10,
-                        color: Colors.red,
-                        title: '15+ Days',
-                        titleStyle: const TextStyle(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
+            ),
+          ),
+        ),
+        PieChartSectionData(
+          value: 30,
+          color: Colors.orange,
+          title: '',
+          titleStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          radius: 50,
+          badgeWidget: Transform.rotate(
+            angle: -1.1, // Adjust the rotation angle to curve the text
+            child: const Text(
+              '4-7 Days',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
+            ),
+          ),
+        ),
+        PieChartSectionData(
+          value: 20,
+          color: Colors.blue,
+          title: '',
+          titleStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          radius: 50,
+          badgeWidget: Transform.rotate(
+            angle: 0.2, // Adjust the rotation angle to curve the text
+            child: const Text(
+              '8-14 Days',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        PieChartSectionData(
+          value: 10,
+          color: Colors.red,
+          title: '',
+          titleStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          radius: 50,
+          badgeWidget: Transform.rotate(
+            angle: 1.1, // Adjust the rotation angle to curve the text
+            child: const Text(
+              '15+ Days',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
+
              
               const SizedBox(height: 10),
-              SizedBox(
+              const SizedBox(
                 height: 3,
               ),
               // Users List Button (kept at the bottom as well)
@@ -323,32 +477,55 @@ class UserCard extends StatelessWidget {
     required this.userPhone,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 6,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          userName,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+ @override
+Widget build(BuildContext context) {
+  return Card(
+    color: Colors.black, // Set the card color to black
+    elevation: 6,
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    child: ListTile(
+      contentPadding: const EdgeInsets.all(16),
+      title: Text(
+        userName,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white, // Set text color to white
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Email: $userEmail'),
-            Text('Role: $userRole'),
-            /*Text('Address: $userAddress'),
-            Text('Phone: $userPhone'),*/
-          ],
-        ),
-        trailing: const Icon(Icons.arrow_forward),
-        onTap: () {
-          // Handle tap event (navigate to a detailed page if needed)
-        },
       ),
-    );
-  }
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Email: $userEmail',
+            style: const TextStyle(color: Colors.white), // Set text color to white
+          ),
+          Text(
+            'Role: $userRole',
+            style: const TextStyle(color: Colors.white), // Set text color to white
+          ),
+          /* Uncomment these lines if you want to include address and phone
+          Text(
+            'Address: $userAddress',
+            style: const TextStyle(color: Colors.white),
+          ),
+          Text(
+            'Phone: $userPhone',
+            style: const TextStyle(color: Colors.white),
+          ),
+          */
+        ],
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward,
+        color: Colors.white, // Set the trailing icon color to white
+      ),
+      onTap: () {
+        // Handle tap event (navigate to a detailed page if needed)
+      },
+    ),
+  );
+}
+
 }

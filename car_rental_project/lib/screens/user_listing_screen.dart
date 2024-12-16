@@ -1,9 +1,7 @@
 import 'package:car_rental_project/models/user_model.dart';
+import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart'; // For graph plotting
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
-import '../providers/user_provider.dart';
 
 class UserListingScreen extends StatelessWidget {
   const UserListingScreen({super.key});
@@ -64,6 +62,15 @@ class _UserListingScreenBodyState extends State<UserListingScreenBody> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Listing', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+           Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                    );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -73,7 +80,11 @@ class _UserListingScreenBodyState extends State<UserListingScreenBody> {
             children: [
               const Text(
                 'Users List',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 73, 72, 72)),
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 73, 72, 72),
+                ),
               ),
               const SizedBox(height: 20),
               users.isEmpty
