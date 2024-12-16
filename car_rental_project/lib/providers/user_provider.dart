@@ -386,7 +386,36 @@ Future<void> signInWithFacebook(BuildContext context) async {
 }
 
 
+void resetPassword(String email, BuildContext context) async {
+  // Trim any extra spaces in the email
+  email = email.trim();
 
+  // Check if the email is empty
+  if (email.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please enter your email.')),
+    );
+    return;
+  }
+
+  try {
+    // Send password reset email using FirebaseAuth
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Password reset email sent. Check your inbox!'),
+      ),
+    );
+
+    // Close the dialog or navigate back to the login screen
+    Navigator.pop(context);
+  } catch (e) {
+    // Handle any errors
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
+  }
+}
 
 
 

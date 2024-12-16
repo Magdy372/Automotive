@@ -1,33 +1,43 @@
+import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart'; // For graph plotting
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/user_model.dart'; // Import the UserModel
+import 'package:fl_chart/fl_chart.dart';
 
-class AdminDashboardScreen extends StatelessWidget {
+class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Admin Dashboardd',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.teal,
-        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        cardColor: const Color(0xFF1F1F1F),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Color(0xFFB0BEC5)),
-          bodySmall: TextStyle(color: Colors.white54),
-        ),
-        fontFamily: 'Roboto',
-      ),
-      home: const DashboardScreen(),
-    );
-  }
+  _AdminDashboardScreenState createState() => _AdminDashboardScreenState();
 }
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+  List<UserModel> lastTwoUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLastTwoUsers();
+  }
+
+  // Fetch last two users from Firestore
+  Future<void> fetchLastTwoUsers() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('createdAt', descending: true) // Assuming you have a 'createdAt' field
+          .limit(2)
+          .get();
+
+      setState(() {
+        lastTwoUsers = snapshot.docs.map((doc) {
+          return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+        }).toList();
+      });
+    } catch (e) {
+      print("Error fetching users: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,6 @@ class DashboardScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          // Make the entire content scrollable
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -58,6 +67,7 @@ class DashboardScreen extends StatelessWidget {
                   color: Color.fromARGB(255, 73, 72, 72),
                 ),
               ),
+              
               const SizedBox(height: 20),
               GridView.count(
                 crossAxisCount: 2,
@@ -95,103 +105,6 @@ class DashboardScreen extends StatelessWidget {
                     textColor: Colors.white,
                     backgroundColor: Colors.green,
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Cars Rented & Uploaded Per Month',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 73, 72, 72),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 300,
-                child: BarChart(
-                  BarChartData(
-                    barGroups: [
-                      BarChartGroupData(
-                        x: 0,
-                        barRods: [
-                          BarChartRodData(toY: 15, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 10, color: Colors.black, width: 10),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 1,
-                        barRods: [
-                          BarChartRodData(toY: 20, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 18, color: Colors.black, width: 10),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 2,
-                        barRods: [
-                          BarChartRodData(toY: 12, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 8, color: Colors.black, width: 10),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 3,
-                        barRods: [
-                          BarChartRodData(toY: 18, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 14, color: Colors.black, width: 10),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 4,
-                        barRods: [
-                          BarChartRodData(toY: 25, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 20, color: Colors.black, width: 10),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 5,
-                        barRods: [
-                          BarChartRodData(toY: 30, color: Colors.grey, width: 10),
-                          BarChartRodData(toY: 22, color: Colors.black, width: 10),
-                        ],
-                      ),
-                    ],
-                    titlesData: FlTitlesData(
-                      leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: true),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            switch (value.toInt()) {
-                              case 0:
-                                return const Text('Jan');
-                              case 1:
-                                return const Text('Feb');
-                              case 2:
-                                return const Text('Mar');
-                              case 3:
-                                return const Text('Apr');
-                              case 4:
-                                return const Text('May');
-                              case 5:
-                                return const Text('Jun');
-                              default:
-                                return const Text('');
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Row(
-                children: [
-                  Legend(color: Colors.grey, label: 'Cars Rented'),
-                  SizedBox(width: 16),
-                  Legend(color: Colors.black, label: 'Cars Uploaded'),
                 ],
               ),
               const SizedBox(height: 20),
@@ -237,9 +150,54 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
               ),
+             
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 3,
+              ),
+              // Users List Button (kept at the bottom as well)
+             /* Container(
+                width: double.infinity, // Makes the button full width
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), // Adds margin to give some space around the button
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const UserListingScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: const Color.fromARGB(255, 0, 0, 0), // Button background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Pill shape for the button
+                    ),
+                    elevation: 6, // Adds a shadow for a lifted effect
+                    shadowColor: const Color.fromARGB(255, 0, 0, 0), // Custom shadow color
+                    textStyle: const TextStyle(
+                      fontSize: 18, // Larger font size
+                      fontWeight: FontWeight.bold, // Bold text for emphasis
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // Centers the content horizontally
+                    children: const [
+                      Icon(
+                        Icons.arrow_forward, // Arrow icon
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 15), // Space between the icon and the text
+                      Text(
+                        'View Users List',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),*/
               const SizedBox(height: 20),
+              // Display last two users at the bottom
               const Text(
-                'Recent Rentals',
+                'Recent Users',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -247,29 +205,42 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 2,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return const RentalCard(
-                      carModel: 'Tesla Model 3',
-                      renterName: 'John Doe',
-                      rentalDate: '2024-12-01',
-                      imageAsset: 'assets/images/tesla_model.png',
-                      textColor: Colors.white,
+              lastTwoUsers.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: lastTwoUsers.length,
+                      itemBuilder: (context, index) {
+                        UserModel user = lastTwoUsers[index];
+                        return UserCard(
+                          userName: user.name,
+                          userEmail: user.email,
+                          userRole: user.role,
+                          userAddress: user.address ?? 'Not provided',
+                          userPhone: user.phone ?? 'Not provided',
+                        );
+                      },
+                    ),
+              // View All button behind recent users
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const UserListingScreen()),
                     );
-                  } else {
-                    return const RentalCard(
-                      carModel: 'BMW M4',
-                      renterName: 'Jane Smith',
-                      rentalDate: '2024-12-05',
-                      imageAsset: 'assets/images/BMW_M4.png',
-                      textColor: Colors.white,
-                    );
-                  }
-                },
+                  },
+                  child: const Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -286,7 +257,8 @@ class StatsCard extends StatelessWidget {
   final Color textColor;
   final Color backgroundColor;
 
-  const StatsCard({super.key, 
+  const StatsCard({
+    super.key,
     required this.title,
     required this.count,
     required this.icon,
@@ -335,19 +307,20 @@ class StatsCard extends StatelessWidget {
   }
 }
 
-class RentalCard extends StatelessWidget {
-  final String carModel;
-  final String renterName;
-  final String rentalDate;
-  final String imageAsset;
-  final Color textColor;
+class UserCard extends StatelessWidget {
+  final String userName;
+  final String userEmail;
+  final String userRole;
+  final String userAddress;
+  final String userPhone;
 
-  const RentalCard({super.key, 
-    required this.carModel,
-    required this.renterName,
-    required this.rentalDate,
-    required this.imageAsset,
-    required this.textColor,
+  const UserCard({
+    super.key,
+    required this.userName,
+    required this.userEmail,
+    required this.userRole,
+    required this.userAddress,
+    required this.userPhone,
   });
 
   @override
@@ -358,65 +331,24 @@ class RentalCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: ClipOval(
-          child: Image.asset(
-            imageAsset,
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
-          ),
-        ),
         title: Text(
-          carModel,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
+          userName,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Rented by: $renterName',
-              style: TextStyle(color: textColor.withOpacity(0.7)),
-            ),
-            Text(
-              'Rental Date: $rentalDate',
-              style: TextStyle(color: textColor.withOpacity(0.7)),
-            ),
+            Text('Email: $userEmail'),
+            Text('Role: $userRole'),
+            /*Text('Address: $userAddress'),
+            Text('Phone: $userPhone'),*/
           ],
         ),
-        trailing: Icon(Icons.arrow_forward, color: textColor.withOpacity(0.7)),
+        trailing: const Icon(Icons.arrow_forward),
         onTap: () {
-          // Handle tap event
+          // Handle tap event (navigate to a detailed page if needed)
         },
       ),
-    );
-  }
-}
-
-class Legend extends StatelessWidget {
-  final Color color;
-  final String label;
-
-  const Legend({super.key, required this.color, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 14, color: Colors.black)),
-      ],
     );
   }
 }

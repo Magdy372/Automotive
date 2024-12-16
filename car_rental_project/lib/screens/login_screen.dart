@@ -144,6 +144,30 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              if (_emailController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please enter your email to reset password.'),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              userProvider.resetPassword(_emailController.text, context);
+                            },
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
                         SizedBox(
                           width: double.infinity,
                           height: 54,
@@ -202,30 +226,26 @@ class LoginScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Facebook icon in a circle
-                             GestureDetector(
-                              onTap: () {
-                                // Call the Google sign-in function from UserProvider
-                                userProvider.signInWithFacebook(context);
-                              },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF1877F2),
-                                shape: BoxShape.circle,
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: const Icon(
-                                FontAwesomeIcons.facebookF,
-                                color: Colors.white,
-                                size: 24.0,
-                              ),
-                            ),
-                             ),
-                            const SizedBox(width: 20),
-                            // Google icon in a circle
                             GestureDetector(
                               onTap: () {
-                                // Call the Google sign-in function from UserProvider
+                                userProvider.signInWithFacebook(context);
+                              },
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF1877F2),
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: const Icon(
+                                  FontAwesomeIcons.facebookF,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            GestureDetector(
+                              onTap: () {
                                 userProvider.signInWithGoogle(context);
                               },
                               child: Container(
@@ -241,7 +261,6 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                             
                           ],
                         ),
                       ],
