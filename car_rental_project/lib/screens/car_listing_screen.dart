@@ -4,6 +4,8 @@ import '../providers/car_provider.dart';
 import 'package:car_rental_project/models/car_model.dart';
 
 class CarListingScreen extends StatefulWidget {
+  const CarListingScreen({super.key});
+
   @override
   _CarListingScreenState createState() => _CarListingScreenState();
 }
@@ -35,7 +37,8 @@ class _CarListingScreenState extends State<CarListingScreen> {
             itemBuilder: (context, index) {
               final car = cars[index];
               return ListTile(
-                leading: Image.asset(car.image, width: 60, height: 60), // Placeholder for car image
+                leading: Image.asset(car.image,
+                    width: 60, height: 60), // Placeholder for car image
                 title: Text(car.name),
                 subtitle: Text('${car.price.toStringAsFixed(2)} per day'),
                 trailing: Text(car.brand.toString().split('.').last),

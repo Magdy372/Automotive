@@ -7,6 +7,8 @@ class EditProfileScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+
+  EditProfileScreen({super.key});
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -54,7 +56,7 @@ class EditProfileScreen extends StatelessWidget {
                 );
               },
               child: userProvider.isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(color: Colors.white)
                   : const Text('Save Changes'),
             ),
           ],

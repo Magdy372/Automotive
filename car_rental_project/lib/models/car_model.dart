@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Enums for Car Attributes
-
 enum Brand { BMW, Toyota, Honda, Tesla, MG, Mercedes, Ford, Audi, Hyundai }
 enum BodyType {
   Sedan,
@@ -31,6 +30,10 @@ class Car {
   final List<Feature> features; // Features list (Bluetooth, Camera, etc.)
   final DocumentReference seller; // Reference to seller's Firestore document
   bool isBooked; // Whether the car is currently booked
+  DateTime? availableFrom; // The earliest date the car is available
+  DateTime? availableTo; // The latest date the car is available
+
+  List<DateTime> bookedDates; // List of booked dates
 
   Car({
     required this.id,
@@ -45,7 +48,15 @@ class Car {
     required this.features,
     required this.seller,
     this.isBooked = false,
+    this.availableFrom,
+    this.availableTo,
+    this.bookedDates = const [],
   });
+
+  // To check if a specific date is booked
+  bool isDateBooked(DateTime date) {
+    return bookedDates.any((bookedDate) => bookedDate.isAtSameMomentAs(date));
+  }
 
   // Convert Enum to String for Firestore Storage
   static String _enumToString(dynamic enumValue) => enumValue.toString().split('.').last;
@@ -55,42 +66,52 @@ class Car {
     return enumValues.firstWhere((e) => e.toString().split('.').last == enumString);
   }
 
-  // Factory constructor to create a Car from Firestore data
-  factory Car.fromMap(Map<String, dynamic> data, DocumentReference reference ){
-    return Car(
-      id: data['id'] ?? '',
-      name: data['name'] ?? '',
-      brand: _stringToEnum(data['brand'] ?? '', Brand.values),
-      price: (data['price'] ?? 0).toDouble(),
-      image: data['image'] ?? '',
-      rating: (data['rating'] ?? 0).toDouble(),
-      description: data['description'] ?? '',
-      bodyType: _stringToEnum(data['bodyType'] ?? '', BodyType.values),
-      transmissionType: _stringToEnum(data['transmissionType'] ?? '', TransmissionType.values),
-      features: (data['features'] ?? [])
-          .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
-          .toList(),
-      seller: reference,
-      isBooked:true,
-    );
-  }
+ factory Car.fromMap(Map<String, dynamic> data, DocumentReference reference) {
+  return Car(
+    id: data['id'] ?? '',
+    name: data['name'] ?? '',
+    brand: _stringToEnum(data['brand'] ?? '', Brand.values),
+    price: (data['price'] ?? 0).toDouble(),
+    image: data['image'] ?? '',
+    rating: (data['rating'] ?? 0).toDouble(),
+    description: data['description'] ?? '',
+    bodyType: _stringToEnum(data['bodyType'] ?? '', BodyType.values),
+    transmissionType: _stringToEnum(data['transmissionType'] ?? '', TransmissionType.values),
+    features: (data['features'] ?? [])
+        .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
+        .toList(),
+    seller: reference,
+    isBooked: data['isBooked'] ?? false,
+    availableFrom: (data['availableFrom'] != null)
+        ? (data['availableFrom'] as Timestamp).toDate()
+        : null,
+    availableTo: (data['availableTo'] != null)
+        ? (data['availableTo'] as Timestamp).toDate()
+        : null,
+    bookedDates: (data['bookedDates'] as List?)?.map<DateTime>((timestamp) =>
+        (timestamp as Timestamp).toDate()).toList() ?? [],
+  );
+}
 
-  // Converts the Car object to a Firestore-compatible map
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'brand': _enumToString(brand),
-      'price': price,
-      'image': image,
-      'rating': rating,
-      'description': description,
-      'bodyType': _enumToString(bodyType),
-      'transmissionType': _enumToString(transmissionType),
-      'features': features.map((feature) => _enumToString(feature)).toList(),
-      'seller': seller,
-    };
-  }
+Map<String, dynamic> toMap() {
+  return {
+    'id': id,
+    'name': name,
+    'brand': _enumToString(brand),
+    'price': price,
+    'image': image,
+    'rating': rating,
+    'description': description,
+    'bodyType': _enumToString(bodyType),
+    'transmissionType': _enumToString(transmissionType),
+    'features': features.map((feature) => _enumToString(feature)).toList(),
+    'seller': seller,
+    'isBooked': isBooked,
+    'availableFrom': availableFrom != null ? Timestamp.fromDate(availableFrom!) : null,
+    'availableTo': availableTo != null ? Timestamp.fromDate(availableTo!) : null,
+    'bookedDates': bookedDates.map((date) => Timestamp.fromDate(date)).toList(),
+  };
+}
 
   // Checks if the car is booked based on the current date and rental collection
   static Future<bool> checkBookingStatus(String carId) async {

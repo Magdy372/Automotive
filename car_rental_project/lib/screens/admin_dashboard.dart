@@ -139,7 +139,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       count: totalCars.toString(), // Display the actual number of cars
                       icon: Icons.directions_car,
                       textColor: Colors.white,
-                      backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
     const StatsCard(
@@ -205,7 +205,7 @@ SizedBox(
   height: 300,
   child: LineChart(
     LineChartData(
-      gridData: FlGridData(show: true),
+      gridData: const FlGridData(show: true),
       titlesData: FlTitlesData(
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
@@ -257,12 +257,12 @@ SizedBox(
       lineBarsData: [
         LineChartBarData(
           spots: [
-            FlSpot(0, 1),  // Jan
-            FlSpot(1, 1.5), // Feb
-            FlSpot(2, 1.8), // Mar
-            FlSpot(3, 2),  // Apr
-            FlSpot(4, 2.5), // May
-            FlSpot(5, 3),  // Jun
+            const FlSpot(0, 1),  // Jan
+            const FlSpot(1, 1.5), // Feb
+            const FlSpot(2, 1.8), // Mar
+            const FlSpot(3, 2),  // Apr
+            const FlSpot(4, 2.5), // May
+            const FlSpot(5, 3),  // Jun
           ],
           isCurved: true,
           color: Colors.blue,  // Correct color usage

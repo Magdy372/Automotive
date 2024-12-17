@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
               ),
               colorScheme: const ColorScheme.light(
                 primary: AppColors.primaryColorLight,
-                background: AppColors.backgroundColorLight,
+                surface: AppColors.backgroundColorLight,
                 onPrimary: AppColors.textColorLight,
                 secondary: AppColors.activeButtonLight,
               ),
@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
               ),
               colorScheme: const ColorScheme.dark(
                 primary: AppColors.primaryColorDark,
-                background: AppColors.backgroundColorDark,
+                surface: AppColors.backgroundColorDark,
                 onPrimary: AppColors.textColorDark,
                 secondary: AppColors.activeButtonDark,
               ),
@@ -124,7 +124,6 @@ class MyApp extends StatelessWidget {
               '/login': (context) => LoginScreen(),
               '/profile': (context) => const ProfileScreen(),
               '/CarUpload': (context) => const CarUploadScreen(),
-              
             },
           );
         },

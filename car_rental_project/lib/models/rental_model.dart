@@ -1,16 +1,15 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class RentalModel {
   String? id; // Firestore document ID
-  final DocumentReference car; // Must be DocumentReference
-  final DocumentReference buyer; // Must be DocumentReference
+  final DocumentReference car;
+  final DocumentReference buyer;
   final DateTime startDate;
   final DateTime endDate;
   final double totalPrice;
 
-  // Optional fields
+  // Optional additional details
   String? carName;
   String? carBodyType;
   String? carBrand;
@@ -29,61 +28,59 @@ class RentalModel {
     this.sellerName,
   });
 
-  // Convert RentalModel to a Map for Firestore
+  // Convert to Firestore-compatible map
   Map<String, dynamic> toMap() {
     return {
-      'car': car, // Stored as DocumentReference
-      'buyer': buyer, // Stored as DocumentReference
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'car': car.path,
+      'buyer': buyer.path,
+      'startDate': Timestamp.fromDate(startDate),
+      'endDate': Timestamp.fromDate(endDate),
       'totalPrice': totalPrice,
     };
   }
 
-  
-  // Convert DocumentSnapshot to RentalModel
+  // Create from Firestore document snapshot
   static Future<RentalModel> fromDocumentSnapshot(DocumentSnapshot doc) async {
-  var data = doc.data() as Map<String, dynamic>;
-
-  // Create a base RentalModel from the document data
-  var rental = RentalModel.fromMap(data);
-
-  // Fetch related car details
-  var carSnapshot = await rental.car.get();
-  if (carSnapshot.exists) {
-    rental.carName = carSnapshot['name'];  // Add car name
-    rental.carBodyType = carSnapshot['bodyType'];  // Add car body type
-    rental.carBrand = carSnapshot['brand'];  // Add car brand
-    
-    // Safely retrieve seller details
-    var sellerRef = carSnapshot['seller'] as DocumentReference?;
-
-    // Check if sellerRef is valid (non-null) and get the seller data
-    if (sellerRef != null) {
-      var sellerSnapshot = await sellerRef.get();
-      
-      // Ensure that the seller data exists
-      if (sellerSnapshot.exists) {
-        rental.sellerName = sellerSnapshot['name'] ?? 'Unknown Seller';  // Assign seller's name (or default)
-      } else {
-        rental.sellerName = 'Seller not found'; // Default if the seller doesn't exist
-      }
-    } else {
-      rental.sellerName = 'Seller not referenced'; // If no seller reference is available
+    // Ensure the document exists and has data
+    if (!doc.exists) {
+      throw Exception('Document does not exist');
     }
-  }
 
-  return rental;
-}
-
-  // Factory method to create RentalModel from a Firestore map
-  factory RentalModel.fromMap(Map<String, dynamic> data) {
-    return RentalModel(
-      car: data['car'] as DocumentReference, // Load as DocumentReference
-      buyer: data['buyer'] as DocumentReference, // Load as DocumentReference
-      startDate: DateTime.parse(data['startDate']),
-      endDate: DateTime.parse(data['endDate']),
+    var data = doc.data() as Map<String, dynamic>;
+    
+    // Create base rental model
+    var rental = RentalModel(
+      id: doc.id,
+      car: FirebaseFirestore.instance.doc(data['car']),
+      buyer: FirebaseFirestore.instance.doc(data['buyer']),
+      startDate: (data['startDate'] as Timestamp).toDate(),
+      endDate: (data['endDate'] as Timestamp).toDate(),
       totalPrice: (data['totalPrice'] ?? 0).toDouble(),
     );
+
+    // Fetch additional details
+    try {
+      // Fetch car details
+      var carSnapshot = await rental.car.get();
+      if (carSnapshot.exists) {
+        rental.carName = carSnapshot['name'];
+        rental.carBodyType = carSnapshot['bodyType'];
+        rental.carBrand = carSnapshot['brand'];
+
+        // Fetch seller details if available
+        var sellerRef = carSnapshot['seller'] as DocumentReference?;
+        if (sellerRef != null) {
+          var sellerSnapshot = await sellerRef.get();
+          rental.sellerName = sellerSnapshot.exists 
+            ? (sellerSnapshot['name'] ?? 'Unknown Seller')
+            : 'Seller Not Found';
+        }
+      }
+    } catch (e) {
+      // Log any errors while fetching additional details
+      debugPrint('Error fetching additional rental details: $e');
+    }
+
+    return rental;
   }
 }

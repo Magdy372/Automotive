@@ -28,11 +28,11 @@ class BookingCard extends StatelessWidget {
                   BorderRadius.vertical(top: Radius.circular(15)),
               color: Colors.white,
             ),
-            child: Column(
+            child: const Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -45,11 +45,11 @@ class BookingCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: 15),
                 // Date, Time, Number Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Text('1 MAY', style: TextStyle(fontSize: 16)),
                     Text('23 MAY', style: TextStyle(fontSize: 16)),
                   ],
@@ -61,8 +61,8 @@ class BookingCard extends StatelessWidget {
           // Passenger & Booking Info
           Container(
             padding: const EdgeInsets.all(15),
-            child: Column(
-              children: const [
+            child: const Column(
+              children: [
                 BookingDetails(
                     title1: 'Landlord',
                     subtitle1: 'Rana Mohamed',
