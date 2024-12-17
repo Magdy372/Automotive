@@ -73,6 +73,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       final rentalProvider =
           Provider.of<RentalProvider>(context, listen: false);
       rentalProvider.fetchRentalsByUser(userId); // Fetch rentals data
+       final carProvider = Provider.of<CarProvider>(context, listen: false);
+         carProvider.getUserCars(userId); // Fetch cars by user ID
+      
     }
   }
 
@@ -236,7 +239,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildUserCars() {
     return Consumer<CarProvider>(
       builder: (context, carProvider, child) {
-        final userCars = carProvider.cars;
+        final userCars = carProvider.carsbysuser;
 
         if (userCars.isEmpty) {
           return const Center(child: Text("You have no cars uploaded."));

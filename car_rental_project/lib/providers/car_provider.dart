@@ -10,6 +10,12 @@ class CarProvider with ChangeNotifier {
   List<Car> get cars => _cars;
   List<Car> get filtercars => _filteredCars;
 
+List<Car> _carsbysuser = [];
+
+  List<Car> get carsbysuser => _carsbysuser;
+
+  
+
   /// Fetch cars from Firestore and update their booking status
   Future<void> fetchCars() async {
     try {
@@ -88,7 +94,7 @@ class CarProvider with ChangeNotifier {
       }
 
       // Map documents to Car objects and update the cars list
-      _cars = await Future.wait(snapshot.docs.map((doc) async {
+      _carsbysuser = await Future.wait(snapshot.docs.map((doc) async {
         final data = doc.data() as Map<String, dynamic>;
 
         // Debugging the doc data
