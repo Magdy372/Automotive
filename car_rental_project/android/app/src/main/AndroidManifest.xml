@@ -6,7 +6,7 @@
     </queries>
     
     <application
-        android:label="car_rental_project"
+        android:label="Automotive"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
