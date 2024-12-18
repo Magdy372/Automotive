@@ -146,7 +146,7 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Upload Car")),
+      appBar: AppBar(title: const Text("Upload Car",style: TextStyle(color: Colors.white),)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

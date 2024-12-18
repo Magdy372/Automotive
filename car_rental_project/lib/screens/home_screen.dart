@@ -23,9 +23,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedCategory = 0;
-  final categories = ['All', 'Tesla', 'BMW', 'Mercedes', 'Audi'];
   final TextEditingController _searchController = TextEditingController();
+
+
+  bool _showFilters = false; // Toggle visibility of filters
+  String? selectedBrand; 
+  String? selectedBodyType; 
+  String? selectedTransmission; 
+  List<String> selectedFeatures = [];
 
   @override
   void initState() {
@@ -56,7 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(userProvider, theme),
-              _buildCategories(theme),
+              _buildFilters(theme),
+              _buildFilteredCars(carsProvider,theme), // Display filtered cars
               _buildSearchResults(carsProvider),
               _buildFeaturedCars(carsProvider, theme),
               _buildPopularDeals(carsProvider, theme),
@@ -197,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: (query) {
+                _showFilters = false;
                 Provider.of<CarProvider>(context, listen: false)
                     .filterCars(query);
               },
@@ -224,68 +231,240 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Categories Section
-  Widget _buildCategories(ThemeData theme) {
+Widget _buildFilters(ThemeData theme) {
+  final textColor = theme.colorScheme.onPrimary;
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Filters',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            IconButton(
+              icon: Icon(
+                _showFilters ? Icons.close : Icons.filter_list,
+                color: theme.colorScheme.onPrimary,
+              ),
+              onPressed: () {
+                setState(() {
+                  _showFilters = !_showFilters; // Toggle filter visibility
+                  _searchController.clear();
+                  selectedBrand= null; 
+                  selectedBodyType= null; 
+                  selectedTransmission= null; 
+                  selectedFeatures.clear();
+
+                });
+              },
+            ),
+          ],
+        ),
+        if (_showFilters) ...[
+          const SizedBox(height: 15),
+          _buildDropdownFilter(
+          'Brand',
+            ['All', ...Brand.values.map((b) => b.toString().split('.').last)],
+            (value) {
+              setState(() {
+                selectedBrand = value == 'All' ? null : value;
+                print(selectedBrand);
+              });
+            },
+            selectedBrand,
+          ),
+          const SizedBox(height: 10),
+          _buildDropdownFilter(
+            'Body Type',
+            ['All', ...BodyType.values.map((b) => b.toString().split('.').last)],
+            (value) {
+              setState(() {
+                selectedBodyType = value == 'All' ? null : value;
+                print(selectedBodyType);
+              });
+            },
+            selectedBodyType,
+          ),
+          const SizedBox(height: 10),
+          _buildDropdownFilter(
+            'Transmission',
+            ['All', ...TransmissionType.values.map((t) => t.toString().split('.').last)],
+            (value) {
+              setState(() {
+                selectedTransmission = value == 'All' ? null : value;
+                print(selectedTransmission);
+              });
+            },
+            selectedTransmission,
+          ),
+
+          const SizedBox(height: 10),
+          _buildMultiSelectFilter(
+            'Features',
+            Feature.values.map((f) => f.toString().split('.').last).toList(),
+            (selected) {
+              setState(() {
+                selectedFeatures = selected;
+                print(selectedFeatures);
+              });
+            },
+          ),
+
+        ]
+      ],
+    ),
+  );
+}
+
+Widget _buildDropdownFilter(String label, List<String> options, Function(String?) onChanged, String? selectedValue) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 5),
+      DropdownButton<String>(
+        value: selectedValue ?? 'All',
+        isExpanded: true,
+        items: options.map((option) {
+          return DropdownMenuItem<String>(
+            value: option,
+            child: Text(option),
+          );
+        }).toList(),
+        onChanged: onChanged,
+      ),
+      const SizedBox(height: 10),
+    ],
+  );
+}
+
+Widget _buildMultiSelectFilter(String label, List<String> options, Function(List<String>) onSelectionChanged) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 5),
+      Wrap(
+        spacing: 10,
+        children: options.map((option) {
+          final isSelected = selectedFeatures.contains(option);
+          return ChoiceChip(
+            label: Text(option),
+            selected: isSelected,
+            onSelected: (selected) {
+              setState(() {
+                if (selected) {
+                  selectedFeatures.add(option);
+                } else {
+                  selectedFeatures.remove(option);
+                }
+                onSelectionChanged(selectedFeatures);
+              });
+            },
+          );
+        }).toList(),
+      ),
+      const SizedBox(height: 10),
+    ],
+  );
+}
+
+Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
     final backgroundColor = theme
         .appBarTheme.backgroundColor; // Use theme's AppBar background color
     final textColor = theme
         .colorScheme.onPrimary; // Text/icon color for active/inactive states
     final activeTabColor = theme.colorScheme.primary;
     final restButtonColor = theme.colorScheme.secondary;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 30),
-          Text(
-            'Categories',
+
+  if (!_showFilters) {
+    return const SizedBox.shrink(); // Returns an empty widget
+  }
+  List<Car> filteredCars = carsProvider.cars.where((car) {
+    // Brand filtering
+    if (selectedBrand != null && car.brand != Brand.values.firstWhere((b) => b.toString().split('.').last == selectedBrand)) return false;
+    
+    // Body Type filtering
+    if (selectedBodyType != null && car.bodyType != BodyType.values.firstWhere((b) => b.toString().split('.').last == selectedBodyType)) return false;
+    
+    // Transmission filtering
+    if (selectedTransmission != null && car.transmissionType != TransmissionType.values.firstWhere((t) => t.toString().split('.').last == selectedTransmission)) return false;
+    
+    // Features filtering - check if ANY selected feature is present
+    if (selectedFeatures.isNotEmpty &&
+        !selectedFeatures.every((feature) => car.features.contains(Feature.values.firstWhere((f) => f.toString().split('.').last == feature)))) {
+      return false;
+    }
+    
+    return true;
+  }).toList();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Only show "Filtered Cars" label if filters are applied and there are cars
+      if (_showFilters && filteredCars.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Text(
+            'Filtered Cars',
             style: TextStyle(
-              fontSize: 18,
-              color: textColor,
+              fontSize: 18, 
               fontWeight: FontWeight.bold,
+              color: textColor
             ),
           ),
-          const SizedBox(height: 15),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                categories.length,
-                (index) => GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = index;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _selectedCategory == index
-                          ? activeTabColor
-                          : restButtonColor.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      categories[index],
-                      style: TextStyle(
-                        color: _selectedCategory == index
-                            ? AppColors.backgroundColorLight
-                            : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+        ),
+      
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: filteredCars.isEmpty
+            ? Text(
+                _showFilters 
+                  ? 'No cars match the selected filters.' 
+                  : 'All Cars',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).textTheme.bodyLarge?.color
+                ),
+              )
+            : SizedBox(
+                  height: 350, // Match the height of Featured Cars
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: filteredCars.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  CarDetailScreen(car: filteredCars[index]),
+                            ),
+                          );
+                        },
+                        child: _buildCarCard(filteredCars[index], context),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ),
-          ),
-        ],
       ),
-    );
-  }
+    ],
+  );  
+}
+
 
   Widget _buildSearchResults(CarProvider carsProvider) {
     final cars = carsProvider.filtercars;
@@ -370,7 +549,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: cars.length,
                     itemBuilder: (context, index) {
-                      return _buildCarCard(cars[index], context);
+                      return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CarDetailScreen(
+                              car: cars[index],
+                            ),
+                          ),
+                        );
+                      },
+                      child: _buildCarCard(cars[index], context),
+                    );
                     },
                   ),
                 ),
