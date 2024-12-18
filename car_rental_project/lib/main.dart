@@ -11,6 +11,9 @@ import 'package:car_rental_project/screens/onboarding_screen.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // For Supabase upload
+
+
 
 class AppColors {
   // Light theme colors
@@ -34,8 +37,18 @@ class AppColors {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  try {
+    await Supabase.initialize(
+      url: 'https://mrwbinussxmgdlcyeztb.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yd2JpbnVzc3htZ2RsY3llenRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0OTU1MDEsImV4cCI6MjA1MDA3MTUwMX0.OD8MDRSiqx63U_N7RXgANOYqtT38Xc_8GcodjZbi4RA',
+    );
+  } catch (e) {
+    print('Supabase initialization error: $e');
+  }
   runApp(const MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

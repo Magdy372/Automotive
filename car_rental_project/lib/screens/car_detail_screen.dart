@@ -32,7 +32,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               background: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
+                    child: Image.network(
                       widget.car.image, // Replace with your car image path
                       fit: BoxFit.cover,
                     ),
@@ -134,8 +134,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _specificationCard("${widget.car.horsepower}HP", "Power"),
-            _specificationCard("${widget.car.acceleration}s", "0 - 100 mph"),
+            _specificationCard("${widget.car.horsepower} HP", "Power"),
+            _specificationCard("${widget.car.acceleration}s", "0-100 mph"),
             _specificationCard("${widget.car.topSpeed} km/h", "Top Speed"),
           ],
         ),

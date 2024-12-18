@@ -717,7 +717,7 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                 ),
               ),
               child: Center(
-                child: Image.asset(
+                child: Image.network(
                   car.image,
                   height: 160,
                   fit: BoxFit.cover,
