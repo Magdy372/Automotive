@@ -15,7 +15,7 @@ enum BodyType {
   SportsCar
 }
 enum TransmissionType { Manual, Automatic }
-enum Feature { Bluetooth, Sensors, Navigation, Camera }
+enum Feature { Bluetooth, Sensors, Navigation, Camera , Autopilot , Sunroof }
 
 class Car {
   String id;
@@ -24,6 +24,10 @@ class Car {
   final double price; // Price per day
   final String image; // URL to car image
   final double rating; // Average rating
+  final double horsepower; // Horsepower of the car
+  final double acceleration; // Acceleration (0-100 km/h)
+  final double tankCapacity; // Tank capacity in liters
+  final int topSpeed; 
   final String description; // Description of the car
   final BodyType bodyType; // Body type (e.g., Sedan, SUV, etc.)
   final TransmissionType transmissionType; // Transmission type (Manual/Automatic)
@@ -45,6 +49,10 @@ class Car {
     required this.description,
     required this.bodyType,
     required this.transmissionType,
+    required this.horsepower,
+    required this.acceleration,
+    required this.tankCapacity,
+    required this.topSpeed,
     required this.features,
     required this.seller,
     this.isBooked = false,
@@ -77,6 +85,10 @@ class Car {
     description: data['description'] ?? '',
     bodyType: _stringToEnum(data['bodyType'] ?? '', BodyType.values),
     transmissionType: _stringToEnum(data['transmissionType'] ?? '', TransmissionType.values),
+    horsepower: (data['horsepower'] ?? 0).toDouble(),
+    acceleration: (data['acceleration'] ?? 0).toDouble(),
+    tankCapacity: (data['tankCapacity'] ?? 0).toDouble(),
+    topSpeed: (data['topSpeed'] ?? 0),
     features: (data['features'] ?? [])
         .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
         .toList(),
@@ -104,6 +116,10 @@ Map<String, dynamic> toMap() {
     'description': description,
     'bodyType': _enumToString(bodyType),
     'transmissionType': _enumToString(transmissionType),
+    'horsepower': horsepower,
+    'acceleration': acceleration,
+    'tankCapacity': tankCapacity,
+    'topSpeed': topSpeed,  // Add the new attribute here
     'features': features.map((feature) => _enumToString(feature)).toList(),
     'seller': seller,
     'isBooked': isBooked,

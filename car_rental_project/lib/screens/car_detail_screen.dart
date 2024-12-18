@@ -17,14 +17,6 @@ class CarDetailScreen extends StatefulWidget {
 }
 
 class _CarDetailScreenState extends State<CarDetailScreen> {
-  final Map<String, bool> _selectedFeatures = {
-    "Bluetooth": false,
-    "Apple CarPlay": false,
-    "Android Auto": false,
-    "360 Camera": false,
-    "Parking Sensors": false,
-    "Navigation": false,
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -100,19 +92,19 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.speed, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
-                Text("300 km/h", style: TextStyle(color: Colors.grey)),
-                SizedBox(width: 16),
-                Icon(Icons.settings, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
-                Text("Automatic", style: TextStyle(color: Colors.grey)),
-                SizedBox(width: 16),
-                Icon(Icons.local_gas_station, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
-                Text("50L", style: TextStyle(color: Colors.grey)),
+                const Icon(Icons.speed, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text("${widget.car.topSpeed} km/h", style: TextStyle(color: Colors.grey)),
+                const SizedBox(width: 16),
+                const Icon(Icons.settings, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(widget.car.transmissionType.toString().split('.').last, style: const TextStyle(color: Colors.grey)),
+                const SizedBox(width: 16),
+                const Icon(Icons.local_gas_station, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text("${widget.car.tankCapacity}L", style: TextStyle(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 12),
@@ -142,9 +134,9 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _specificationCard("350 HP", "Power"),
-            _specificationCard("4.5", "0-60 mph"),
-            _specificationCard("300 km/h", "Top Speed"),
+            _specificationCard("${widget.car.horsepower}HP", "Power"),
+            _specificationCard("${widget.car.acceleration}s", "0 - 100 mph"),
+            _specificationCard("${widget.car.topSpeed} km/h", "Top Speed"),
           ],
         ),
       ],
@@ -174,59 +166,54 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       ),
     );
   }
+Widget _buildFeatures() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        "Features",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      Wrap(
+        spacing: 8,
+        runSpacing: 10, // Adds vertical spacing
+        children: widget.car.features.map((feature) {
+          // Convert enum value to a user-friendly string
+          final featureName = feature.toString().split('.').last;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Text(
+              featureName,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    ],
+  );
+}
 
-  Widget _buildFeatures() {
+  Widget _buildDescription() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Features",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 10, // Adds vertical spacing
-          children: _selectedFeatures.keys.map((feature) {
-            return GestureDetector(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color:
-                      _selectedFeatures[feature]! ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Text(
-                  feature,
-                  style: TextStyle(
-                    color: _selectedFeatures[feature]!
-                        ? Colors.white
-                        : Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDescription() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
           "Description",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          "Experience luxury and performance with the Mercedes AMG GT. This stunning vehicle combines cutting-edge technology with elegant design to deliver an unforgettable driving experience.",
-          style: TextStyle(color: Colors.grey),
+          widget.car.description,
+          style: const TextStyle(color: Colors.grey),
         ),
       ],
     );

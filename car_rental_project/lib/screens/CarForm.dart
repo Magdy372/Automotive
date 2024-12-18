@@ -18,6 +18,11 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController horsepowerController = TextEditingController();
+  final TextEditingController accelerationController = TextEditingController();
+  final TextEditingController tankCapacityController = TextEditingController();
+  final TextEditingController topspeedController = TextEditingController();
+
 
   DateTime? _availableFrom;
   DateTime? _availableTo;
@@ -62,6 +67,10 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   void _uploadCarForRent(BuildContext context) {
     if (nameController.text.isEmpty ||
         priceController.text.isEmpty ||
+        horsepowerController.text.isEmpty ||
+        accelerationController.text.isEmpty ||
+        tankCapacityController.text.isEmpty ||
+        topspeedController.text.isEmpty ||
         _selectedBodyType == null ||
         _selectedTransmissionType == null ||
         _selectedFeatures.isEmpty ||
@@ -108,6 +117,10 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
       seller: sellerRef,
       availableFrom: _availableFrom,
       availableTo: _availableTo,
+      horsepower: double.tryParse(horsepowerController.text) ?? 0.0,
+      acceleration: double.tryParse(accelerationController.text) ?? 0.0,
+      tankCapacity: double.tryParse(tankCapacityController.text) ?? 0.0,
+      topSpeed: int.tryParse(topspeedController.text) ?? 0
     );
 
     final carProvider = Provider.of<CarProvider>(context, listen: false);
@@ -116,6 +129,10 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
       nameController.clear();
       priceController.clear();
       descriptionController.clear();
+      horsepowerController.clear();
+      accelerationController.clear();
+      tankCapacityController.clear();
+      topspeedController.clear;
       setState(() {
         _selectedBodyType = null;
         _selectedTransmissionType = null;
@@ -146,145 +163,179 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Upload Car",style: TextStyle(color: Colors.white),)),
+      appBar: AppBar(
+        title: const Text("Upload Car", style: TextStyle(color: Colors.white)),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              const Text('Upload a Car for Rent',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Expanded(
-                child: Form(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Car name field
-                      TextField(
-                        controller: nameController,
-                        decoration:
-                            const InputDecoration(labelText: "Car Name"),
-                      ),
-
-                      // Price per day field
-                      TextField(
-                        controller: priceController,
-                        decoration:
-                            const InputDecoration(labelText: "Price per Day"),
-                        keyboardType: TextInputType.number,
-                      ),
-
-                      // Car description field
-                      TextField(
-                        controller: descriptionController,
-                        decoration:
-                            const InputDecoration(labelText: "Description"),
-                      ),
-
-                      // Body Type Dropdown
-                      DropdownButton<BodyType>(
-                        value: _selectedBodyType,
-                        hint: const Text('Select Body Type'),
-                        onChanged: (BodyType? value) {
-                          setState(() {
-                            _selectedBodyType = value;
-                          });
-                        },
-                        items: BodyType.values.map((BodyType value) {
-                          return DropdownMenuItem<BodyType>(
-                            value: value,
-                            child: Text(value.toString().split('.').last),
-                          );
-                        }).toList(),
-                      ),
-
-                      // Transmission Type Dropdown
-                      DropdownButton<TransmissionType>(
-                        value: _selectedTransmissionType,
-                        hint: const Text('Select Transmission Type'),
-                        onChanged: (TransmissionType? value) {
-                          setState(() {
-                            _selectedTransmissionType = value;
-                          });
-                        },
-                        items: TransmissionType.values
-                            .map((TransmissionType value) {
-                          return DropdownMenuItem<TransmissionType>(
-                            value: value,
-                            child: Text(value.toString().split('.').last),
-                          );
-                        }).toList(),
-                      ),
-
-                      // Brand Dropdown
-                      DropdownButton<Brand>(
-                        value: _selectedBrand,
-                        hint: const Text('Select Brand'),
-                        onChanged: (Brand? value) {
-                          setState(() {
-                            _selectedBrand = value;
-                          });
-                        },
-                        items: Brand.values.map((Brand value) {
-                          return DropdownMenuItem<Brand>(
-                            value: value,
-                            child: Text(value.toString().split('.').last),
-                          );
-                        }).toList(),
-                      ),
-
-                      // Select Features
-                      const Text('Select Features:'),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 4.0,
-                        children: Feature.values.map((Feature feature) {
-                          return ChoiceChip(
-                            label: Text(feature.toString().split('.').last),
-                            selected: _selectedFeatures.contains(feature),
-                            onSelected: (selected) {
-                              _toggleFeature(feature);
-                            },
-                          );
-                        }).toList(),
-                      ),
-
-                      // Available from Date Picker
-                      ListTile(
-                        title: const Text('Available From:'),
-                        subtitle: Text(_availableFrom != null
-                            ? _availableFrom!.toLocal().toString().split(' ')[0]
-                            : 'Not selected'),
-                        onTap: () => _selectDate(context, true),
-                      ),
-
-                      // Available to Date Picker
-                      ListTile(
-                        title: const Text('Available To:'),
-                        subtitle: Text(_availableTo != null
-                            ? _availableTo!.toLocal().toString().split(' ')[0]
-                            : 'Not selected'),
-                        onTap: () => _selectDate(context, false),
-                      ),
-
-                      // Upload Button
-                      Align(
-                        alignment: Alignment.center,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _uploadCarForRent(context);
+        child: SingleChildScrollView(  // Add this widget to make the page scrollable
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text('Upload a Car for Rent',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                // Form fields
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Car name field
+                    TextField(
+                      controller: nameController,
+                      decoration:
+                          const InputDecoration(labelText: "Car Name"),
+                    ),
+                    const SizedBox(height: 20),
+                    // Price per day field
+                    TextField(
+                      controller: priceController,
+                      decoration:
+                          const InputDecoration(labelText: "Price per Day"),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    // Horsepower field
+                    TextField(
+                      controller: horsepowerController,
+                      decoration:
+                          const InputDecoration(labelText: "Horsepower (HP)"),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    // Acceleration field
+                    TextField(
+                      controller: accelerationController,
+                      decoration: const InputDecoration(
+                          labelText: "Acceleration (0-100 km/h in seconds)"),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    // Tank Capacity field
+                    TextField(
+                      controller: tankCapacityController,
+                      decoration: const InputDecoration(
+                          labelText: "Tank Capacity (liters)"),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    // TopSpeed field
+                    TextField(
+                      controller: topspeedController,
+                      decoration:
+                          const InputDecoration(labelText: "Top Speed (km/h)"),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    // Car description field
+                    TextField(
+                      controller: descriptionController,
+                      decoration:
+                          const InputDecoration(labelText: "Description"),
+                    ),
+                    const SizedBox(height: 20),
+                    // Body Type Dropdown
+                    DropdownButton<BodyType>(
+                      value: _selectedBodyType,
+                      hint: const Text('Select Body Type'),
+                      onChanged: (BodyType? value) {
+                        setState(() {
+                          _selectedBodyType = value;
+                        });
+                      },
+                      items: BodyType.values.map((BodyType value) {
+                        return DropdownMenuItem<BodyType>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Transmission Type Dropdown
+                    DropdownButton<TransmissionType>(
+                      value: _selectedTransmissionType,
+                      hint: const Text('Select Transmission Type'),
+                      onChanged: (TransmissionType? value) {
+                        setState(() {
+                          _selectedTransmissionType = value;
+                        });
+                      },
+                      items: TransmissionType.values
+                          .map((TransmissionType value) {
+                        return DropdownMenuItem<TransmissionType>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Brand Dropdown
+                    DropdownButton<Brand>(
+                      value: _selectedBrand,
+                      hint: const Text('Select Brand'),
+                      onChanged: (Brand? value) {
+                        setState(() {
+                          _selectedBrand = value;
+                        });
+                      },
+                      items: Brand.values.map((Brand value) {
+                        return DropdownMenuItem<Brand>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Select Features
+                    const Text('Select Features:'),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: Feature.values.map((Feature feature) {
+                        return ChoiceChip(
+                          label: Text(feature.toString().split('.').last),
+                          selected: _selectedFeatures.contains(feature),
+                          onSelected: (selected) {
+                            _toggleFeature(feature);
                           },
-                          child: const Text("Upload Car",
-                              style: TextStyle(fontSize: 16)),
-                        ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    // Available from Date Picker
+                    ListTile(
+                      title: const Text('Available From:'),
+                      subtitle: Text(_availableFrom != null
+                          ? _availableFrom!.toLocal().toString().split(' ')[0]
+                          : 'Not selected'),
+                      onTap: () => _selectDate(context, true),
+                    ),
+                    const SizedBox(height: 20),
+                    // Available to Date Picker
+                    ListTile(
+                      title: const Text('Available To:'),
+                      subtitle: Text(_availableTo != null
+                          ? _availableTo!.toLocal().toString().split(' ')[0]
+                          : 'Not selected'),
+                      onTap: () => _selectDate(context, false),
+                    ),
+                    const SizedBox(height: 20),
+                    // Upload Button
+                    Align(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _uploadCarForRent(context);
+                        },
+                        child: const Text("Upload Car",
+                            style: TextStyle(fontSize: 16)),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
