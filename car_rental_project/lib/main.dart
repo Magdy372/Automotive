@@ -12,7 +12,8 @@ import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // For Supabase upload
-
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 class AppColors {
@@ -34,9 +35,90 @@ class AppColors {
   static const Color activeButtonDark = Color.fromARGB(255, 237, 237, 241);
 }
 
+class NotificationService {
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  static FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  static const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel',
+    'High Importance Notifications',
+    description: 'This channel is used for important notifications.',
+    importance: Importance.max,  // This will make notifications pop up
+    enableVibration: true,
+    playSound: true,
+    enableLights: true,
+    showBadge: true,
+  );
+
+  static Future<void> initialize() async {
+    // Request permission
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      announcement: true,
+      carPlay: true,
+      criticalAlert: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      
+      // Get FCM token
+      String? token = await messaging.getToken();
+      print('FCM Token: $token');
+
+      // Initialize local notifications
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+
+      await _notificationsPlugin.initialize(
+        const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        ),
+        onDidReceiveNotificationResponse: (details) {
+          // Handle notification tap
+          print('Notification clicked: ${details.payload}');
+        },
+      );
+
+      // Handle foreground messages
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
+
+        if (notification != null && android != null) {
+          _notificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription: channel.description,
+                icon: android.smallIcon,
+              ),
+            ),
+            payload: message.data.toString(),
+          );
+        }
+      });
+    }
+  }
+
+  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print('Handling a background message: ${message.messageId}');
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService.initialize(); 
+  
   try {
     await Supabase.initialize(
       url: 'https://mrwbinussxmgdlcyeztb.supabase.co',
@@ -45,6 +127,10 @@ void main() async {
   } catch (e) {
     print('Supabase initialization error: $e');
   }
+  
+  // Set up background message handler
+  FirebaseMessaging.onBackgroundMessage(NotificationService._firebaseMessagingBackgroundHandler);
+  
   runApp(const MyApp());
 }
 
