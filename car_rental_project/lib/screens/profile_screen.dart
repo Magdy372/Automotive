@@ -64,21 +64,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   void initState() {
     super.initState();
-    // Get user ID from UserProvider
+    // Delay the data fetching to happen after the build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchUserData();
+    });
+  }
+
+  void _fetchUserData() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userId = userProvider.currentUser?.id ??
-        ''; // Ensure the user is logged in and has an ID
+    final userId = userProvider.currentUser?.id ?? '';
 
     if (userId.isNotEmpty) {
-      final rentalProvider =
-          Provider.of<RentalProvider>(context, listen: false);
-      rentalProvider.fetchRentalsByUser(userId); // Fetch rentals data
-       final carProvider = Provider.of<CarProvider>(context, listen: false);
-         carProvider.getUserCars(userId); // Fetch cars by user ID
+      final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
+      final carProvider = Provider.of<CarProvider>(context, listen: false);
       
+      // Fetch data
+      rentalProvider.fetchRentalsByUser(userId);
+      carProvider.getUserCars(userId);
     }
   }
 
+  // Rest of your existing code remains the same
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -90,7 +96,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         body: const Center(child: Text("User not logged in")),
       );
     }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -296,97 +301,98 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
 // Recent Rentals Display
-  Widget _buildRecentRentals() {
-    return Consumer<RentalProvider>(
-      builder: (context, rentalProvider, child) {
-        final recentRentals = rentalProvider.rentals;
+Widget _buildRecentRentals() {
+  return Consumer<RentalProvider>(builder: (context, rentalProvider, child) {
+    final recentRentals = rentalProvider.rentalsForUser;
 
-        if (recentRentals.isEmpty) {
-          return const Center(child: Text("No recent rentals found."));
-        }
+    if (recentRentals.isEmpty) {
+      return const Center(child: Text("No recent rentals found."));
+    }
 
-        return Card(
-          elevation: 5,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Recent Rentals",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Loop through rentals and display relevant details
-                for (var rental in recentRentals)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Recent Rentals",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (var rental in recentRentals)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Label and car name
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Car Name', // Label for car name
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              rental.carName ??
-                                  'Unknown Car', // Display car name
+                        const Text(
+                          'Car Name',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Builder(
+                          builder: (context) {
+                            final carName = rental.id != null 
+                              ? rentalProvider.carNames[rental.id] 
+                              : null;
+                            debugPrint('Rental ${rental.id}: Car name: $carName'); // Debug print
+                            return Text(
+                              carName ?? 'Unknown Car',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
-                            ),
-                          ],
-                        ),
-
-                        // Label and rental duration
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Number of Days', // Label for the number of days
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              "${rental.endDate.difference(rental.startDate).inDays} days", // Display the number of days
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
+                            );
+                          }
                         ),
                       ],
                     ),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
+                    // Label and rental duration
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Number of Days', // Label for the number of days
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          "${rental.endDate.difference(rental.startDate).inDays} days", // Display the number of days
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
     );
-  }
+  });
+}
 
   // Helper function to create settings options
   Widget _buildSettingsOption(

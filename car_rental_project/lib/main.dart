@@ -6,12 +6,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/providers/car_provider.dart';
-import 'package:car_rental_project/providers/rental_provider.dart'; // Added RentalProvider
+import 'package:car_rental_project/providers/rental_provider.dart'; 
 import 'package:car_rental_project/screens/onboarding_screen.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // For Supabase upload
+import 'package:supabase_flutter/supabase_flutter.dart'; 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 

@@ -110,7 +110,7 @@ List<Car> _carsbysuser = [];
       notifyListeners();
     } catch (e) {
       debugPrint('Error fetching user cars: $e');
-      rethrow; // Rethrow the exception for further handling
+    // Rethrow the exception for further handling
     }
   }
 

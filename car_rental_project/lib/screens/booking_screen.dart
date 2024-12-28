@@ -294,7 +294,7 @@ class _BookingScreenState extends State<BookingScreen> {
         await rentalProvider.addRental(
           RentalModel(
             car: carRef,
-            buyer: buyerRef,
+            buyerRef: buyerRef,
             startDate: _startDate!,
             endDate: _endDate!,
             totalPrice: _totalPrice,
