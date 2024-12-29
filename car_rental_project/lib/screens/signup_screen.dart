@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../models/user_model.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -84,12 +85,7 @@ class SignupScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: _nameController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your full name';
-                            }
-                            return null;
-                          },
+                        validator: UserModel.validateName,
                           decoration: InputDecoration(
                             label: const Text('Full name'),
                             hintText: 'Enter fullname',
@@ -102,16 +98,7 @@ class SignupScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: _emailController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
+                       validator: UserModel.validateEmail,
                           decoration: InputDecoration(
                             label: const Text('Email'),
                             hintText: 'Enter email',
@@ -126,15 +113,8 @@ class SignupScreen extends StatelessWidget {
                           controller: _passwordController,
                           obscureText: true,
                           obscuringCharacter: '*',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters long';
-                            }
-                            return null;
-                          },
+                          validator: UserModel.validatePassword,
+                          
                           decoration: InputDecoration(
                             label: const Text('Password'),
                             hintText: 'Enter password',

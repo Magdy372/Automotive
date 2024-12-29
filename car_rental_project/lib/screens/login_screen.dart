@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../models/user_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -86,12 +87,7 @@ class LoginScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: _emailController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            return null;
-                          },
+                      validator: UserModel.validateEmail,
                           decoration: InputDecoration(
                             label: const Text('Email'),
                             hintText: 'Enter email',
@@ -117,12 +113,7 @@ class LoginScreen extends StatelessWidget {
                           controller: _passwordController,
                           obscureText: true,
                           obscuringCharacter: '*',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            return null;
-                          },
+                        validator: UserModel.validatePassword,
                           decoration: InputDecoration(
                             label: const Text('Password'),
                             hintText: 'Enter password',
@@ -228,7 +219,7 @@ class LoginScreen extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                               // userProvider.signInWithFacebook(context);
+                              //  userProvider.signInWithFacebook(context);
                               },
                               child: Container(
                                 decoration: const BoxDecoration(
@@ -246,7 +237,7 @@ class LoginScreen extends StatelessWidget {
                             const SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
-                                //userProvider.signInWithGoogle(context);
+                              //  userProvider.signInWithGoogle(context);
                               },
                               child: Container(
                                 decoration: const BoxDecoration(
