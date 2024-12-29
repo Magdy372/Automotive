@@ -4,6 +4,7 @@ import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -26,28 +27,67 @@ class _BookingScreenState extends State<BookingScreen> {
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
 
   late List<DateTime> _bookedDates;
+   void _debugPrintBookedDates() {
+    debugPrint('=== Debug Booked Dates ===');
+    for (int i = 0; i < _bookedDates.length; i += 2) {
+      DateTime start = _bookedDates[i];
+      DateTime? end = i + 1 < _bookedDates.length ? _bookedDates[i + 1] : null;
+      debugPrint('Range ${i ~/ 2}: ${start.toString()} to ${end?.toString() ?? 'N/A'}');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    // Ensure booked dates are properly paired
     _bookedDates = widget.car.bookedDates ?? [];
-
-    // Remove any incomplete pairs
     if (_bookedDates.length % 2 != 0) {
       _bookedDates.removeLast();
     }
-
-    debugPrint('Booked dates for this car: $_bookedDates');
+    _debugPrintBookedDates();
   }
 
-  /// Helper method to display the TableCalendar dialog
+  bool _isBooked(DateTime day) {
+    final DateTime dateToCheck = DateTime(day.year, day.month, day.day);
+    
+    debugPrint('Checking if date is booked: $dateToCheck');
+    
+    if (_bookedDates.isEmpty) {
+      debugPrint('No booked dates available');
+      return false;
+    }
+
+    for (int i = 0; i < _bookedDates.length; i += 2) {
+      DateTime start = DateTime(
+        _bookedDates[i].year,
+        _bookedDates[i].month,
+        _bookedDates[i].day,
+      );
+      DateTime end = DateTime(
+        _bookedDates[i + 1].year,
+        _bookedDates[i + 1].month,
+        _bookedDates[i + 1].day,
+      );
+      
+      debugPrint('Comparing with range: $start to $end');
+
+      if (dateToCheck.isAtSameMomentAs(start) || 
+          dateToCheck.isAtSameMomentAs(end) || 
+          (dateToCheck.isAfter(start) && dateToCheck.isBefore(end))) {
+        debugPrint('Date $dateToCheck is booked');
+        return true;
+      }
+    }
+    
+    debugPrint('Date $dateToCheck is not booked');
+    return false;
+  }
+
   Future<DateTime?> _showDatePickerDialog({
     required DateTime firstDate,
     required DateTime lastDate,
     DateTime? focusedDay,
   }) async {
     try {
-      // Ensure focusedDay is within the valid range
       if (focusedDay == null || focusedDay.isBefore(firstDate)) {
         focusedDay = firstDate;
       } else if (focusedDay.isAfter(lastDate)) {
@@ -66,7 +106,7 @@ class _BookingScreenState extends State<BookingScreen> {
               lastDay: lastDate,
               focusedDay: focusedDay!,
               calendarFormat: CalendarFormat.month,
-              headerStyle: HeaderStyle(
+              headerStyle: const HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
                 titleTextStyle: TextStyle(
@@ -76,53 +116,45 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
               ),
               calendarStyle: CalendarStyle(
-                // Today's date styling
                 todayDecoration: BoxDecoration(
-                  color: Colors.blue.shade200,
+                  color: Colors.blueGrey,
                   shape: BoxShape.circle,
                 ),
-                // Available dates styling
-                defaultDecoration: BoxDecoration(
-                   color: Colors.green.shade300, 
-                  shape: BoxShape.circle,
+                todayTextStyle: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                // Weekend dates styling
-                weekendDecoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  shape: BoxShape.circle,
-                ),
-                // Disabled dates styling
-                disabledDecoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  shape: BoxShape.circle,
-                ),
+                defaultTextStyle: const TextStyle(color: Colors.black87),
+                weekendTextStyle: const TextStyle(color: Colors.black87),
+                outsideTextStyle: const TextStyle(color: Colors.grey),
+                disabledTextStyle: const TextStyle(color: Colors.grey),
               ),
-              selectedDayPredicate: (day) {
-                // Highlight available and booked dates differently
-                if (_isBooked(day)) {
-                  return false; // Booked dates won't be selectable
-                }
-                return true;
-              },
-              // Custom day builder to show booked and available dates
               calendarBuilders: CalendarBuilders(
                 defaultBuilder: (context, day, focusedDay) {
-                  if (_isBooked(day)) {
-                    return Container(
-                      margin: const EdgeInsets.all(4.0),
-                      decoration: BoxDecoration(
-                        color:Color.fromARGB(255, 210, 48, 48),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${day.day}',
-                          style: TextStyle(color: Colors.white),
+                  bool isBooked = _isBooked(day);
+                  bool isToday = isSameDay(day, DateTime.now());
+                  
+                  // Always return a container for all dates
+                  return Container(
+                    margin: const EdgeInsets.all(4.0),
+                    decoration: BoxDecoration(
+                      color: isBooked 
+                          ? Colors.red.shade400
+                          : isToday 
+                              ? Colors.blueGrey
+                              : Colors.green.shade400,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: isToday || isBooked ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
-                    );
-                  }
-                  return null; // Use default styling
+                    ),
+                  );
                 },
               ),
               onDaySelected: (selectedDay, focusedDay) {
@@ -130,7 +162,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   Navigator.pop(context, selectedDay);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text("This date is already booked!"),
                       backgroundColor: Colors.red,
                     ),
@@ -146,37 +178,6 @@ class _BookingScreenState extends State<BookingScreen> {
       return null;
     }
   }
-
-  bool _isBooked(DateTime day) {
-    // Optimization: Early return for days outside the overall booking range
-    if (_bookedDates.isEmpty ||
-        day.isBefore(widget.car.availableFrom!) ||
-        day.isAfter(widget.car.availableTo!)) {
-      return false;
-    }
-
-    // More efficient iteration through booked dates
-    for (int i = 0; i < _bookedDates.length; i += 2) {
-      try {
-        DateTime start = _bookedDates[i];
-        DateTime end = _bookedDates[i + 1];
-
-        // Check if the day is within the booked range
-        if (day.isAtSameMomentAs(start) ||
-            day.isAtSameMomentAs(end) ||
-            (day.isAfter(start) && day.isBefore(end))) {
-          return true;
-        }
-      } catch (e) {
-        debugPrint('Error checking booked dates: $e');
-        // Silently handle any potential index out of bounds
-        break;
-      }
-    }
-
-    return false;
-  }
-
   void _selectStartDate() async {
     debugPrint(
         'Selecting start date...'); // Log the start date selection process
@@ -383,9 +384,9 @@ class _BookingScreenState extends State<BookingScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildLegendItem(Colors.blue.shade200, 'Today'),
+                      _buildLegendItem(Colors.blueGrey, 'Today'),
                       _buildLegendItem(const Color.fromARGB(255, 210, 48, 48), 'Booked'),
-                      _buildLegendItem(const Color.fromARGB(255, 101, 24, 128), 'Available'),
+                      _buildLegendItem( Colors.green.shade400, 'Available'),
                     ],
                   ),
                 ),
@@ -510,7 +511,6 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-// Modified input field with icon support and always showing selected date
   Widget _buildReadOnlyInputField(String label, DateTime? date,
       {IconData? icon}) {
     return TextFormField(

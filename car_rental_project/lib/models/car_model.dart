@@ -1,21 +1,7 @@
 // car_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum Brand { BMW, Toyota, Honda, Tesla, MG, Mercedes, Ford, Audi, Hyundai }
-enum BodyType {
-  Sedan,
-  Hatchback,
-  Coupe,
-  SUV,
-  Crossover,
-  Convertible,
-  Wagon,
-  Minivan,
-  PickupTruck,
-  SportsCar
-}
-enum TransmissionType { Manual, Automatic }
-enum Feature { Bluetooth, Sensors, Navigation, Camera, Autopilot, Sunroof }
+
 
 class Car {
   String id;
@@ -131,3 +117,22 @@ class Car {
   }
 }
 
+
+
+
+
+enum Brand { BMW, Toyota, Honda, Tesla, MG, Mercedes, Ford, Audi, Hyundai }
+enum BodyType {
+  Sedan,
+  Hatchback,
+  Coupe,
+  SUV,
+  Crossover,
+  Convertible,
+  Wagon,
+  Minivan,
+  PickupTruck,
+  SportsCar
+}
+enum TransmissionType { Manual, Automatic }
+enum Feature { Bluetooth, Sensors, Navigation, Camera, Autopilot, Sunroof }

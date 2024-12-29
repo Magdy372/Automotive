@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RentalModel {
-  final String? id; // Firestore document ID
-  final DocumentReference car; // Reference to the car document
-  final DocumentReference buyerRef; // Reference to the buyer document
+  final String? id; 
+  final DocumentReference car;
+  final DocumentReference buyerRef; 
   final DateTime startDate;
   final DateTime endDate;
   final double totalPrice;

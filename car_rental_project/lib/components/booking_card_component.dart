@@ -20,7 +20,7 @@ class BookingCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Flight Details
+          
           Container(
             padding: const EdgeInsets.all(15),
             decoration: const BoxDecoration(
@@ -58,7 +58,7 @@ class BookingCard extends StatelessWidget {
             ),
           ),
           const Divider(thickness: 1),
-          // Passenger & Booking Info
+    
           Container(
             padding: const EdgeInsets.all(15),
             child: const Column(
