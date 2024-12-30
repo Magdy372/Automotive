@@ -65,12 +65,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
             notification.date.month == yesterday.month &&
             notification.date.day == yesterday.day).toList();
       case NotificationStatus.older:
-        return notifications
-            .where((notification) => notification.date.isBefore(yesterday))
-            .toList();
+        return notifications.where((notification) =>
+            notification.date.isBefore(yesterday) &&
+            !(notification.date.year == yesterday.year &&
+              notification.date.month == yesterday.month &&
+              notification.date.day == yesterday.day)).toList();
       default:
         return [];
     }
+
   }
 
   @override
@@ -88,15 +91,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
               _buildSection("Yesterday", NotificationStatus.yesterday),
               _buildSection("Older", NotificationStatus.older),
             ],
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildBottomNavBar(),
-          ),
+          )
         ],
       ),
+      bottomNavigationBar: _buildBottomNavBar(),
+
     );
   }
 
@@ -114,7 +113,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         'Notifications',
         style: TextStyle(
           color: Colors.black,
-          fontSize: 20,
+          fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -185,11 +184,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
+  // Bottom Navigation Bar
   Widget _buildBottomNavBar() {
+    // Access the current theme's colors dynamically
+    // final theme = Theme.of(context);
+    // final backgroundColor = theme
+    //     .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    // final textColor = theme
+    //     .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    // final activeTabColor =
+    //     theme.colorScheme.primary; // Active tab background color
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
@@ -204,23 +213,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
           onTabChange: (index) {
             switch (index) {
               case 0:
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const HomeScreen()),
                 );
                 break;
               case 1:
-                break; // Stay on current screen
-              case 2:
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
                 );
                 break;
               case 3:
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen()),
                 );
                 break;
             }

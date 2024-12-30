@@ -1,54 +1,21 @@
 import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/screens/edit_profile_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:car_rental_project/screens/settings_screen.dart';
+import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
-import '../models/car_model.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Car Rental System',
-      theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 0, 0, 0),
-        scaffoldBackgroundColor: Colors.white,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.black),
-          bodyMedium: TextStyle(color: Colors.black87),
-          displayLarge: TextStyle(color: Colors.black),
-          displayMedium: TextStyle(color: Colors.black87),
-        ),
-        appBarTheme: const AppBarTheme(
-          color: Color.fromARGB(255, 0, 0, 0),
-          titleTextStyle: TextStyle(color: Colors.white),
-        ),
-        cardColor: Colors.white,
-        buttonTheme: const ButtonThemeData(
-          buttonColor: Color.fromARGB(255, 0, 0, 0),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-        ),
-        colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: Colors.white)
-            .copyWith(surface: Colors.white),
-      ),
-      home: const UserProfilePage(),
+    return const Scaffold(
+      body: UserProfilePage(),
     );
   }
 }
@@ -57,7 +24,7 @@ class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
   @override
-  _UserProfilePageState createState() => _UserProfilePageState();
+  State<UserProfilePage> createState() => _UserProfilePageState();
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
@@ -98,19 +65,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Color.fromARGB(255, 0, 0, 0)),
-            onPressed: () {
-              // Handle edit action, e.g., navigate to edit profile page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditProfileScreen()),
-              );
-            },
-          ),
-        ],
+      title: const Text(
+        'Profile',
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      centerTitle: true,
+      backgroundColor: Colors.white,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit, color: Color.fromARGB(255, 0, 0, 0)),
+          onPressed: () {
+            // Handle edit action, e.g., navigate to edit profile page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditProfileScreen()),
+            );
+          },
+        ),
+      ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -146,6 +122,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           _buildPaymentMethodOption(context),
         ],
       ),
+      bottomNavigationBar: _buildBottomNavBar(),
+
     );
   }
 
@@ -458,6 +436,73 @@ Widget _buildRecentRentals() {
             Text(subtitle, style: const TextStyle(color: Colors.black54)),
             if (progress > 0.0) const SizedBox(height: 10),
             if (progress > 0.0) LinearProgressIndicator(value: progress),
+          ],
+        ),
+      ),
+    );
+  }
+  // Bottom Navigation Bar
+  Widget _buildBottomNavBar() {
+    // Access the current theme's colors dynamically
+    // final theme = Theme.of(context);
+    // final backgroundColor = theme
+    //     .appBarTheme.backgroundColor; // Use theme's AppBar background color
+    // final textColor = theme
+    //     .colorScheme.onPrimary; // Text/icon color for active/inactive states
+    // final activeTabColor =
+    //     theme.colorScheme.primary; // Active tab background color
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+        child: GNav(
+          backgroundColor: Colors.black,
+          color: Colors.white,
+          activeColor: Colors.white,
+          tabBackgroundColor: const Color.fromARGB(255, 66, 66, 66),
+          padding: const EdgeInsets.all(16),
+          gap: 8,
+          selectedIndex: 2,
+          onTabChange: (index) {
+            switch (index) {
+              case 0:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                );
+                break;
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
+                );
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen()),
+                );
+                break;
+            }
+          },
+          tabs: const [
+            GButton(icon: Icons.home, text: 'Home'),
+            GButton(icon: Icons.notifications, text: 'Notifications'),
+            GButton(icon: Icons.person, text: 'Profile'),
+            GButton(icon: Icons.settings, text: 'Settings'),
           ],
         ),
       ),
