@@ -1,5 +1,7 @@
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
+import 'package:car_rental_project/screens/onboarding_screen.dart';
+import 'package:car_rental_project/screens/signup_screen.dart';
 import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -94,9 +96,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.logout_rounded),
             onPressed: () {
-              // Handle notifications
+               Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  Onboarding()),
+                    );
             },
           ),
         ],
