@@ -1,13 +1,13 @@
-import 'package:car_rental_project/constants.dart';
 import 'package:car_rental_project/screens/CarForm.dart';
+import 'package:car_rental_project/screens/onboarding_screens.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
+import 'package:car_rental_project/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/providers/car_provider.dart';
 import 'package:car_rental_project/providers/rental_provider.dart'; 
-import 'package:car_rental_project/screens/onboarding_screen.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
           Widget initialScreen;
 
           if (userProvider.currentUser == null) {
-            initialScreen = const Onboarding(); // No user logged in
+            initialScreen = const SplashScreen(); // No user logged in
           } else if (userProvider.currentUser?.role == 'admin') {
             initialScreen = const AdminDashboardScreen(); // Admin role
           } else {
@@ -139,10 +139,10 @@ class MyApp extends StatelessWidget {
             home: initialScreen,
             debugShowCheckedModeBanner: false,
             routes: {
-              '/onboarding': (context) => const Onboarding(),
+              '/onboarding': (context) => const OnboardingScreens(),
               '/admin': (context) => const AdminDashboardScreen(),
               '/home': (context) => const HomeScreen(),
-              '/login': (context) => LoginScreen(),
+              // '/login': (context) => LoginScreen(),
               '/profile': (context) => const ProfileScreen(),
               '/CarUpload': (context) => const CarUploadScreen(),
             },

@@ -627,7 +627,7 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
       // Navigate to CarListingScreen when tapped
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  CarListingScreen()),
+        MaterialPageRoute(builder: (context) =>  const CarListingScreen()),
       );
     },
     child: const Text(
@@ -739,7 +739,7 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                   const SizedBox(height: 5),
                   Text(
                     car.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

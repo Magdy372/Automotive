@@ -21,12 +21,12 @@ class MyBookingsScreen extends StatelessWidget {
           // Tab Section: Upcoming and Previous
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: Column(
-                    children: const [
+                    children: [
                       Text('Upcoming',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
@@ -37,7 +37,7 @@ class MyBookingsScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: Column(
-                    children: const [
+                    children: [
                       Text('Previous',
                           style: TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 16)),
@@ -51,7 +51,7 @@ class MyBookingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Ticket Card
-          Expanded(
+          const Expanded(
             child: SingleChildScrollView(
               child: BookingCard(),
             ),

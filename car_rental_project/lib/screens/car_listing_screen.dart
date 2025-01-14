@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/car_provider.dart';
-import 'package:car_rental_project/models/car_model.dart';
 
 class CarListingScreen extends StatefulWidget {
   const CarListingScreen({super.key});

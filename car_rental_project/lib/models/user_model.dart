@@ -46,6 +46,7 @@ class UserModel {
     if (password.length < 6) {
       return 'Password must be at least 6 characters';
     }
+    return null;
     // Add more password requirements if needed
     //  if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$').hasMatch(password)) {
     //    return 'Password must contain at least one letter and one number';

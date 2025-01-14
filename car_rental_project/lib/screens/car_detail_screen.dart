@@ -96,7 +96,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               children: [
                 const Icon(Icons.speed, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.topSpeed} km/h", style: TextStyle(color: Colors.grey)),
+                Text("${widget.car.topSpeed} km/h", style: const TextStyle(color: Colors.grey)),
                 const SizedBox(width: 16),
                 const Icon(Icons.settings, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
@@ -104,7 +104,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 const SizedBox(width: 16),
                 const Icon(Icons.local_gas_station, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.tankCapacity}L", style: TextStyle(color: Colors.grey)),
+                Text("${widget.car.tankCapacity}L", style: const TextStyle(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 12),

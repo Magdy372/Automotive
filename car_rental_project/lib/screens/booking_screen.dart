@@ -115,19 +115,19 @@ class _BookingScreenState extends State<BookingScreen> {
                   color: Colors.black87,
                 ),
               ),
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 todayDecoration: BoxDecoration(
                   color: Colors.blueGrey,
                   shape: BoxShape.circle,
                 ),
-                todayTextStyle: const TextStyle(
+                todayTextStyle: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
-                defaultTextStyle: const TextStyle(color: Colors.black87),
-                weekendTextStyle: const TextStyle(color: Colors.black87),
-                outsideTextStyle: const TextStyle(color: Colors.grey),
-                disabledTextStyle: const TextStyle(color: Colors.grey),
+                defaultTextStyle: TextStyle(color: Colors.black87),
+                weekendTextStyle: TextStyle(color: Colors.black87),
+                outsideTextStyle: TextStyle(color: Colors.grey),
+                disabledTextStyle: TextStyle(color: Colors.grey),
               ),
               calendarBuilders: CalendarBuilders(
                 defaultBuilder: (context, day, focusedDay) {
@@ -325,7 +325,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Book Your Rental'),
+        title: const Text('Book Your Rental'),
         backgroundColor: Colors.black, // Changed from deepPurple to black
       ),
       body: SingleChildScrollView(
@@ -347,21 +347,21 @@ class _BookingScreenState extends State<BookingScreen> {
                     children: [
                       Text(
                         'Book: ${widget.car.name}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.black, // Changed from deepPurple
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
-                          Icon(Icons.car_rental,
+                          const Icon(Icons.car_rental,
                               color: Colors.black), // Changed from deepPurple
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
                             '\$${widget.car.price}/day',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.black87,
                             ),
@@ -372,7 +372,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Color legend
               Card(
                 elevation: 3,
@@ -391,7 +391,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Date selection and pricing
               Form(
                 key: _formKey,
@@ -403,14 +403,14 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: _buildReadOnlyInputField('Start Date', _startDate,
                           icon: Icons.calendar_today),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // End Date Selection
                     GestureDetector(
                       onTap: _selectEndDate,
                       child: _buildReadOnlyInputField('End Date', _endDate,
                           icon: Icons.calendar_today),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Total Price Display
                     Card(
                       elevation: 3,
@@ -422,7 +422,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               'Total Price',
                               style: TextStyle(
                                 fontSize: 18,
@@ -433,7 +433,7 @@ class _BookingScreenState extends State<BookingScreen> {
                               _totalPrice > 0
                                   ? '\$${_totalPrice.toStringAsFixed(2)}'
                                   : 'Select dates',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black, // Changed from deepPurple
@@ -443,10 +443,10 @@ class _BookingScreenState extends State<BookingScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     // Confirm and Book Button
                     AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
@@ -461,7 +461,7 @@ class _BookingScreenState extends State<BookingScreen> {
                             color: Colors.black.withOpacity(0.5),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -470,10 +470,10 @@ class _BookingScreenState extends State<BookingScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 50, vertical: 15),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Confirm and Book',
                           style: TextStyle(
                             fontSize: 18,
@@ -505,7 +505,7 @@ class _BookingScreenState extends State<BookingScreen> {
             border: Border.all(color: Colors.grey.shade300),
           ),
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         Text(text),
       ],
     );
@@ -518,7 +518,7 @@ class _BookingScreenState extends State<BookingScreen> {
       decoration: InputDecoration(
         // When a date is selected, show it as the label
         labelText:
-            date != null ? '${label}: ${_dateFormat.format(date)}' : label,
+            date != null ? '$label: ${_dateFormat.format(date)}' : label,
         // If no date is selected, show hint
         hintText: date == null ? 'Select date' : null,
         prefixIcon: icon != null ? Icon(icon, color: Colors.black) : null,
@@ -527,7 +527,7 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.black),
+          borderSide: const BorderSide(color: Colors.black),
         ),
         // Change label style when a date is selected
         labelStyle: TextStyle(

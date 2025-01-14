@@ -1,7 +1,8 @@
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:car_rental_project/screens/onboarding_screen.dart';
+import 'package:car_rental_project/screens/onboarding_screens.dart';
 import 'package:car_rental_project/screens/signup_screen.dart';
+import 'package:car_rental_project/screens/splash_screen.dart';
 import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -100,7 +101,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () {
                Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) =>  Onboarding()),
+                      MaterialPageRoute(builder: (context) =>  const SplashScreen()),
                     );
             },
           ),
@@ -135,7 +136,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CarListingScreen(),
+                          builder: (context) => const CarListingScreen(),
                         ),
                       );
                     },

@@ -179,7 +179,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             background: Container(color: Colors.red),
             child: NotificationCard(notification: notification),
           );
-        }).toList(),
+        }),
       ],
     );
   }

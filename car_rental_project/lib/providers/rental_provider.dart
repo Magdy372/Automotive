@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:car_rental_project/models/rental_model.dart';
-import 'package:car_rental_project/models/car_model.dart';
 
 class RentalProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

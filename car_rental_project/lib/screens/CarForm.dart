@@ -287,7 +287,7 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.image_outlined, size: 40, color: Colors.grey),
+                                  const Icon(Icons.image_outlined, size: 40, color: Colors.grey),
                                   const SizedBox(height: 8),
                                   Text(
                                     "Tap to select image",
