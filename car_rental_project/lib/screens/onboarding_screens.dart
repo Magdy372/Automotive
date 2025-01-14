@@ -3,7 +3,7 @@ import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:car_rental_project/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:google_fonts/google_fonts.dart';  // Import google_fonts package
+import 'package:google_fonts/google_fonts.dart';
 
 class OnboardingScreens extends StatefulWidget {
   const OnboardingScreens({super.key});
@@ -15,6 +15,9 @@ class OnboardingScreens extends StatefulWidget {
 class _OnboardingScreensState extends State<OnboardingScreens> {
   final PageController _pageController = PageController(initialPage: 0);
   int currentIndex = 0;
+
+  // Mock currentUser for demonstration
+  final currentUser = null; // Replace with actual user-check logic
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +31,22 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
             padding: const EdgeInsets.only(right: 20, top: 20),
             child: InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (_) => SignupScreen()));
+                  // Navigate directly to the appropriate screen based on currentUser
+                  if (currentUser == null) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => SignupScreen()),
+                    );
+                  } else {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                    );
+                  }
                 },
                 child: Text(
                   'Skip',
-                  style: GoogleFonts.poppins(  // Using Google Font
+                  style: GoogleFonts.poppins(
                     color: Colors.grey,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400,
@@ -91,14 +104,23 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                   setState(() {
                     if (currentIndex < 2) {
                       currentIndex++;
-                      if (currentIndex < 3) {
-                        _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeIn);
-                      }
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeIn,
+                      );
                     } else {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (_) => SignupScreen()));
+                      // Navigate to appropriate screen based on currentUser
+                      if (currentUser == null) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => SignupScreen()),
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => LoginScreen()),
+                        );
+                      }
                     }
                   });
                 },
@@ -170,7 +192,7 @@ class createPage extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(  // Using Google Font
+            style: GoogleFonts.poppins(
               color: OnboardingConstants.primaryColor,
               fontSize: 25,
               fontWeight: FontWeight.bold,
@@ -182,7 +204,7 @@ class createPage extends StatelessWidget {
           Text(
             description,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(  // Using Google Font
+            style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: Colors.grey,
