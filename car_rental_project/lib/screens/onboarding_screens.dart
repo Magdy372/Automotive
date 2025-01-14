@@ -109,18 +109,10 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                         curve: Curves.easeIn,
                       );
                     } else {
-                      // Navigate to appropriate screen based on currentUser
-                      if (currentUser == null) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => SignupScreen()),
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => LoginScreen()),
-                        );
-                      }
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => SignupScreen()),
+                      );
                     }
                   });
                 },
@@ -128,6 +120,26 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                   Icons.arrow_forward_ios,
                   size: 24,
                   color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            child: InkWell(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginScreen()),
+                );
+              },
+              child: Text(
+                'Already have an account?',
+                style: GoogleFonts.poppins(
+                  color: OnboardingConstants.primaryColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.underline,
                 ),
               ),
             ),
