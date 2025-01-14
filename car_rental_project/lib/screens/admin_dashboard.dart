@@ -101,7 +101,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () {
                Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) =>  const SplashScreen()),
+                      MaterialPageRoute(builder: (context) =>  LoginScreen()),
                     );
             },
           ),

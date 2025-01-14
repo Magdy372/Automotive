@@ -75,57 +75,57 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // Future<void> login({
-  //   required String email,
-  //   required String password,
-  //   required BuildContext context,
-  // }) async {
-  //   // Validate email and password
-  //   final emailError = UserModel.validateEmail(email);
-  //   if (emailError != null) {
-  //     _showError(context, emailError);
-  //     return;
-  //   }
+  Future<void> login({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
+    // Validate email and password
+    final emailError = UserModel.validateEmail(email);
+    if (emailError != null) {
+      _showError(context, emailError);
+      return;
+    }
 
-  //   final passwordError = UserModel.validatePassword(password);
-  //   if (passwordError != null) {
-  //     _showError(context, passwordError);
-  //     return;
-  //   }
+    final passwordError = UserModel.validatePassword(password);
+    if (passwordError != null) {
+      _showError(context, passwordError);
+      return;
+    }
 
-  //   await _setLoadingState(true);
-  //   try {
-  //     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-  //       email: email.trim(),
-  //       password: password.trim(),
-  //     );
+    await _setLoadingState(true);
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
 
-  //     DocumentSnapshot userDoc = await _firestore
-  //         .collection('users')
-  //         .doc(userCredential.user!.uid)
-  //         .get();
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
 
-  //     if (!userDoc.exists) {
-  //       throw Exception("User data not found.");
-  //     }
+      if (!userDoc.exists) {
+        throw Exception("User data not found.");
+      }
 
-  //     _currentUser = UserModel.fromJson(userDoc.data() as Map<String, dynamic>);
-  //     notifyListeners();
+      _currentUser = UserModel.fromJson(userDoc.data() as Map<String, dynamic>);
+      notifyListeners();
 
-  //     await _navigateToAppropriateScreen(context);
-  //     _showSuccess(context, 'Login successful!');
-  //   } on FirebaseAuthException catch (e) {
-  //     _showError(context, e.code == 'user-not-found'
-  //         ? 'No user found for this email.'
-  //         : e.code == 'wrong-password'
-  //             ? 'Incorrect password.'
-  //             : 'An error occurred. Please try again.');
-  //   } catch (e) {
-  //     _showError(context, 'Error: $e');
-  //   } finally {
-  //     await _setLoadingState(false);
-  //   }
-  // }
+      await _navigateToAppropriateScreen(context);
+      _showSuccess(context, 'Login successful!');
+    } on FirebaseAuthException catch (e) {
+      _showError(context, e.code == 'user-not-found'
+          ? 'No user found for this email.'
+          : e.code == 'wrong-password'
+              ? 'Incorrect password.'
+              : 'An error occurred. Please try again.');
+    } catch (e) {
+      _showError(context, 'Error: $e');
+    } finally {
+      await _setLoadingState(false);
+    }
+  }
 
   Future<void> signup({
     required String name,

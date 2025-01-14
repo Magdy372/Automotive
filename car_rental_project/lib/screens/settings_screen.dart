@@ -126,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
                             Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder: (context) =>  SplashScreen(),
+                            builder: (context) => LoginScreen(),
                               ),
                             );
                             Navigator.of(context).pop(); // Close the dialog
