@@ -367,7 +367,7 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
 
       Navigator.of(context).pushNamedAndRemoveUntil(
-        '/onboarding',
+        '/login',
         (route) => false,
       );
     } catch (e) {

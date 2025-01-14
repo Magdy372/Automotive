@@ -21,7 +21,7 @@ class UserListingScreen extends StatelessWidget {
           bodyMedium: TextStyle(color: Color(0xFFB0BEC5)),
           bodySmall: TextStyle(color: Colors.white54),
         ),
-        fontFamily: 'Roboto',
+        fontFamily: 'poppins',
       ),
       home: const UserListingScreenBody(),
     );

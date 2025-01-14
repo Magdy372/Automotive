@@ -7,15 +7,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/providers/car_provider.dart';
-import 'package:car_rental_project/providers/rental_provider.dart'; 
+import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; 
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:car_rental_project/services/NotificationService.dart';
-
-
 
 class AppColors {
   // Light theme colors
@@ -39,24 +37,24 @@ class AppColors {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await NotificationService.initialize(); 
-  
+  await NotificationService.initialize();
+
   try {
     await Supabase.initialize(
       url: 'https://mrwbinussxmgdlcyeztb.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yd2JpbnVzc3htZ2RsY3llenRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0OTU1MDEsImV4cCI6MjA1MDA3MTUwMX0.OD8MDRSiqx63U_N7RXgANOYqtT38Xc_8GcodjZbi4RA',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yd2JpbnVzc3htZ2RsY3llenRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0OTU1MDEsImV4cCI6MjA1MDA3MTUwMX0.OD8MDRSiqx63U_N7RXgANOYqtT38Xc_8GcodjZbi4RA',
     );
   } catch (e) {
     print('Supabase initialization error: $e');
   }
-  
+
   // Set up background message handler
-  FirebaseMessaging.onBackgroundMessage(NotificationService.firebaseMessagingBackgroundHandler);
-  
+  FirebaseMessaging.onBackgroundMessage(
+      NotificationService.firebaseMessagingBackgroundHandler);
+
   runApp(const MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

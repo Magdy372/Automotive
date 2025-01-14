@@ -19,55 +19,36 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Spacer(flex: 2),
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(25, 50, 25, 20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40.0),
-                    topRight: Radius.circular(40.0),
-                  ),
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Welcome back',
-                        style: TextStyle(
-                          fontSize: 38.0,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildEmailField(),
-                      const SizedBox(height: 10),
-                      _buildPasswordField(),
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: _buildForgotPasswordButton(context, userProvider),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildLoginButton(userProvider, context),
-                      const SizedBox(height: 20),
-                      _buildSignUpWithDivider(),
-                      const SizedBox(height: 10),
-                      _buildSocialLoginButtons(userProvider),
-                    ],
-                  ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Welcome back',
+                style: TextStyle(
+                  fontSize: 38.0,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              _buildEmailField(),
+              const SizedBox(height: 10),
+              _buildPasswordField(),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: _buildForgotPasswordButton(context, userProvider),
+              ),
+              const SizedBox(height: 10),
+              _buildLoginButton(userProvider, context),
+              const SizedBox(height: 20),
+              _buildSignUpWithDivider(),
+              const SizedBox(height: 10),
+              _buildSocialLoginButtons(userProvider),
+            ],
+          ),
         ),
       ),
     );
@@ -113,7 +94,8 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildForgotPasswordButton(BuildContext context, UserProvider userProvider) {
+  Widget _buildForgotPasswordButton(
+      BuildContext context, UserProvider userProvider) {
     return TextButton(
       onPressed: () {
         if (_emailController.text.isEmpty) {
@@ -209,7 +191,10 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialButton({required Color color, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildSocialButton(
+      {required Color color,
+      required IconData icon,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
