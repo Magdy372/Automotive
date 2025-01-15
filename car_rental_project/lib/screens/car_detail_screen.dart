@@ -1,5 +1,6 @@
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
@@ -93,28 +94,28 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           children: [
             Text(
               widget.car.name,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style:  GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 const Icon(Icons.speed, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.topSpeed} km/h", style: const TextStyle(color: Colors.grey)),
+                Text("${widget.car.topSpeed} km/h", style:  GoogleFonts.poppins(color: Colors.grey)),
                 const SizedBox(width: 16),
                 const Icon(Icons.settings, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(widget.car.transmissionType.toString().split('.').last, style: const TextStyle(color: Colors.grey)),
+                Text(widget.car.transmissionType.toString().split('.').last, style:  GoogleFonts.poppins(color: Colors.grey)),
                 const SizedBox(width: 16),
                 const Icon(Icons.local_gas_station, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.tankCapacity}L", style: const TextStyle(color: Colors.grey)),
+                Text("${widget.car.tankCapacity}L", style:  GoogleFonts.poppins(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 12),
             Text(
               "\$${widget.car.price}/day",
-              style:  TextStyle(
+              style:  GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode? Colors.grey[300]:Colors.black,
@@ -134,7 +135,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       children: [
          Text(
           "Specifications",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
         ),
         const SizedBox(height: 8),
         Row(
@@ -162,12 +163,12 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           child: Column(
             children: [
               Text(title,
-                  style: const TextStyle(
+                  style:  GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       color: Colors.white)),
               const SizedBox(height: 4),
-              Text(subtitle, style: TextStyle(color:isDarkMode?Colors.grey[300]:Colors.white)),
+              Text(subtitle, style: GoogleFonts.poppins(color:isDarkMode?Colors.grey[300]:Colors.white)),
             ],
           ),
         ),
@@ -182,7 +183,7 @@ Widget _buildFeatures() {
     children: [
       Text(
         "Features",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
+        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
       ),
       const SizedBox(height: 8),
       Wrap(
@@ -200,7 +201,7 @@ Widget _buildFeatures() {
             ),
             child: Text(
               featureName,
-              style:  TextStyle(
+              style:  GoogleFonts.poppins(
                 color: isDarkMode?Colors.grey[300]:Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -216,14 +217,14 @@ Widget _buildFeatures() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+         Text(
           "Description",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
           widget.car.description,
-          style: const TextStyle(color: Colors.grey),
+          style:  GoogleFonts.poppins(color: Colors.grey),
         ),
       ],
     );
@@ -255,7 +256,7 @@ Widget _buildFooter(BuildContext context) {
         padding: EdgeInsets.all(12),
         child: Text(
           "Book Now",
-          style: TextStyle(fontSize: 16, color: isDarkMode?Colors.grey[300]:Colors.white),
+          style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode?Colors.grey[300]:Colors.white),
         ),
       ),
     ),
