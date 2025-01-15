@@ -58,29 +58,27 @@ class MyApp extends StatelessWidget {
           }
 
           return MaterialApp(
-            title: 'Car Rental App',
+            title: 'Automotive',
             theme: ThemeData(
               brightness: Brightness.light,
               primarySwatch: Colors.blue,
               scaffoldBackgroundColor: Colors.white,
               // Light theme colors
-              colorScheme: ColorScheme.light(
+              colorScheme: const ColorScheme.light(
                 primary: Color(0XFF97B3AE),
                 secondary: Color(0XFF97B3AE),
                 surface: Colors.white,
-                background: Colors.white,
                 onPrimary: Colors.white,
                 onSecondary: Colors.white,
                 onSurface: Colors.black,
-                onBackground: Colors.black,
               ),
               // Card theme for light mode
-              cardTheme: CardTheme(
+              cardTheme: const CardTheme(
                 color: Color.fromARGB(255, 247, 245, 244),
                 elevation: 0,
               ),
               // Text theme for light mode
-              textTheme: TextTheme(
+              textTheme: const TextTheme(
                 bodyLarge: TextStyle(color: Colors.black),
                 bodyMedium: TextStyle(color: Colors.black87),
                 titleLarge: TextStyle(color: Colors.black),
@@ -95,11 +93,9 @@ class MyApp extends StatelessWidget {
                 primary: Colors.grey[800]!,
                 secondary: Colors.grey[700]!,
                 surface: Colors.grey[900]!,
-                background: Colors.black,
                 onPrimary: Colors.white,
                 onSecondary: Colors.grey[300]!,
                 onSurface: Colors.white,
-                onBackground: Colors.white,
               ),
               // Card theme for dark mode
               cardTheme: CardTheme(
@@ -108,9 +104,9 @@ class MyApp extends StatelessWidget {
               ),
               // Text theme for dark mode
               textTheme: TextTheme(
-                bodyLarge: TextStyle(color: Colors.white),
+                bodyLarge: const TextStyle(color: Colors.white),
                 bodyMedium: TextStyle(color: Colors.grey[300]),
-                titleLarge: TextStyle(color: Colors.white),
+                titleLarge: const TextStyle(color: Colors.white),
               ),
               // Bottom navigation bar theme
               bottomNavigationBarTheme: BottomNavigationBarThemeData(

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
-import 'package:car_rental_project/screens/login_screen.dart';
 
 class UserProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;

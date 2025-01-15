@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
@@ -78,8 +79,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       body: Stack(
         children: [
           ListView(
@@ -94,25 +97,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
           )
         ],
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: _buildBottomNavBar(context),
 
     );
   }
 
   Widget _buildHeader() {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        icon: Icon(Icons.arrow_back, color: isDarkMode? Colors.grey[300]:Colors.black),
         onPressed: () {
           Navigator.pop(context);
         },
       ),
-      title: const Text(
+      title: Text(
         'Notifications',
-        style: TextStyle(
-          color: Colors.black,
+        style: GoogleFonts.poppins(
+          color: isDarkMode? Colors.grey[300]:Colors.black,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -122,6 +127,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _buildSection(String title, NotificationStatus status) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final filteredNotifications = filterNotifications(status);
 
     if (filteredNotifications.isEmpty) {
@@ -135,7 +141,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style:  GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         ...filteredNotifications.map((notification) {
@@ -176,7 +182,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               );
             },
-            background: Container(color: Colors.red),
+            background: Container(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
             child: NotificationCard(notification: notification),
           );
         }),
@@ -184,69 +190,65 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  // Bottom Navigation Bar
-  Widget _buildBottomNavBar() {
-    // Access the current theme's colors dynamically
-    // final theme = Theme.of(context);
-    // final backgroundColor = theme
-    //     .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    // final textColor = theme
-    //     .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    // final activeTabColor =
-    //     theme.colorScheme.primary; // Active tab background color
+    // Bottom Navigation Bar
+  Widget _buildBottomNavBar(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-        child: GNav(
-          backgroundColor: Colors.black,
-          color: Colors.white,
-          activeColor: Colors.white,
-          tabBackgroundColor: const Color.fromARGB(255, 66, 66, 66),
-          padding: const EdgeInsets.all(16),
-          gap: 8,
-          selectedIndex: 1,
-          onTabChange: (index) {
-            switch (index) {
-              case 0:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                );
-                break;
-              case 1:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NotificationScreen()),
-                );
-                break;
-              case 2:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
-                break;
-              case 3:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsScreen()),
-                );
-                break;
-            }
-          },
-          tabs: const [
-            GButton(icon: Icons.home, text: 'Home'),
-            GButton(icon: Icons.notifications, text: 'Notifications'),
-            GButton(icon: Icons.person, text: 'Profile'),
-            GButton(icon: Icons.settings, text: 'Settings'),
-          ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
+          borderRadius: BorderRadius.circular(40),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: GNav(
+            color: isDarkMode ? Colors.grey[300] : Colors.white,
+            activeColor: Colors.white,
+            tabBackgroundColor: Colors.white.withOpacity(0.30),
+            padding: const EdgeInsets.all(12),
+            gap: 5,
+            selectedIndex:
+                1, // Set the default selected index to 1 (Notifications tab)
+            onTabChange: (index) {
+              switch (index) {
+                case 0:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                  break;
+                case 1:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const NotificationScreen()),
+                  );
+                  break;
+                case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()),
+                  );
+                  break;
+                case 3:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()),
+                  );
+                  break;
+              }
+            },
+            tabs: const [
+              GButton(icon: Icons.home),
+              GButton(icon: Icons.notifications),
+              GButton(icon: Icons.person),
+              GButton(icon: Icons.settings),
+            ],
+          ),
         ),
       ),
     );
@@ -260,6 +262,8 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Column(
@@ -270,11 +274,11 @@ class NotificationCard extends StatelessWidget {
             children: [
               Text(
                 DateFormat('dd/MM/yyyy').format(notification.date),
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE), fontSize: 12),
               ),
               Text(
                 DateFormat('hh:mm a').format(notification.date),
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE), fontSize: 12),
               ),
             ],
           ),
@@ -283,12 +287,12 @@ class NotificationCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 24, 24, 24),
+              color: isDarkMode? Colors.grey[900]:Color(0XFF97B3AE),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Text(
               notification.body,
-              style: const TextStyle(color: Colors.white),
+              style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Colors.white,),
             ),
           ),
         ],

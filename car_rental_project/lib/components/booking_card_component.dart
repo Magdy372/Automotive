@@ -1,34 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BookingCard extends StatelessWidget {
   const BookingCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade300,
-            spreadRadius: 2,
-            blurRadius: 10,
-          ),
-        ],
+        color: isDarkMode?Colors.grey[900]: const Color.fromARGB(255, 249, 248, 247),
       ),
       child: Column(
         children: [
           
           Container(
             padding: const EdgeInsets.all(15),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(15)),
-              color: Colors.white,
+                  const BorderRadius.vertical(top: Radius.circular(15)),
+              color: isDarkMode?Colors.grey[900]: const Color.fromARGB(255, 249, 248, 247),
             ),
-            child: const Column(
+            child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,27 +33,27 @@ class BookingCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Mercedes AMG GT',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                        Text('Mercedes',
-                            style: TextStyle(color: Colors.grey)),
+                            style: GoogleFonts.poppins(
+                                fontSize: 20, fontWeight: FontWeight.bold, color: isDarkMode?Colors.grey[300]: Colors.black)),
+                         Text('Mercedes',
+                            style: GoogleFonts.poppins(color: Colors.grey)),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 // Date, Time, Number Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('1 MAY', style: TextStyle(fontSize: 16)),
-                    Text('23 MAY', style: TextStyle(fontSize: 16)),
+                    Text('1 MAY', style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode?Colors.grey[300]: Colors.black)),
+                    Text('23 MAY', style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode?Colors.grey[300]: Colors.black)),
                   ],
                 ),
               ],
             ),
           ),
-          const Divider(thickness: 1),
+          Divider(thickness: 1, color: isDarkMode?Colors.grey[500]:Color(0XFF97B3AE),),
     
           Container(
             padding: const EdgeInsets.all(15),
@@ -117,18 +113,18 @@ class BookingDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title1,
-                style: const TextStyle(
+                style:  GoogleFonts.poppins(
                     fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(subtitle1, style: const TextStyle(color: Colors.grey)),
+            Text(subtitle1, style:  GoogleFonts.poppins(color: Colors.grey)),
           ],
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(title2,
-                style: const TextStyle(
+                style:  GoogleFonts.poppins(
                     fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(subtitle2, style: const TextStyle(color: Colors.grey)),
+            Text(subtitle2, style:  GoogleFonts.poppins(color: Colors.grey)),
           ],
         ),
       ],

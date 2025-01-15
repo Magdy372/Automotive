@@ -4,6 +4,7 @@ import 'package:car_rental_project/screens/my_bookings_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -11,22 +12,26 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final userProvider = Provider.of<UserProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set background to white
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.grey[300] : Colors.black),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(
+              color: isDarkMode ? Colors.grey[300] : Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -38,9 +43,9 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildListTile(
               icon: Icons.person,
-              iconColor: Colors.black,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
               label: 'Account',
-              labelColor: Colors.black,
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
               onTap: () {
                 Navigator.push(
                   context,
@@ -48,14 +53,16 @@ class SettingsScreen extends StatelessWidget {
                     builder: (context) => const ProfileScreen(),
                   ),
                 );
-              },
+              }, isDarkMode: isDarkMode,
             ),
-            const Divider(),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
             _buildListTile(
-              icon: Icons.car_rental, 
-              iconColor: Colors.black,
-              label: 'My bookings', 
-              labelColor: Colors.black,             
+              icon: Icons.car_rental,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+              label: 'My bookings',
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
               onTap: () {
                 Navigator.push(
                   context,
@@ -63,36 +70,72 @@ class SettingsScreen extends StatelessWidget {
                     builder: (context) => const MyBookingsScreen(),
                   ),
                 );
-              },
+              }, isDarkMode: isDarkMode,
             ),
-            const Divider(),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
             _buildListTile(
               icon: Icons.notifications,
-              iconColor: Colors.black,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
               label: 'Notifications',
-              labelColor: Colors.black,
-            onTap: () {
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const NotificationScreen(),
                   ),
                 );
-              },
+              }, isDarkMode: isDarkMode,
             ),
-            const Divider(),
-            _buildListTile(icon: Icons.visibility, iconColor: Colors.black, label: 'Appearance',labelColor: Colors.black, onTap: () {}),
-            const Divider(),
-            _buildListTile(icon: Icons.lock, iconColor: Colors.black, label: 'Privacy & Security',labelColor: Colors.black, onTap: () {}),
-            const Divider(),
-            _buildListTile(icon: Icons.headphones, iconColor: Colors.black, label: 'Help and Support',labelColor: Colors.black, onTap: () {}),
-            const Divider(),
-            _buildListTile(icon: Icons.info, iconColor: Colors.black, label: 'About',labelColor: Colors.black, onTap: () {}),
-            const Divider(),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
             _buildListTile(
-              icon: Icons.logout, 
+              icon: Icons.visibility,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+              label: 'Appearance',
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+              onTap: () {}, isDarkMode: isDarkMode,
+            ),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
+            _buildListTile(
+              icon: Icons.lock,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+              label: 'Privacy & Security',
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+              onTap: () {}, isDarkMode: isDarkMode,
+            ),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
+            _buildListTile(
+              icon: Icons.headphones,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+              label: 'Help and Support',
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+              onTap: () {}, isDarkMode: isDarkMode,
+            ),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
+            _buildListTile(
+              icon: Icons.info,
+              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+              label: 'About',
+              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+              onTap: () {}, isDarkMode: isDarkMode,
+            ),
+           Divider(
+              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+            ),
+            _buildListTile(
+              icon: Icons.logout,
               iconColor: Colors.red,
-              label: 'Logout', 
+              label: 'Logout',
               labelColor: Colors.red,
               onTap: () {
                 // Show a confirmation dialog when the logout is tapped
@@ -105,27 +148,19 @@ class SettingsScreen extends StatelessWidget {
                       content: const Text("Do you really want to logout?"),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text(
-                            "No",
-                            style: TextStyle(
-                            color: Colors.black
-                            )),
+                          child:  Text("No", style: GoogleFonts.poppins(color: Colors.black)),
                           onPressed: () {
-                            Navigator.of(context).pop();  // Close the dialog
+                            Navigator.of(context).pop(); // Close the dialog
                           },
                         ),
                         TextButton(
-                          child: const Text(
-                            "Yes",
-                            style: TextStyle(
-                            color: Colors.red
-                            )),
+                          child:  Text("Yes", style: GoogleFonts.poppins(color: Colors.red)),
                           onPressed: () {
                             userProvider.logout(context);
                             Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(),
                               ),
                             );
                             Navigator.of(context).pop(); // Close the dialog
@@ -135,21 +170,29 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 );
-              },
-            )        ],
+              }, isDarkMode: isDarkMode,
+            ),
+          ],
         ),
       ),
     );
-  }   
+  }
 
-  Widget _buildListTile({required IconData icon,required Color iconColor, required String label,required Color labelColor, required VoidCallback onTap}) {
+  Widget _buildListTile({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required Color labelColor,
+    required VoidCallback onTap,
+    required bool isDarkMode,
+  }) {
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(
         label,
-        style: TextStyle(fontSize: 16, color: labelColor),
+        style: GoogleFonts.poppins(fontSize: 16, color: labelColor),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+      trailing:  Icon(Icons.arrow_forward_ios, size: 16, color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
       onTap: onTap,
     );
   }

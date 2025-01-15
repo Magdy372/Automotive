@@ -34,7 +34,7 @@ class SignupScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 38.0,
                   fontWeight: FontWeight.w900,
-                  color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE),
+                  color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE),
                 ),
               ),
               const SizedBox(height: 10),
@@ -73,7 +73,7 @@ class SignupScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: isDarkMode? Colors.black:Colors.white,
-                    backgroundColor: isDarkMode? Colors.white:Color(0XFF997B3AE)
+                    backgroundColor: isDarkMode? Colors.white:const Color(0Xff997b3ae)
                   ),
                   child: userProvider.isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
@@ -127,7 +127,7 @@ class SignupScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:Color(0XFF97B3AE)),
+            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:const Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -153,7 +153,7 @@ class SignupScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
@@ -171,7 +171,7 @@ class SignupScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),

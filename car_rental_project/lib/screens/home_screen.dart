@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color:
-                              isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
+                              isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
                         ),
                         padding: const EdgeInsets.all(8),
                         child: Icon(
@@ -144,13 +144,13 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: isDarkMode
               ? Colors.grey[900]
-              : Color.fromARGB(255, 249, 248, 247),
+              : const Color.fromARGB(255, 249, 248, 247),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
             Icon(Icons.search,
-                color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE)),
+                color: isDarkMode ? Colors.grey[400] : const Color(0XFF97B3AE)),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   hintStyle: GoogleFonts.poppins(
                       color: isDarkMode ? Colors.grey[600] : Colors.grey),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
                 ),
               ),
             ),
@@ -178,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: Icon(
                 Icons.close,
-                color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE),
+                color: isDarkMode ? Colors.grey[400] : const Color(0XFF97B3AE),
               ),
             ),
           ],
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: Icon(
                   _showFilters ? Icons.close : Icons.filter_list,
-                  color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE),
+                  color: isDarkMode ? Colors.grey[400] : const Color(0XFF97B3AE),
                 ),
                 onPressed: () {
                   setState(() {
@@ -367,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
             final isSelected = selectedFeatures.contains(option);
             return ChoiceChip(
               backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
-              selectedColor: isDarkMode ? Colors.grey[600] : Color(0XFF97B3AE),
+              selectedColor: isDarkMode ? Colors.grey[600] : const Color(0XFF97B3AE),
               label: Text(
                 option,
                 style: GoogleFonts.poppins(
@@ -404,22 +404,25 @@ class _HomeScreenState extends State<HomeScreen> {
       if (selectedBrand != null &&
           car.brand !=
               Brand.values.firstWhere(
-                  (b) => b.toString().split('.').last == selectedBrand))
+                  (b) => b.toString().split('.').last == selectedBrand)) {
         return false;
+      }
 
       // Body Type filtering
       if (selectedBodyType != null &&
           car.bodyType !=
               BodyType.values.firstWhere(
-                  (b) => b.toString().split('.').last == selectedBodyType))
+                  (b) => b.toString().split('.').last == selectedBodyType)) {
         return false;
+      }
 
       // Transmission filtering
       if (selectedTransmission != null &&
           car.transmissionType !=
               TransmissionType.values.firstWhere(
-                  (t) => t.toString().split('.').last == selectedTransmission))
+                  (t) => t.toString().split('.').last == selectedTransmission)) {
         return false;
+      }
 
       // Features filtering - check if ANY selected feature is present
       if (selectedFeatures.isNotEmpty &&
@@ -640,7 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
+                    color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -714,7 +717,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: isDarkMode
               ? Colors.grey[900]
-              : Color.fromARGB(255, 247, 245, 244),
+              : const Color.fromARGB(255, 247, 245, 244),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -726,7 +729,7 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: isDarkMode
                     ? Colors.grey[900]
-                    : Color.fromARGB(255, 247, 245, 244),
+                    : const Color.fromARGB(255, 247, 245, 244),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -806,13 +809,12 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
+          color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
           borderRadius: BorderRadius.circular(40),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: GNav(
-            // backgroundColor: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE),
             color: isDarkMode ? Colors.grey[300] : Colors.white,
             activeColor: Colors.white,
             tabBackgroundColor: Colors.white.withOpacity(0.30),

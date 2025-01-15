@@ -49,7 +49,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                 child: Text(
                   'Skip',
                   style: GoogleFonts.poppins(
-                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
+                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400,
                   ),
@@ -99,7 +99,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
+                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
               ),
               child: IconButton(
                 onPressed: () {
@@ -138,7 +138,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               child: Text(
                 'Already have an account?',
                 style: GoogleFonts.poppins(
-                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
+                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   decoration: TextDecoration.underline,
@@ -160,7 +160,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
       width: isActive ? 20 : 8,
       margin: const EdgeInsets.only(right: 5.0),
       decoration: BoxDecoration(
-      color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
+      color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
         borderRadius: BorderRadius.circular(5),
       ),
     );
@@ -211,7 +211,7 @@ class createPage extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-            color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
+            color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
               fontSize: 25,
               fontWeight: FontWeight.bold,
             ),

@@ -31,7 +31,7 @@ class LoginScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 38.0,
                   fontWeight: FontWeight.w900,
-                  color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE),
+                  color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE),
                 ),
               ),
               const SizedBox(height: 10),
@@ -64,7 +64,7 @@ class LoginScreen extends StatelessWidget {
       validator: UserModel.validateEmail,
       decoration: InputDecoration(
         label: const Text('Email'),
-        hintStyle: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
+        hintStyle: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
       ),
     );
   }
@@ -79,7 +79,7 @@ class LoginScreen extends StatelessWidget {
       validator: UserModel.validatePassword,
       decoration: InputDecoration(
         label: const Text('Password'),
-        hintStyle:  GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
+        hintStyle:  GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
       ),
     );
   }
@@ -103,7 +103,7 @@ class LoginScreen extends StatelessWidget {
       },
       child:Text(
         'Forgot Password?',
-        style: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
+        style: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
       ),
     );
   }
@@ -124,7 +124,7 @@ class LoginScreen extends StatelessWidget {
         },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: isDarkMode? Colors.black:Colors.white,
-                    backgroundColor: isDarkMode? Colors.white:Color(0XFF997B3AE)
+                    backgroundColor: isDarkMode? Colors.white:const Color(0Xff997b3ae)
                   ),
         child: userProvider.isLoading
             ? const CircularProgressIndicator(color: Colors.white)
@@ -148,7 +148,7 @@ class LoginScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:Color(0XFF97B3AE)),
+            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:const Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -174,7 +174,7 @@ class LoginScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
@@ -192,7 +192,7 @@ class LoginScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
