@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../models/user_model.dart';
@@ -14,9 +15,10 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0),
         child: Form(
@@ -24,29 +26,29 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+               Text(
                 'Welcome back',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 38.0,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE),
                 ),
               ),
               const SizedBox(height: 10),
-              _buildEmailField(),
+              _buildEmailField(context),
               const SizedBox(height: 10),
-              _buildPasswordField(),
+              _buildPasswordField(context),
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
-                child: _buildForgotPasswordButton(context, userProvider),
+                child: _buildForgotPasswordButton(context, userProvider,isDarkMode),
               ),
               const SizedBox(height: 10),
-              _buildLoginButton(userProvider, context),
+              _buildLoginButton(userProvider, context,isDarkMode),
               const SizedBox(height: 20),
-              _buildSignUpWithDivider(),
+              _buildSignUpWithDivider(context),
               const SizedBox(height: 10),
-              _buildSocialLoginButtons(userProvider),
+              _buildSocialMediaButtons(userProvider,context),
             ],
           ),
         ),
@@ -54,26 +56,22 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailField(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: _emailController,
       validator: UserModel.validateEmail,
       decoration: InputDecoration(
         label: const Text('Email'),
-        hintText: 'Enter email',
-        hintStyle: const TextStyle(color: Colors.black26),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black12),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+        hintStyle: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
       ),
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: _passwordController,
       obscureText: true,
@@ -81,21 +79,15 @@ class LoginScreen extends StatelessWidget {
       validator: UserModel.validatePassword,
       decoration: InputDecoration(
         label: const Text('Password'),
-        hintText: 'Enter password',
-        hintStyle: const TextStyle(color: Colors.black26),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black12),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+        hintStyle:  GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
       ),
     );
   }
 
   Widget _buildForgotPasswordButton(
-      BuildContext context, UserProvider userProvider) {
+      BuildContext context, UserProvider userProvider, bool isDarkMode) {
+            final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return TextButton(
       onPressed: () {
         if (_emailController.text.isEmpty) {
@@ -109,14 +101,14 @@ class LoginScreen extends StatelessWidget {
 
         userProvider.resetPassword(_emailController.text, context);
       },
-      child: const Text(
+      child:Text(
         'Forgot Password?',
-        style: TextStyle(color: Colors.black54),
+        style: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE)),
       ),
     );
   }
 
-  Widget _buildLoginButton(UserProvider userProvider, BuildContext context) {
+  Widget _buildLoginButton(UserProvider userProvider, BuildContext context, bool isDarkMode) {
     return SizedBox(
       width: double.infinity,
       height: 54,
@@ -130,10 +122,10 @@ class LoginScreen extends StatelessWidget {
             );
           }
         },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.black,
-        ),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: isDarkMode? Colors.black:Colors.white,
+                    backgroundColor: isDarkMode? Colors.white:Color(0XFF997B3AE)
+                  ),
         child: userProvider.isLoading
             ? const CircularProgressIndicator(color: Colors.white)
             : const Text('Login'),
@@ -141,7 +133,8 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignUpWithDivider() {
+  Widget _buildSignUpWithDivider(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -151,11 +144,11 @@ class LoginScreen extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: TextStyle(color: Colors.black45),
+            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -168,40 +161,49 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialLoginButtons(UserProvider userProvider) {
+
+  Widget _buildSocialMediaButtons(UserProvider userProvider, BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSocialButton(
-          color: const Color(0xFF1877F2),
-          icon: FontAwesomeIcons.facebookF,
+        GestureDetector(
           onTap: () {
             // userProvider.signInWithFacebook(context);
           },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              shape: BoxShape.circle,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: const Icon(
+              FontAwesomeIcons.facebookF,
+              color: Colors.white,
+              size: 24.0,
+            ),
+          ),
         ),
         const SizedBox(width: 20),
-        _buildSocialButton(
-          color: Colors.black,
-          icon: FontAwesomeIcons.google,
+        GestureDetector(
           onTap: () {
             // userProvider.signInWithGoogle(context);
           },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
+              shape: BoxShape.circle,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: const Icon(
+              FontAwesomeIcons.google,
+              color: Colors.white,
+              size: 24.0,
+            ),
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSocialButton(
-      {required Color color,
-      required IconData icon,
-      required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        padding: const EdgeInsets.all(16.0),
-        child: Icon(icon, color: Colors.white, size: 24.0),
-      ),
     );
   }
 }

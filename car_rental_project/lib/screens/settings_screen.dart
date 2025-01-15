@@ -3,7 +3,6 @@ import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:car_rental_project/screens/my_bookings_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
-import 'package:car_rental_project/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

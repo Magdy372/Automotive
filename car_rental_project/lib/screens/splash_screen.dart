@@ -1,8 +1,6 @@
-import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/onboarding_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

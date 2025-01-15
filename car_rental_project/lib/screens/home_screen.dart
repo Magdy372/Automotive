@@ -2,13 +2,12 @@ import 'package:car_rental_project/screens/CarForm.dart';
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:car_rental_project/constants.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
@@ -24,11 +23,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-
   bool _showFilters = false; // Toggle visibility of filters
-  String? selectedBrand; 
-  String? selectedBodyType; 
-  String? selectedTransmission; 
+  String? selectedBrand;
+  String? selectedBodyType;
+  String? selectedTransmission;
   List<String> selectedFeatures = [];
 
   @override
@@ -43,28 +41,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor = theme.colorScheme.primary;
     final carsProvider = Provider.of<CarProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(userProvider, theme),
-              _buildFilters(theme),
-              _buildFilteredCars(carsProvider,theme), // Display filtered cars
+              _buildHeader(userProvider, isDarkMode),
+              _buildFilters(isDarkMode),
+              _buildFilteredCars(carsProvider), // Display filtered cars
               _buildSearchResults(carsProvider),
-              _buildFeaturedCars(carsProvider, theme),
-              _buildPopularDeals(carsProvider, theme),
+              _buildFeaturedCars(carsProvider),
+              _buildPopularDeals(carsProvider),
             ],
           ),
         ),
@@ -73,372 +66,406 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeader(UserProvider userProvider, ThemeData theme) {
-    final backgroundColor = theme.appBarTheme.backgroundColor;
-    final textColor = theme.colorScheme.onPrimary;
-    final activeTabColor = theme.colorScheme.primary;
+  Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Welcome Message
+            Padding(
+              padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.end, // Align icons at the end
+                children: [
+                  // Notification Icon
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationScreen(),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 25, left: 10, right: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color:
+                              isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.notifications_none_rounded,
+                          color: isDarkMode ? Colors.grey[300] : Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _buildSearchBar(isDarkMode),
+      ],
+    );
+  }
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+  // Search Bar Widget
+  Widget _buildSearchBar(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 15, left: 15),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+          color: isDarkMode
+              ? Colors.grey[900]
+              : Color.fromARGB(255, 249, 248, 247),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.search,
+                color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                onChanged: (query) {
+                  _showFilters = false;
+                  Provider.of<CarProvider>(context, listen: false)
+                      .filterCars(query);
+                },
+                style: GoogleFonts.poppins(
+                    color: isDarkMode ? Colors.grey[300] : Colors.grey),
+                decoration: InputDecoration(
+                  hintText: 'Search for your dream car',
+                  hintStyle: GoogleFonts.poppins(
+                      color: isDarkMode ? Colors.grey[600] : Colors.grey),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 15),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _searchController.clear();
+                Provider.of<CarProvider>(context, listen: false).filterCars('');
+              },
+              child: Icon(
+                Icons.close,
+                color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFilters(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Welcome Message
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColorLight,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    "Find your dream car",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textColorLight,
-                    ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.end, // Align icons at the end
-                  children: [
-                    // Notification Icon
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NotificationScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.ButtonBackLight.withOpacity(0.2),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.notifications_none_rounded,
-                          color: AppColors.textColorLight,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Sell Your Car Icon
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CarUploadScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.ButtonBackLight.withOpacity(0.2),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.directions_car_filled_rounded,
-                          color: AppColors.textColorLight,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                  ],
+              Text(
+                'Filters',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
+              ),
+              IconButton(
+                icon: Icon(
+                  _showFilters ? Icons.close : Icons.filter_list,
+                  color: isDarkMode ? Colors.grey[400] : Color(0XFF97B3AE),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showFilters = !_showFilters; // Toggle filter visibility
+                    _searchController.clear();
+                    selectedBrand = null;
+                    selectedBodyType = null;
+                    selectedTransmission = null;
+                    selectedFeatures.clear();
+                  });
+                },
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildSearchBar(),
-        ],
-      ),
-    );
-  }
-
-  // Search Bar Widget
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-        color: AppColors.ButtonBackLight,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textColorLight.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: AppColors.NavAndHeaderLight),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (query) {
-                _showFilters = false;
-                Provider.of<CarProvider>(context, listen: false)
-                    .filterCars(query);
-              },
-              style: const TextStyle(color: AppColors.primaryColorLight),
-              decoration: const InputDecoration(
-                hintText: 'Search for your dream car',
-                hintStyle: TextStyle(color: AppColors.primaryColorLight),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 15),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              _searchController.clear();
-              Provider.of<CarProvider>(context, listen: false).filterCars('');
-            },
-            child: const Icon(
-              Icons.close,
-              color: AppColors.NavAndHeaderLight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-Widget _buildFilters(ThemeData theme) {
-  final textColor = theme.colorScheme.onPrimary;
-
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Filters',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
-            ),
-            IconButton(
-              icon: Icon(
-                _showFilters ? Icons.close : Icons.filter_list,
-                color: theme.colorScheme.onPrimary,
-              ),
-              onPressed: () {
+          if (_showFilters) ...[
+            const SizedBox(height: 15),
+            _buildDropdownFilter(
+              'Brand',
+              [
+                'All',
+                ...Brand.values.map((b) => b.toString().split('.').last),
+              ],
+              (value) {
                 setState(() {
-                  _showFilters = !_showFilters; // Toggle filter visibility
-                  _searchController.clear();
-                  selectedBrand= null; 
-                  selectedBodyType= null; 
-                  selectedTransmission= null; 
-                  selectedFeatures.clear();
-
+                  selectedBrand = value == 'All' ? null : value;
+                  print(selectedBrand);
                 });
               },
+              selectedBrand,
+              isDarkMode,
             ),
-          ],
-        ),
-        if (_showFilters) ...[
-          const SizedBox(height: 15),
-          _buildDropdownFilter(
-          'Brand',
-            ['All', ...Brand.values.map((b) => b.toString().split('.').last)],
-            (value) {
-              setState(() {
-                selectedBrand = value == 'All' ? null : value;
-                print(selectedBrand);
-              });
-            },
-            selectedBrand,
-          ),
-          const SizedBox(height: 10),
-          _buildDropdownFilter(
-            'Body Type',
-            ['All', ...BodyType.values.map((b) => b.toString().split('.').last)],
-            (value) {
-              setState(() {
-                selectedBodyType = value == 'All' ? null : value;
-                print(selectedBodyType);
-              });
-            },
-            selectedBodyType,
-          ),
-          const SizedBox(height: 10),
-          _buildDropdownFilter(
-            'Transmission',
-            ['All', ...TransmissionType.values.map((t) => t.toString().split('.').last)],
-            (value) {
-              setState(() {
-                selectedTransmission = value == 'All' ? null : value;
-                print(selectedTransmission);
-              });
-            },
-            selectedTransmission,
-          ),
-
-          const SizedBox(height: 10),
-          _buildMultiSelectFilter(
-            'Features',
-            Feature.values.map((f) => f.toString().split('.').last).toList(),
-            (selected) {
+            const SizedBox(height: 10),
+            _buildDropdownFilter(
+              'Body Type',
+              [
+                'All',
+                ...BodyType.values.map((b) => b.toString().split('.').last),
+              ],
+              (value) {
+                setState(() {
+                  selectedBodyType = value == 'All' ? null : value;
+                  print(selectedBodyType);
+                });
+              },
+              selectedBodyType,
+              isDarkMode,
+            ),
+            const SizedBox(height: 10),
+            _buildDropdownFilter(
+              'Transmission',
+              [
+                'All',
+                ...TransmissionType.values
+                    .map((t) => t.toString().split('.').last),
+              ],
+              (value) {
+                setState(() {
+                  selectedTransmission = value == 'All' ? null : value;
+                  print(selectedTransmission);
+                });
+              },
+              selectedTransmission,
+              isDarkMode,
+            ),
+            const SizedBox(height: 10),
+            _buildMultiSelectFilter(
+                'Features',
+                Feature.values
+                    .map((f) => f.toString().split('.').last)
+                    .toList(), (selected) {
               setState(() {
                 selectedFeatures = selected;
                 print(selectedFeatures);
               });
-            },
-          ),
-
-        ]
-      ],
-    ),
-  );
-}
-
-Widget _buildDropdownFilter(String label, List<String> options, Function(String?) onChanged, String? selectedValue) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            }, isDarkMode),
+          ]
+        ],
       ),
-      const SizedBox(height: 5),
-      DropdownButton<String>(
-        value: selectedValue ?? 'All',
-        isExpanded: true,
-        items: options.map((option) {
-          return DropdownMenuItem<String>(
-            value: option,
-            child: Text(option),
-          );
-        }).toList(),
-        onChanged: onChanged,
-      ),
-      const SizedBox(height: 10),
-    ],
-  );
-}
-
-Widget _buildMultiSelectFilter(String label, List<String> options, Function(List<String>) onSelectionChanged) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-      const SizedBox(height: 5),
-      Wrap(
-        spacing: 10,
-        children: options.map((option) {
-          final isSelected = selectedFeatures.contains(option);
-          return ChoiceChip(
-            label: Text(option),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                if (selected) {
-                  selectedFeatures.add(option);
-                } else {
-                  selectedFeatures.remove(option);
-                }
-                onSelectionChanged(selectedFeatures);
-              });
-            },
-          );
-        }).toList(),
-      ),
-      const SizedBox(height: 10),
-    ],
-  );
-}
-
-Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor = theme.colorScheme.primary;
-    final restButtonColor = theme.colorScheme.secondary;
-
-  if (!_showFilters) {
-    return const SizedBox.shrink(); // Returns an empty widget
+    );
   }
-  List<Car> filteredCars = carsProvider.cars.where((car) {
-    // Brand filtering
-    if (selectedBrand != null && car.brand != Brand.values.firstWhere((b) => b.toString().split('.').last == selectedBrand)) return false;
-    
-    // Body Type filtering
-    if (selectedBodyType != null && car.bodyType != BodyType.values.firstWhere((b) => b.toString().split('.').last == selectedBodyType)) return false;
-    
-    // Transmission filtering
-    if (selectedTransmission != null && car.transmissionType != TransmissionType.values.firstWhere((t) => t.toString().split('.').last == selectedTransmission)) return false;
-    
-    // Features filtering - check if ANY selected feature is present
-    if (selectedFeatures.isNotEmpty &&
-        !selectedFeatures.every((feature) => car.features.contains(Feature.values.firstWhere((f) => f.toString().split('.').last == feature)))) {
-      return false;
-    }
-    
-    return true;
-  }).toList();
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Only show "Filtered Cars" label if filters are applied and there are cars
-      if (_showFilters && filteredCars.isNotEmpty)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Text(
-            'Filtered Cars',
-            style: TextStyle(
-              fontSize: 18, 
-              fontWeight: FontWeight.bold,
-              color: textColor
-            ),
+  Widget _buildDropdownFilter(
+    String label,
+    List<String> options,
+    Function(String?) onChanged,
+    String? selectedValue,
+    bool isDarkMode,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: isDarkMode ? Colors.grey[300] : Colors.black,
           ),
         ),
-      
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: filteredCars.isEmpty
-            ? Text(
-                _showFilters 
-                  ? 'No cars match the selected filters.' 
-                  : 'All Cars',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).textTheme.bodyLarge?.color
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[800] : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+            ),
+          ),
+          child: DropdownButton<String>(
+            value: selectedValue ?? 'All',
+            isExpanded: true,
+            dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+            style: GoogleFonts.poppins(
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+            items: options.map((option) {
+              return DropdownMenuItem<String>(
+                value: option,
+                child: Text(
+                  option,
+                  style: GoogleFonts.poppins(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                 ),
-              )
-            : SizedBox(
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildMultiSelectFilter(
+    String label,
+    List<String> options,
+    Function(List<String>) onSelectionChanged,
+    bool isDarkMode,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Wrap(
+          spacing: 10,
+          children: options.map((option) {
+            final isSelected = selectedFeatures.contains(option);
+            return ChoiceChip(
+              backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
+              selectedColor: isDarkMode ? Colors.grey[600] : Color(0XFF97B3AE),
+              label: Text(
+                option,
+                style: GoogleFonts.poppins(
+                  color: isSelected
+                      ? Colors.white
+                      : (isDarkMode ? Colors.grey[300] : Colors.black),
+                ),
+              ),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    selectedFeatures.add(option);
+                  } else {
+                    selectedFeatures.remove(option);
+                  }
+                  onSelectionChanged(selectedFeatures);
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildFilteredCars(CarProvider carsProvider) {
+    if (!_showFilters) {
+      return const SizedBox.shrink(); // Returns an empty widget
+    }
+    List<Car> filteredCars = carsProvider.cars.where((car) {
+      // Brand filtering
+      if (selectedBrand != null &&
+          car.brand !=
+              Brand.values.firstWhere(
+                  (b) => b.toString().split('.').last == selectedBrand))
+        return false;
+
+      // Body Type filtering
+      if (selectedBodyType != null &&
+          car.bodyType !=
+              BodyType.values.firstWhere(
+                  (b) => b.toString().split('.').last == selectedBodyType))
+        return false;
+
+      // Transmission filtering
+      if (selectedTransmission != null &&
+          car.transmissionType !=
+              TransmissionType.values.firstWhere(
+                  (t) => t.toString().split('.').last == selectedTransmission))
+        return false;
+
+      // Features filtering - check if ANY selected feature is present
+      if (selectedFeatures.isNotEmpty &&
+          !selectedFeatures.every((feature) => car.features.contains(Feature
+              .values
+              .firstWhere((f) => f.toString().split('.').last == feature)))) {
+        return false;
+      }
+
+      return true;
+    }).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Only show "Filtered Cars" label if filters are applied and there are cars
+        if (_showFilters && filteredCars.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Text(
+              'Filtered Cars',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
+            ),
+          ),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: filteredCars.isEmpty
+              ? Text(
+                  _showFilters
+                      ? 'No cars match the selected filters.'
+                      : 'All Cars',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[300]
+                        : Colors.black,
+                  ),
+                )
+              : SizedBox(
                   height: 350, // Match the height of Featured Cars
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -459,14 +486,14 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                     },
                   ),
                 ),
-      ),
-    ],
-  );  
-}
-
+        ),
+      ],
+    );
+  }
 
   Widget _buildSearchResults(CarProvider carsProvider) {
     final cars = carsProvider.filtercars;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     // If no search query, return empty widget
     if (_searchController.text.isEmpty) return const SizedBox();
@@ -476,17 +503,26 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Search Results",
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppColors.NavAndHeaderLight,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[300]
+                  : Colors.black,
             ),
           ),
           const SizedBox(height: 15),
           cars.isEmpty
-              ? const Text('No cars found') // Show message if no cars match
+              ? Text(
+                  'No cars found',
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[300]
+                        : Colors.black,
+                  ),
+                ) // Show message if no cars match
               : SizedBox(
                   height: 350, // Match the height of Featured Cars
                   child: ListView.builder(
@@ -514,16 +550,10 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
   }
 
   // Featured Cars Section
-  Widget _buildFeaturedCars(CarProvider carsProvider, ThemeData theme) {
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor = theme.colorScheme.primary;
-    final restButtonColor = theme.colorScheme.secondary;
+  Widget _buildFeaturedCars(CarProvider carsProvider) {
     final cars = carsProvider.cars;
-    print(
-        "22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     print(cars);
 
     return Padding(
@@ -533,10 +563,12 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
         children: [
           Text(
             "Featured Cars",
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: textColor,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[300]
+                  : Colors.black,
             ),
           ),
           const SizedBox(height: 15),
@@ -549,18 +581,18 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                     itemCount: cars.length,
                     itemBuilder: (context, index) {
                       return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CarDetailScreen(
-                              car: cars[index],
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CarDetailScreen(
+                                car: cars[index],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: _buildCarCard(cars[index], context),
-                    );
+                          );
+                        },
+                        child: _buildCarCard(cars[index], context),
+                      );
                     },
                   ),
                 ),
@@ -570,13 +602,9 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
   }
 
   // Popular Deals Section
-  Widget _buildPopularDeals(CarProvider carsProvider, ThemeData theme) {
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor = theme.colorScheme.primary;
-    final restButtonColor = theme.colorScheme.secondary;
+  Widget _buildPopularDeals(CarProvider carsProvider) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     final Cars = carsProvider.cars
         .where((car) => car.rating >= 0) // Filter based on high ratings
         .toList();
@@ -586,8 +614,6 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
 
     final popularCars = Cars.take(5).toList(); // Take the top 5 cars
 
-    print(
-        "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
     print(popularCars);
 
     return Padding(
@@ -600,47 +626,48 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
             children: [
               Text(
                 "Popular Deals",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textColor,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[300]
+                      : Colors.black,
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  // You can implement the "View All" functionality here
-                },
+                onPressed: () {},
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   decoration: BoxDecoration(
-                    color: backgroundColor,
+                    color: isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                     Align(
-  alignment: Alignment.centerRight,
-  child: GestureDetector(
-    onTap: () {
-      // Navigate to CarListingScreen when tapped
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>  const CarListingScreen()),
-      );
-    },
-    child: const Text(
-      'View All',
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.blue, // You can change this color if you want
-      ),
-    ),
-  ),
-)
-
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Navigate to CarListingScreen when tapped
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CarListingScreen()),
+                            );
+                          },
+                          child: Text(
+                            'View All',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).brightness == Brightness.dark? Colors.grey[300]: Colors.white,
+                            ), // You can change this color if you want
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -679,28 +706,16 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
 
   // Car Card Widget
   Widget _buildCarCard(Car car, BuildContext context) {
-    final theme = Theme.of(context);
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor = theme.colorScheme.primary;
-    final secondary = theme.colorScheme.secondary;
-    // final buttonColor = theme.elevatedButtonTheme.style?.backgroundColor?.resolve({MaterialState.selected}) ?? theme.primaryColor;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       child: Container(
         width: 240,
         margin: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: secondary,
+          color: isDarkMode
+              ? Colors.grey[900]
+              : Color.fromARGB(255, 247, 245, 244),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textColorLight.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
         child: Column(
           children: [
@@ -709,7 +724,9 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
               height: 180,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: secondary,
+                color: isDarkMode
+                    ? Colors.grey[900]
+                    : Color.fromARGB(255, 247, 245, 244),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -731,16 +748,16 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                 children: [
                   Text(
                     car.brand.toString().split('.').last,
-                    style: const TextStyle(
-                      color: Colors.black38,
+                    style: GoogleFonts.poppins(
+                      color: isDarkMode ? Colors.grey[300] : Colors.black,
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     car.name,
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: GoogleFonts.poppins(
+                      color: isDarkMode ? Colors.grey[300] : Colors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -750,15 +767,15 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                     children: [
                       const Icon(
                         Icons.star,
-                        color: Colors.black,
+                        color: Colors.yellow,
                         size: 18,
                       ),
                       const SizedBox(width: 5),
                       Text(
                         car.rating.toString(),
-                        style: const TextStyle(
+                        style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black38,
+                          color: isDarkMode ? Colors.grey[300] : Colors.black,
                         ),
                       ),
                     ],
@@ -766,10 +783,10 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
                   const SizedBox(height: 10),
                   Text(
                     '\$${car.price}/day',
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.grey[300] : Colors.black,
                     ),
                   ),
                 ],
@@ -783,66 +800,62 @@ Widget _buildFilteredCars(CarProvider carsProvider ,ThemeData theme ) {
 
   // Bottom Navigation Bar
   Widget _buildBottomNavBar(BuildContext context) {
-    // Access the current theme's colors dynamically
-    final theme = Theme.of(context);
-    final backgroundColor = theme
-        .appBarTheme.backgroundColor; // Use theme's AppBar background color
-    final textColor = theme
-        .colorScheme.onPrimary; // Text/icon color for active/inactive states
-    final activeTabColor =
-        theme.colorScheme.primary; // Active tab background color
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-        child: GNav(
-          backgroundColor: backgroundColor!,
-          color: Colors.white,
-          activeColor: Colors.white,
-          tabBackgroundColor: activeTabColor.withOpacity(0.5),
-          padding: const EdgeInsets.all(16),
-          gap: 8,
-          onTabChange: (index) {
-            switch (index) {
-              case 0:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                );
-                break;
-              case 1:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NotificationScreen()),
-                );
-                break;
-              case 2:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
-                break;
-              case 3:
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsScreen()),
-                );
-                break;
-            }
-          },
-          tabs: const [
-            GButton(icon: Icons.home, text: 'Home'),
-            GButton(icon: Icons.notifications, text: 'Notifications'),
-            GButton(icon: Icons.person, text: 'Profile'),
-            GButton(icon: Icons.settings, text: 'Settings'),
-          ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE),
+          borderRadius: BorderRadius.circular(40),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: GNav(
+            // backgroundColor: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE),
+            color: isDarkMode ? Colors.grey[300] : Colors.white,
+            activeColor: Colors.white,
+            tabBackgroundColor: Colors.white.withOpacity(0.30),
+            padding: const EdgeInsets.all(12),
+            gap: 5,
+            onTabChange: (index) {
+              switch (index) {
+                case 0:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                  break;
+                case 1:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const NotificationScreen()),
+                  );
+                  break;
+                case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()),
+                  );
+                  break;
+                case 3:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()),
+                  );
+                  break;
+              }
+            },
+            tabs: const [
+              GButton(icon: Icons.home),
+              GButton(icon: Icons.notifications),
+              GButton(icon: Icons.person),
+              GButton(icon: Icons.settings),
+            ],
+          ),
         ),
       ),
     );

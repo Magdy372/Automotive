@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../models/user_model.dart';
@@ -17,9 +18,10 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0), // Add padding on top
         child: Form(
@@ -27,33 +29,30 @@ class SignupScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Get Started',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 38.0,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE),
                 ),
               ),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _nameController,
                 label: 'Full name',
-                hintText: 'Enter fullname',
                 validator: UserModel.validateName,
               ),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _emailController,
                 label: 'Email',
-                hintText: 'Enter email',
                 validator: UserModel.validateEmail,
               ),
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _passwordController,
                 label: 'Password',
-                hintText: 'Enter password',
                 obscureText: true,
                 validator: UserModel.validatePassword,
               ),
@@ -73,8 +72,8 @@ class SignupScreen extends StatelessWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
+                    foregroundColor: isDarkMode? Colors.black:Colors.white,
+                    backgroundColor: isDarkMode? Colors.white:Color(0XFF997B3AE)
                   ),
                   child: userProvider.isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
@@ -82,9 +81,9 @@ class SignupScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildDivider(),
+              _buildDivider(context),
               const SizedBox(height: 10),
-              _buildSocialMediaButtons(userProvider),
+              _buildSocialMediaButtons(userProvider,context),
             ],
           ),
         ),
@@ -96,7 +95,6 @@ class SignupScreen extends StatelessWidget {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required String hintText,
     required String? Function(String?)? validator,
     bool obscureText = false,
   }) {
@@ -107,17 +105,15 @@ class SignupScreen extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.black26),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+        hintStyle: GoogleFonts.poppins(color: Colors.black26),
+
       ),
     );
   }
 
   // Divider for the "Sign up with" section
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -127,11 +123,11 @@ class SignupScreen extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: TextStyle(color: Colors.black45),
+            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -145,7 +141,9 @@ class SignupScreen extends StatelessWidget {
   }
 
   // Social Media Buttons for Sign Up
-  Widget _buildSocialMediaButtons(UserProvider userProvider) {
+  Widget _buildSocialMediaButtons(UserProvider userProvider, BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -154,8 +152,8 @@ class SignupScreen extends StatelessWidget {
             // userProvider.signInWithFacebook(context);
           },
           child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF1877F2),
+            decoration: BoxDecoration(
+              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
@@ -172,8 +170,8 @@ class SignupScreen extends StatelessWidget {
             // userProvider.signInWithGoogle(context);
           },
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.black,
+            decoration: BoxDecoration(
+              color: isDarkMode? Colors.grey[800]:Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),

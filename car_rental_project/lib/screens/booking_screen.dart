@@ -4,7 +4,6 @@ import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';

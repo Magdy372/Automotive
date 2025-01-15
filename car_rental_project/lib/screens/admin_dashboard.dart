@@ -1,8 +1,5 @@
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:car_rental_project/screens/onboarding_screens.dart';
-import 'package:car_rental_project/screens/signup_screen.dart';
-import 'package:car_rental_project/screens/splash_screen.dart';
 import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

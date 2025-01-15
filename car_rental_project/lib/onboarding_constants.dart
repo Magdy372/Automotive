@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 class OnboardingConstants {
-static var primaryColor = const Color(0xFFA7ABDE); 
 
   static var titleOne = 'Welcome to Automotive!';
   static var descriptionOne = 'Find your perfect ride, wherever you are. We make renting cars simple, affordable, and fast';

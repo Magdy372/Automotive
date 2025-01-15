@@ -175,7 +175,7 @@ class UserProvider with ChangeNotifier {
       _showSuccess(context, 'Signup successful!');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {

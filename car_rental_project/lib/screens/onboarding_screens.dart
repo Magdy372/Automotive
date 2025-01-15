@@ -21,11 +21,13 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
   @override
   Widget build(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode? Colors.black:Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20, top: 20),
@@ -47,7 +49,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                 child: Text(
                   'Skip',
                   style: GoogleFonts.poppins(
-                    color: Colors.grey,
+                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400,
                   ),
@@ -97,7 +99,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: OnboardingConstants.primaryColor,
+                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
               ),
               child: IconButton(
                 onPressed: () {
@@ -116,10 +118,10 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                     }
                   });
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_forward_ios,
                   size: 24,
-                  color: Colors.white,
+                  color:isDarkMode? Colors.black: Colors.white,
                 ),
               ),
             ),
@@ -136,7 +138,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               child: Text(
                 'Already have an account?',
                 style: GoogleFonts.poppins(
-                  color: OnboardingConstants.primaryColor,
+                    color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   decoration: TextDecoration.underline,
@@ -150,13 +152,15 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
   }
 
   Widget _indicator(bool isActive) {
+     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       height: 10.0,
       width: isActive ? 20 : 8,
       margin: const EdgeInsets.only(right: 5.0),
       decoration: BoxDecoration(
-        color: OnboardingConstants.primaryColor,
+      color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
         borderRadius: BorderRadius.circular(5),
       ),
     );
@@ -189,6 +193,8 @@ class createPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.only(left: 50, right: 50, bottom: 80),
       child: Column(
@@ -205,7 +211,7 @@ class createPage extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: OnboardingConstants.primaryColor,
+            color:isDarkMode? Colors.grey[300]: Color(0XFF97B3AE),
               fontSize: 25,
               fontWeight: FontWeight.bold,
             ),
