@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -40,6 +41,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
   }
 
+
+
   void _fetchUserData() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.currentUser?.id ?? '';
@@ -53,6 +56,53 @@ class _UserProfilePageState extends State<UserProfilePage> {
       carProvider.getUserCars(userId);
     }
   }
+
+  
+
+
+
+  void showRatingDialog(BuildContext context, String carId, CarProvider carProvider) {
+  double rating = 0;
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Rate this car'),
+        content: RatingBar.builder(
+          initialRating: 0,
+          minRating: 1,
+          direction: Axis.horizontal,
+          allowHalfRating: true,
+          itemCount: 5,
+          itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+          itemBuilder: (context, _) => const Icon(
+            Icons.star,
+            color: Colors.amber,
+          ),
+          onRatingUpdate: (newRating) {
+            rating = newRating;
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await carProvider.rateCar(carId, rating);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   // Rest of your existing code remains the same
   @override
@@ -292,7 +342,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 Widget _buildRecentRentals() {
   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-  return Consumer<RentalProvider>(builder: (context, rentalProvider, child) {
+  return Consumer<RentalProvider>(
+    builder: (context, rentalProvider, child) 
+    {
     final recentRentals = rentalProvider.rentalsForUser;
 
     if (recentRentals.isEmpty) {
@@ -374,15 +426,37 @@ Widget _buildRecentRentals() {
                         ),
                       ],
                     ),
-                  ],
+                    // Rating
+
+                      IconButton(
+                        icon: const Icon(Icons.star_border),
+                        onPressed: () {
+                          final carId = rental.car.id; // Get the carId directly from the rental
+                          if (carId != null) {
+                            showRatingDialog(
+                              context,
+                              carId,
+                              Provider.of<CarProvider>(context, listen: false),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Car ID not found')),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
+
 }
+
 
   // Helper function to create settings options
   // Widget _buildSettingsOption(

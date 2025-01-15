@@ -66,74 +66,97 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Welcome Message
-            Padding(
-              padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
+Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Welcome Message
+          Padding(
+            padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.end, // Align icons at the end
-                children: [
-                  // Notification Icon
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NotificationScreen(),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 25, left: 10, right: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color:
-                              isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.notifications_none_rounded,
-                          color: isDarkMode ? Colors.grey[300] : Colors.white,
-                          size: 28,
-                        ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end, // Align icons at the end
+              children: [
+                // Notification Icon
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationScreen(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.notifications_none_rounded,
+                        color: isDarkMode ? Colors.grey[300] : Colors.white,
+                        size: 28,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                // Sell Your Car Icon
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CarUploadScreen(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.car_rental,
+                        color: isDarkMode ? Colors.grey[300] : Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        _buildSearchBar(isDarkMode),
-      ],
-    );
-  }
+          ),
+        ],
+      ),
+      const SizedBox(height: 20),
+      _buildSearchBar(isDarkMode),
+    ],
+  );
+}
 
   // Search Bar Widget
   Widget _buildSearchBar(bool isDarkMode) {
@@ -609,7 +632,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     final Cars = carsProvider.cars
-        .where((car) => car.rating >= 0) // Filter based on high ratings
+        .where((car) => car.rating >= 3) // Filter based on high ratings
         .toList();
 
     Cars.sort((a, b) =>

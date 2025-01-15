@@ -10,11 +10,8 @@ class CarProvider with ChangeNotifier {
   List<Car> get cars => _cars;
   List<Car> get filtercars => _filteredCars;
 
-List<Car> _carsbysuser = [];
-
+  List<Car> _carsbysuser = [];
   List<Car> get carsbysuser => _carsbysuser;
-
-  
 
   /// Fetch cars from Firestore and update their booking status
   Future<void> fetchCars() async {
@@ -27,10 +24,6 @@ List<Car> _carsbysuser = [];
 
       _cars = await Future.wait(snapshot.docs.map((doc) async {
         final data = doc.data() as Map<String, dynamic>;
-
-        // Debugging the doc data
-        debugPrint('Fetched car data: $data');
-
         return Car.fromMap(data, doc.reference);
       }).toList());
 
@@ -38,7 +31,6 @@ List<Car> _carsbysuser = [];
       notifyListeners();
     } catch (e) {
       debugPrint('Error fetching cars: $e');
-      
     }
   }
 
@@ -83,7 +75,6 @@ List<Car> _carsbysuser = [];
   /// Fetch the cars uploaded by a specific user
   Future<void> getUserCars(String userId) async {
     try {
-      // Query Firestore for cars where the seller's ID matches the userId
       QuerySnapshot snapshot = await _firestore
           .collection('Cars')
           .where('seller', isEqualTo: _firestore.doc('Users/$userId'))
@@ -93,26 +84,53 @@ List<Car> _carsbysuser = [];
         throw Exception('No cars found for this user');
       }
 
-      // Map documents to Car objects and update the cars list
       _carsbysuser = await Future.wait(snapshot.docs.map((doc) async {
         final data = doc.data() as Map<String, dynamic>;
-
-        // Debugging the doc data
-        debugPrint('Fetched user car data: $data');
-
         return Car.fromMap(data, doc.reference);
       }).toList());
 
-      // Clear the filtered cars after fetching user cars
-      _filteredCars = [];
-
-      // Notify listeners to update the UI
+      _filteredCars = []; // Clear the filtered cars after fetching user cars
       notifyListeners();
     } catch (e) {
       debugPrint('Error fetching user cars: $e');
-    // Rethrow the exception for further handling
     }
   }
+
+  /// Add a rating to a car
+Future<void> rateCar(String carId, double rating) async {
+  try {
+    final carDoc = _firestore.collection('Cars').doc(carId);
+
+    // Fetch the current ratings array
+    final docSnapshot = await carDoc.get();
+    if (!docSnapshot.exists) {
+      throw Exception('Car document not found in Firestore');
+    }
+
+    final currentRatings = (docSnapshot['ratings'] as List<dynamic>?)?.cast<double>() ?? [];
+    final updatedRatings = [...currentRatings, rating]; // Add the new rating
+
+    // Calculate the average rating
+    final averageRating = updatedRatings.reduce((a, b) => a + b) / updatedRatings.length;
+
+    // Update Firestore with the new ratings array and average rating
+    await carDoc.update({
+      'ratings': updatedRatings, // Update the ratings array
+      'rating': averageRating,   // Save the average rating
+    });
+
+    // Update the local car list
+    final carIndex = _cars.indexWhere((car) => car.id == carId);
+    if (carIndex != -1) {
+      _cars[carIndex].ratings = updatedRatings; // Update the local ratings array
+      _cars[carIndex].rating = averageRating;   // Update the local average rating
+      notifyListeners(); // Notify listeners to update the UI
+    }
+  } catch (e) {
+    debugPrint('Error rating car: $e');
+    rethrow;
+  }
+}
 
   void filterCars(String query) {
     if (query.isEmpty) {
@@ -121,14 +139,9 @@ List<Car> _carsbysuser = [];
     } else {
       _filteredCars = _cars.where((car) {
         final carName = car.name.toLowerCase();
-        //final carBrand = car.brand.toLowerCase();
         final searchQuery = query.toLowerCase();
-        //return carName.contains(searchQuery) || carBrand.contains(searchQuery);
         return carName.contains(searchQuery);
       }).toList();
-      print(
-          "22333344444444444444444444477777777777777777777777777777777777777777777777777777777777777777");
-      print(_filteredCars);
       notifyListeners();
     }
   }

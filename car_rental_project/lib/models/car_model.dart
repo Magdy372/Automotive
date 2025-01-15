@@ -1,7 +1,4 @@
-// car_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
 
 class Car {
   String id;
@@ -9,7 +6,7 @@ class Car {
   final Brand brand;
   final double price;
   final String image;
-  final double rating;
+   double rating;
   final double horsepower;
   final double acceleration;
   final double tankCapacity;
@@ -23,6 +20,7 @@ class Car {
   DateTime? availableFrom;
   DateTime? availableTo;
   List<DateTime> bookedDates;
+  List<double> ratings; // Add this line
 
   Car({
     required this.id,
@@ -44,7 +42,14 @@ class Car {
     this.availableFrom,
     this.availableTo,
     this.bookedDates = const [],
+    this.ratings = const [], // Add this line
   });
+
+  // Add this method to calculate the average rating
+  double get averageRating {
+    if (ratings.isEmpty) return 0.0; // Return 0 if there are no ratings
+    return ratings.reduce((a, b) => a + b) / ratings.length;
+  }
 
   bool isDateBooked(DateTime date) {
     return bookedDates.any((bookedDate) => bookedDate.isAtSameMomentAs(date));
@@ -58,68 +63,65 @@ class Car {
   }
 
   factory Car.fromMap(Map<String, dynamic> data, DocumentReference reference) {
-    return Car(
-      id: data['id'] ?? '',
-      name: data['name'] ?? '',
-      brand: _stringToEnum(data['brand'] ?? '', Brand.values),
-      price: (data['price'] ?? 0).toDouble(),
-      image: data['image'] ?? '',
-      rating: (data['rating'] ?? 0).toDouble(),
-      description: data['description'] ?? '',
-      bodyType: _stringToEnum(data['bodyType'] ?? '', BodyType.values),
-      transmissionType:
-          _stringToEnum(data['transmissionType'] ?? '', TransmissionType.values),
-      horsepower: (data['horsepower'] ?? 0).toDouble(),
-      acceleration: (data['acceleration'] ?? 0).toDouble(),
-      tankCapacity: (data['tankCapacity'] ?? 0).toDouble(),
-      topSpeed: (data['topSpeed'] ?? 0),
-      features: (data['features'] ?? [])
-          .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
-          .toList(),
-      seller: reference,
-      isBooked: data['isBooked'] ?? false,
-      availableFrom: (data['availableFrom'] != null)
-          ? (data['availableFrom'] as Timestamp).toDate()
-          : null,
-      availableTo: (data['availableTo'] != null)
-          ? (data['availableTo'] as Timestamp).toDate()
-          : null,
-      bookedDates: (data['bookedDates'] as List?)
-              ?.map<DateTime>((timestamp) => (timestamp as Timestamp).toDate())
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'brand': _enumToString(brand),
-      'price': price,
-      'image': image,
-      'rating': rating,
-      'description': description,
-      'bodyType': _enumToString(bodyType),
-      'transmissionType': _enumToString(transmissionType),
-      'horsepower': horsepower,
-      'acceleration': acceleration,
-      'tankCapacity': tankCapacity,
-      'topSpeed': topSpeed,
-      'features': features.map((feature) => _enumToString(feature)).toList(),
-      'seller': seller,
-      'isBooked': isBooked,
-      'availableFrom':
-          availableFrom != null ? Timestamp.fromDate(availableFrom!) : null,
-      'availableTo': availableTo != null ? Timestamp.fromDate(availableTo!) : null,
-      'bookedDates': bookedDates.map((date) => Timestamp.fromDate(date)).toList(),
-    };
-  }
+  return Car(
+    id: data['id'] ?? '',
+    name: data['name'] ?? '',
+    brand: _stringToEnum(data['brand'] ?? '', Brand.values),
+    price: (data['price'] ?? 0).toDouble(),
+    image: data['image'] ?? '',
+    rating: (data['rating'] ?? 0).toDouble(), // Fetch the average rating
+    description: data['description'] ?? '',
+    bodyType: _stringToEnum(data['bodyType'] ?? '', BodyType.values),
+    transmissionType: _stringToEnum(data['transmissionType'] ?? '', TransmissionType.values),
+    horsepower: (data['horsepower'] ?? 0).toDouble(),
+    acceleration: (data['acceleration'] ?? 0).toDouble(),
+    tankCapacity: (data['tankCapacity'] ?? 0).toDouble(),
+    topSpeed: (data['topSpeed'] ?? 0),
+    features: (data['features'] ?? [])
+        .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
+        .toList(),
+    seller: reference,
+    isBooked: data['isBooked'] ?? false,
+    availableFrom: (data['availableFrom'] != null)
+        ? (data['availableFrom'] as Timestamp).toDate()
+        : null,
+    availableTo: (data['availableTo'] != null)
+        ? (data['availableTo'] as Timestamp).toDate()
+        : null,
+    bookedDates: (data['bookedDates'] as List?)
+            ?.map<DateTime>((timestamp) => (timestamp as Timestamp).toDate())
+            .toList() ??
+        [],
+    ratings: (data['ratings'] as List<dynamic>?)?.cast<double>().toList() ?? [], // Fetch the ratings array
+  );
 }
 
-
-
-
+Map<String, dynamic> toMap() {
+  return {
+    'id': id,
+    'name': name,
+    'brand': _enumToString(brand),
+    'price': price,
+    'image': image,
+    'rating': rating, // Save the average rating
+    'description': description,
+    'bodyType': _enumToString(bodyType),
+    'transmissionType': _enumToString(transmissionType),
+    'horsepower': horsepower,
+    'acceleration': acceleration,
+    'tankCapacity': tankCapacity,
+    'topSpeed': topSpeed,
+    'features': features.map((feature) => _enumToString(feature)).toList(),
+    'seller': seller,
+    'isBooked': isBooked,
+    'availableFrom':
+        availableFrom != null ? Timestamp.fromDate(availableFrom!) : null,
+    'availableTo': availableTo != null ? Timestamp.fromDate(availableTo!) : null,
+    'bookedDates': bookedDates.map((date) => Timestamp.fromDate(date)).toList(),
+    'ratings': ratings, // Save the ratings array
+  };
+}
+}
 
 enum Brand { BMW, Toyota, Honda, Tesla, MG, Mercedes, Ford, Audi, Hyundai }
 enum BodyType {
