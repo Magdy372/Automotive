@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/car_model.dart';
 
 class CarProvider with ChangeNotifier {
@@ -12,6 +13,32 @@ class CarProvider with ChangeNotifier {
 
   List<Car> _carsbysuser = [];
   List<Car> get carsbysuser => _carsbysuser;
+
+
+Future<List<Car>> getNearestCars(Position userLocation) async {
+    // Calculate distances
+    for (var car in _cars) {
+      if (car.latitude != null && car.longitude != null) {
+        car.distance = Geolocator.distanceBetween(
+          userLocation.latitude,
+          userLocation.longitude,
+          car.latitude!,
+          car.longitude!,
+        ) /
+            1000; // Convert meters to kilometers
+      } else {
+        car.distance = double.infinity; // No location data
+      }
+    }
+
+    // Sort cars by distance
+    _cars.sort((a, b) => (a.distance ?? double.infinity)
+        .compareTo(b.distance ?? double.infinity));
+
+    return _cars;
+  }
+
+
 
   /// Fetch cars from Firestore and update their booking status
   Future<void> fetchCars() async {

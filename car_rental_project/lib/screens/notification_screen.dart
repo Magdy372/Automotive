@@ -182,7 +182,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               );
             },
-            background: Container(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
+            background: Container(color:isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE)),
             child: NotificationCard(notification: notification),
           );
         }),
@@ -274,11 +274,11 @@ class NotificationCard extends StatelessWidget {
             children: [
               Text(
                 DateFormat('dd/MM/yyyy').format(notification.date),
-                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE), fontSize: 12),
+                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE), fontSize: 12),
               ),
               Text(
                 DateFormat('hh:mm a').format(notification.date),
-                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE), fontSize: 12),
+                style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE), fontSize: 12),
               ),
             ],
           ),
@@ -287,7 +287,7 @@ class NotificationCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[900]:Color(0XFF97B3AE),
+              color: isDarkMode? Colors.grey[900]:const Color(0XFF97B3AE),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Text(

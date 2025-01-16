@@ -6,7 +6,7 @@ import 'package:car_rental_project/screens/home_screen.dart';
 class InternetChecker extends StatefulWidget {
   final Widget child;
 
-  const InternetChecker({Key? key, required this.child}) : super(key: key);
+  const InternetChecker({super.key, required this.child});
 
   @override
   _InternetCheckerState createState() => _InternetCheckerState();
@@ -65,7 +65,7 @@ class _InternetCheckerState extends State<InternetChecker> {
 }
 
 class NoInternetScreen extends StatelessWidget {
-  const NoInternetScreen({Key? key}) : super(key: key);
+  const NoInternetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

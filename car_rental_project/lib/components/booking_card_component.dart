@@ -53,7 +53,7 @@ class BookingCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(thickness: 1, color: isDarkMode?Colors.grey[500]:Color(0XFF97B3AE),),
+          Divider(thickness: 1, color: isDarkMode?Colors.grey[500]:const Color(0XFF97B3AE),),
     
           Container(
             padding: const EdgeInsets.all(15),

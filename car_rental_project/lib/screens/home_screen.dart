@@ -1,5 +1,6 @@
 import 'package:car_rental_project/screens/CarForm.dart';
 import 'package:car_rental_project/screens/car_listing_screen.dart';
+import 'package:car_rental_project/screens/nearest_cars_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +9,6 @@ import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
-import 'package:car_rental_project/constants.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
@@ -681,7 +681,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const CarListingScreen()),
+                                      NearestCarsScreen()),
                             );
                           },
                           child: Text(

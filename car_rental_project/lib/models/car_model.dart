@@ -16,6 +16,9 @@ class Car {
   final TransmissionType transmissionType;
   final List<Feature> features;
   final DocumentReference seller;
+   final double latitude; // Added field
+  final double longitude;
+  double? distance;
   bool isBooked;
   DateTime? availableFrom;
   DateTime? availableTo;
@@ -38,6 +41,9 @@ class Car {
     required this.topSpeed,
     required this.features,
     required this.seller,
+     required this.latitude, // Initialize latitude
+    required this.longitude,
+    this.distance,
     this.isBooked = false,
     this.availableFrom,
     this.availableTo,
@@ -92,6 +98,8 @@ class Car {
             ?.map<DateTime>((timestamp) => (timestamp as Timestamp).toDate())
             .toList() ??
         [],
+         latitude: (data['latitude'] ?? 0).toDouble(), // Map latitude
+      longitude: (data['longitude'] ?? 0).toDouble(),
     ratings: (data['ratings'] as List<dynamic>?)?.cast<double>().toList() ?? [], // Fetch the ratings array
   );
 }
@@ -119,6 +127,8 @@ Map<String, dynamic> toMap() {
     'availableTo': availableTo != null ? Timestamp.fromDate(availableTo!) : null,
     'bookedDates': bookedDates.map((date) => Timestamp.fromDate(date)).toList(),
     'ratings': ratings, // Save the ratings array
+     'latitude': latitude, // Include latitude
+      'longitude': longitude, // Include longitude
   };
 }
 }

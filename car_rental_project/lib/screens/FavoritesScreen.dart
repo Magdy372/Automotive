@@ -4,7 +4,7 @@ import 'package:car_rental_project/models/car_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
+  const FavoritesScreen({super.key});
 
   @override
   _FavoritesScreenState createState() => _FavoritesScreenState();

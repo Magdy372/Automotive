@@ -113,7 +113,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(backgroundColor: isDarkMode? Colors.black:Colors.white,title: Text("Profile", style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),)),
+        appBar: AppBar(backgroundColor: isDarkMode? Colors.black:Colors.white,title: Text("Profile", style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE)),)),
         body: const Center(child: Text("User not logged in")),
       );
     }
@@ -191,7 +191,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Icon(
             Icons.account_circle, // Profile icon
             size: 120, // Icon size
-            color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE) // Icon color
+            color:isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE) // Icon color
           ),
           const SizedBox(height: 10),
           Text(
@@ -251,7 +251,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ],
             ),
-             Divider(color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
+             Divider(color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -432,18 +432,12 @@ Widget _buildRecentRentals() {
                         icon: const Icon(Icons.star_border),
                         onPressed: () {
                           final carId = rental.car.id; // Get the carId directly from the rental
-                          if (carId != null) {
-                            showRatingDialog(
-                              context,
-                              carId,
-                              Provider.of<CarProvider>(context, listen: false),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Car ID not found')),
-                            );
-                          }
-                        },
+                          showRatingDialog(
+                            context,
+                            carId,
+                            Provider.of<CarProvider>(context, listen: false),
+                          );
+                                                },
                       ),
                     ],
                   ),

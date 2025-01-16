@@ -192,7 +192,7 @@ class SettingsScreen extends StatelessWidget {
         label,
         style: GoogleFonts.poppins(fontSize: 16, color: labelColor),
       ),
-      trailing:  Icon(Icons.arrow_forward_ios, size: 16, color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
+      trailing:  Icon(Icons.arrow_forward_ios, size: 16, color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE)),
       onTap: onTap,
     );
   }

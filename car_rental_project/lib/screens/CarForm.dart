@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
@@ -26,6 +27,8 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   final TextEditingController accelerationController = TextEditingController();
   final TextEditingController tankCapacityController = TextEditingController();
   final TextEditingController topspeedController = TextEditingController();
+    final TextEditingController latitudeController = TextEditingController();
+  final TextEditingController longitudeController = TextEditingController();
 
   DateTime? _availableFrom;
   DateTime? _availableTo;
@@ -68,6 +71,45 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
       }
     });
   }
+
+
+
+Future<void> _detectLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permissions are denied.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        latitudeController.text = position.latitude.toString();
+        longitudeController.text = position.longitude.toString();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error detecting location: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
 
   // Pick an image from the gallery
   Future<void> pickImage() async {
@@ -151,6 +193,8 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
         _selectedFeatures.isEmpty ||
         descriptionController.text.isEmpty ||
         _availableFrom == null ||
+         latitudeController.text.isEmpty ||
+        longitudeController.text.isEmpty ||
         _availableTo == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -210,6 +254,8 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
         acceleration: double.tryParse(accelerationController.text) ?? 0.0,
         tankCapacity: double.tryParse(tankCapacityController.text) ?? 0.0,
         topSpeed: int.tryParse(topspeedController.text) ?? 0,
+        latitude: double.tryParse(latitudeController.text) ?? 0.0,
+        longitude: double.tryParse(longitudeController.text) ?? 0.0,
       );
 
       final carProvider = Provider.of<CarProvider>(context, listen: false);
@@ -435,6 +481,36 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
                             : 'Not selected'),
                         onTap: () => _selectDate(context, false)),
                     const SizedBox(height: 20),
+
+// Latitude field
+                TextField(
+                  controller: latitudeController,
+                  decoration: InputDecoration(
+                    labelText: "Latitude",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.location_searching),
+                      onPressed: _detectLocation,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 20),
+
+                // Longitude field
+                TextField(
+                  controller: longitudeController,
+                  decoration: InputDecoration(
+                    labelText: "Longitude",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.location_searching),
+                      onPressed: _detectLocation,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+
+
+
                     // Upload Button
                     Align(
                       alignment: Alignment.center,
