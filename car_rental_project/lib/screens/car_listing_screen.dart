@@ -56,12 +56,20 @@ class _CarListingScreenState extends State<CarListingScreen> {
             itemBuilder: (context, index) {
               final car = cars[index];
               return ListTile(
-                leading: Image.asset(
-                  car.image,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ), // Placeholder for car image
+                leading: car.image != null && car.image!.isNotEmpty
+    ? ClipOval(
+        child: Image.network(
+          car.image!,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(Icons.error, size: 50); // Fallback icon in case of error
+          },
+        ),
+      )
+    : Icon(Icons.image, size: 50),
+ // Placeholder for car image
                 title: Text(
                   car.name,
                   style: GoogleFonts.poppins(

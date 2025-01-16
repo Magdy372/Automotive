@@ -27,7 +27,21 @@ class NearestCarsScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final car = nearestCars[index];
                 return ListTile(
-                  title: Text(car.name),
+                  leading: car.image != null && car.image!.isNotEmpty
+    ? ClipOval(
+        child: Image.network(
+          car.image!,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(Icons.error, size: 50); // Fallback icon in case of error
+          },
+        ),
+      )
+    : Icon(Icons.image, size: 50),
+
+                  title: Text('${car.brand} ${car.name}'),
                   subtitle: Text('${car.price.toStringAsFixed(2)} per day'),
                   trailing: Text('${car.distance!.toStringAsFixed(1)} km'),
                   onTap: () {

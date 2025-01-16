@@ -210,41 +210,76 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
     );
   }
 
-  Widget _buildFilters(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Filters',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+Widget _buildFilters(bool isDarkMode) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Filters',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
-              IconButton(
-                icon: Icon(
-                  _showFilters ? Icons.close : Icons.filter_list,
-                  color: isDarkMode ? Colors.grey[400] : const Color(0XFF97B3AE),
+            ),
+            Row(
+              children: [
+                // Filters button
+                IconButton(
+                  icon: Icon(
+                    _showFilters ? Icons.close : Icons.filter_list,
+                    color: isDarkMode ? Colors.grey[400] : const Color(0XFF97B3AE),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _showFilters = !_showFilters; // Toggle filter visibility
+                      _searchController.clear();
+                      selectedBrand = null;
+                      selectedBodyType = null;
+                      selectedTransmission = null;
+                      selectedFeatures.clear();
+                    });
+                  },
                 ),
-                onPressed: () {
-                  setState(() {
-                    _showFilters = !_showFilters; // Toggle filter visibility
-                    _searchController.clear();
-                    selectedBrand = null;
-                    selectedBodyType = null;
-                    selectedTransmission = null;
-                    selectedFeatures.clear();
-                  });
-                },
-              ),
-            ],
-          ),
+                const SizedBox(width: 10), // Add spacing between buttons
+                // Nearest Cars button
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate to Nearest Cars Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NearestCarsScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDarkMode ? Colors.grey[700] : Colors.blue, // Background color
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10), // Padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                    ),
+                  ),
+                  child: Text(
+                    'Nearest Cars',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Text color
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      
+      
           if (_showFilters) ...[
             const SizedBox(height: 15),
             _buildDropdownFilter(
@@ -681,7 +716,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      NearestCarsScreen()),
+                                      CarListingScreen()),
                             );
                           },
                           child: Text(
