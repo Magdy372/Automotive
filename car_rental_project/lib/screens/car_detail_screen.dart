@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/FavoritesScreen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
 import 'package:car_rental_project/screens/booking_screen.dart'; // Import the BookingScreen
+import 'package:car_rental_project/services/FavoritesService.dart'; // Import the FavoritesService
 
 class CarDetailScreen extends StatefulWidget {
   final Car car;
@@ -18,19 +20,53 @@ class CarDetailScreen extends StatefulWidget {
 }
 
 class _CarDetailScreenState extends State<CarDetailScreen> {
+  bool _isFavorite = false;
+  final FavoritesService _favoritesService = FavoritesService();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite();
+  }
+
+  // Check if the car is already favorited
+  Future<void> _checkIfFavorite() async {
+    final isFavorite = await _favoritesService.isFavorite(widget.car.id);
+    setState(() {
+      _isFavorite = isFavorite;
+    });
+  }
+
+  // Toggle favorite status
+  Future<void> _toggleFavorite() async {
+    if (_isFavorite) {
+      await _favoritesService.removeFavorite(widget.car.id);
+    } else {
+      await _favoritesService.addFavorite({
+        'carId': widget.car.id,
+        'name': widget.car.name,
+        'brand': widget.car.brand.toString(),
+        'price': widget.car.price,
+        'image': widget.car.image,
+      });
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode?Colors.black: Color(0xFFF7F7F7),
+      backgroundColor: isDarkMode ? Colors.black : const Color(0xFFF7F7F7),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 250,
             pinned: true,
-            backgroundColor: isDarkMode?Colors.black: Colors.white,
+            backgroundColor: isDarkMode ? Colors.black : Colors.white,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
@@ -44,15 +80,21 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     top: 30,
                     right: 10,
                     child: IconButton(
-                      icon: const Icon(Icons.favorite, color: Colors.red),
-                      onPressed: () {},
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: _isFavorite ? Colors.red : Colors.white,
+                      ),
+                      onPressed: _toggleFavorite,
                     ),
                   ),
                 ],
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: Icon(
+                Icons.arrow_back,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -85,7 +127,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
-      color: isDarkMode?Colors.grey[900]: Colors.white,
+      color: isDarkMode ? Colors.grey[900] : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -94,31 +136,31 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           children: [
             Text(
               widget.car.name,
-              style:  GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 const Icon(Icons.speed, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.topSpeed} km/h", style:  GoogleFonts.poppins(color: Colors.grey)),
+                Text("${widget.car.topSpeed} km/h", style: GoogleFonts.poppins(color: Colors.grey)),
                 const SizedBox(width: 16),
                 const Icon(Icons.settings, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(widget.car.transmissionType.toString().split('.').last, style:  GoogleFonts.poppins(color: Colors.grey)),
+                Text(widget.car.transmissionType.toString().split('.').last, style: GoogleFonts.poppins(color: Colors.grey)),
                 const SizedBox(width: 16),
                 const Icon(Icons.local_gas_station, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text("${widget.car.tankCapacity}L", style:  GoogleFonts.poppins(color: Colors.grey)),
+                Text("${widget.car.tankCapacity}L", style: GoogleFonts.poppins(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 12),
             Text(
               "\$${widget.car.price}/day",
-              style:  GoogleFonts.poppins(
+              style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode? Colors.grey[300]:Colors.black,
+                color: isDarkMode ? Colors.grey[300] : Colors.black,
               ),
             ),
           ],
@@ -133,9 +175,9 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         Text(
+        Text(
           "Specifications",
-          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.grey[300] : Colors.black),
         ),
         const SizedBox(height: 8),
         Row(
@@ -151,119 +193,125 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
   }
 
   Widget _specificationCard(String title, String subtitle) {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Expanded(
       child: Card(
-        color: isDarkMode?Colors.grey[900]:Color(0XFF97B3AE),
+        color: isDarkMode ? Colors.grey[900] : const Color(0XFF97B3AE),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 2,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              Text(title,
-                  style:  GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white)),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(subtitle, style: GoogleFonts.poppins(color:isDarkMode?Colors.grey[300]:Colors.white)),
+              Text(
+                subtitle,
+                style: GoogleFonts.poppins(color: isDarkMode ? Colors.grey[300] : Colors.white),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-Widget _buildFeatures() {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "Features",
-        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold,color:isDarkMode? Colors.grey[300]:Colors.black),
-      ),
-      const SizedBox(height: 8),
-      Wrap(
-        spacing: 8,
-        runSpacing: 10, // Adds vertical spacing
-        children: widget.car.features.map((feature) {
-          // Convert enum value to a user-friendly string
-          final featureName = feature.toString().split('.').last;
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDarkMode?Colors.grey[900]:Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Text(
-              featureName,
-              style:  GoogleFonts.poppins(
-                color: isDarkMode?Colors.grey[300]:Colors.black,
-                fontWeight: FontWeight.bold,
+  Widget _buildFeatures() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Features",
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.grey[300] : Colors.black),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 10, // Adds vertical spacing
+          children: widget.car.features.map((feature) {
+            // Convert enum value to a user-friendly string
+            final featureName = feature.toString().split('.').last;
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[900] : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-            ),
-          );
-        }).toList(),
-      ),
-    ],
-  );
-}
+              child: Text(
+                featureName,
+                style: GoogleFonts.poppins(
+                  color: isDarkMode ? Colors.grey[300] : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
 
   Widget _buildDescription() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         Text(
+        Text(
           "Description",
           style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
           widget.car.description,
-          style:  GoogleFonts.poppins(color: Colors.grey),
+          style: GoogleFonts.poppins(color: Colors.grey),
         ),
       ],
     );
   }
 
+  Widget _buildFooter(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-Widget _buildFooter(BuildContext context) {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.symmetric(vertical: 20),
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode?Colors.grey[800]:Color(0XFF97B3AE),
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      ),
-      // Navigate to the booking screen when the button is pressed and pass the car data
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BookingScreen(car: widget.car), // Pass the car to the BookingScreen
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        ),
+        // Navigate to the booking screen when the button is pressed and pass the car data
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BookingScreen(car: widget.car), // Pass the car to the BookingScreen
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Text(
+            "Book Now",
+            style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode ? Colors.grey[300] : Colors.white),
           ),
-        );
-      },
-      child:  Padding(
-        padding: EdgeInsets.all(12),
-        child: Text(
-          "Book Now",
-          style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode?Colors.grey[300]:Colors.white),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
- // Bottom Navigation Bar
+  // Bottom Navigation Bar
   Widget _buildBottomNavBar(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -279,7 +327,6 @@ Widget _buildFooter(BuildContext context) {
           child: GNav(
             color: isDarkMode ? Colors.grey[300] : Colors.white,
             activeColor: Colors.white,
-            // tabBackgroundColor: Colors.white.withOpacity(0.30),
             padding: const EdgeInsets.all(12),
             gap: 5,
             onTabChange: (index) {
@@ -293,22 +340,25 @@ Widget _buildFooter(BuildContext context) {
                 case 1:
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const NotificationScreen()),
+                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
                   );
                   break;
                 case 2:
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileScreen()),
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
                   );
                   break;
                 case 3:
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsScreen()),
+                    MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  );
+                  break;
+                     case 4:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const FavoritesScreen()),
                   );
                   break;
               }
@@ -317,7 +367,9 @@ Widget _buildFooter(BuildContext context) {
               GButton(icon: Icons.home),
               GButton(icon: Icons.notifications),
               GButton(icon: Icons.person),
+             
               GButton(icon: Icons.settings),
+               GButton(icon: Icons.favorite),
             ],
           ),
         ),
