@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/car_model.dart';
@@ -5,9 +6,10 @@ import '../providers/car_provider.dart';
 import '../services/location_service.dart';
 
 class NearestCarsScreen extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(  // Wrap with Scaffold to provide Material ancestor
+    return Scaffold(
       appBar: AppBar(
         title: Text('Nearest Cars'),
       ),
@@ -44,7 +46,32 @@ class NearestCarsScreen extends StatelessWidget {
     final locationService = LocationService();
     final carProvider = Provider.of<CarProvider>(context, listen: false);
 
+    // Get the user's current location
     final userLocation = await locationService.getCurrentLocation();
-    return carProvider.getNearestCars(userLocation);
+
+    // Get the list of cars from the provider
+    final cars = carProvider.cars;
+
+    // Calculate distance from user to each car
+    for (var car in cars) {
+      // Ensure that the car has valid latitude and longitude
+      if (car.latitude != null && car.longitude != null) {
+        double distanceInMeters = Geolocator.distanceBetween(
+          userLocation.latitude,
+          userLocation.longitude,
+          car.latitude!,
+          car.longitude!,
+        );
+        double distanceInKilometers = distanceInMeters / 1000;  // Convert meters to kilometers
+        car.distance = distanceInKilometers;  // Store the calculated distance
+      } else {
+        car.distance = double.infinity;  // Set distance as infinity if no valid coordinates
+      }
+    }
+
+    // Sort the cars by distance (optional)
+    cars.sort((a, b) => a.distance!.compareTo(b.distance!));
+
+    return cars;
   }
 }

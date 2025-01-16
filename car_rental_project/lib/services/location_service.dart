@@ -19,8 +19,9 @@ class LocationService {
       throw Exception('Location permissions are permanently denied.');
     }
 
+    // Use high accuracy to get the most precise location
     return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      desiredAccuracy: LocationAccuracy.high,  // Ensures high accuracy
     );
   }
 }
