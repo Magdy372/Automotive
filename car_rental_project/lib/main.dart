@@ -47,16 +47,6 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
-          Widget initialScreen;
-
-          if (userProvider.currentUser == null) {
-            initialScreen = const SplashScreen();
-          } else if (userProvider.currentUser?.role == 'admin') {
-            initialScreen = const AdminDashboardScreen();
-          } else {
-            initialScreen = const HomeScreen();
-          }
-
           return MaterialApp(
             title: 'Automotive',
             theme: ThemeData(
@@ -122,7 +112,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
             themeMode: ThemeMode.system, // This will follow the system theme
-            home: initialScreen,
+            home: const SplashScreen(),
             debugShowCheckedModeBanner: false,
             routes: {
               '/onboarding': (context) => const OnboardingScreens(),
