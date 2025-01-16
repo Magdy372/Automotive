@@ -1,4 +1,5 @@
 import 'package:car_rental_project/screens/CarForm.dart';
+import 'package:car_rental_project/screens/error_screen.dart';
 import 'package:car_rental_project/screens/onboarding_screens.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/splash_screen.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CarProvider()),
         ChangeNotifierProvider(create: (_) => RentalProvider()),
       ],
+      child : InternetChecker(
       child: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
           return MaterialApp(
@@ -125,6 +127,8 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+      )
     );
+    
   }
 }

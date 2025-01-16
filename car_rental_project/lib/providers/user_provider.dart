@@ -364,11 +364,10 @@ class UserProvider with ChangeNotifier {
       await _auth.signOut();
       _currentUser = null;
       notifyListeners();
-
-      Navigator.of(context).pushNamedAndRemoveUntil(
+      /*Navigator.of(context).pushNamedAndRemoveUntil(
         '/login',
         (route) => false,
-      );
+      );*/
     } catch (e) {
       _showError(context, 'Error during logout: $e');
     }
