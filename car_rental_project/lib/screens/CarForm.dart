@@ -38,7 +38,6 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   Brand? _selectedBrand;
   final List<Feature> _selectedFeatures = [];
   File? _imageFile; // To store the picked image
-
   final ImagePicker _picker = ImagePicker(); // Image Picker instance
 
   // DatePicker functions to select availableFrom and availableTo
@@ -483,31 +482,16 @@ Future<void> _detectLocation() async {
                     const SizedBox(height: 20),
 
 // Latitude field
-                TextField(
-                  controller: latitudeController,
-                  decoration: InputDecoration(
-                    labelText: "Latitude",
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.location_searching),
-                      onPressed: _detectLocation,
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 20),
-
-                // Longitude field
-                TextField(
-                  controller: longitudeController,
-                  decoration: InputDecoration(
-                    labelText: "Longitude",
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.location_searching),
-                      onPressed: _detectLocation,
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
+                ListTile(
+      title: const Text('Select Location'),
+      subtitle: Text(latitudeController.text.isNotEmpty
+          ? 'Latitude: ${latitudeController.text}, Longitude: ${longitudeController.text}'
+          : 'Location not selected'),
+      trailing: IconButton(
+        icon: const Icon(Icons.location_on),
+        onPressed: _detectLocation, // Trigger location detection
+      ),
+    ),
 
 
 
