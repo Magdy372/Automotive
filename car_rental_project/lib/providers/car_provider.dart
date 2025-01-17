@@ -160,17 +160,21 @@ Future<void> rateCar(String carId, double rating) async {
 }
 
   void filterCars(String query) {
-    if (query.isEmpty) {
-      _filteredCars = _cars; // Reset to show all cars
-      notifyListeners();
-    } else {
-      _filteredCars = _cars.where((car) {
-        final carName = car.name.toLowerCase();
-        final searchQuery = query.toLowerCase();
-        return carName.contains(searchQuery);
-      }).toList();
-      notifyListeners();
-    }
+  if (query.isEmpty) {
+    _filteredCars = _cars;
+    notifyListeners();
+    return;
+  }
+
+  _filteredCars = _cars.where((car) {
+    final carName = car.name.toLowerCase();
+    final carBrand = car.brand.toString().split('.').last.toLowerCase(); // Convert enum to string
+    final searchQuery = query.toLowerCase();
+    
+    return carName.contains(searchQuery) || carBrand.contains(searchQuery);
+  }).toList();
+  
+  notifyListeners();
   }
 
   // Clear filters

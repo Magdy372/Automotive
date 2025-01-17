@@ -12,6 +12,7 @@ import 'package:car_rental_project/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/car_provider.dart';
+import 'dart:math' show min, max;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String? selectedBodyType;
   String? selectedTransmission;
   List<String> selectedFeatures = [];
+  double _minPrice = 0 ;
+  double _maxPrice = 1000 ; // Set this to your maximum car price
+  RangeValues _selectedPriceRange =  const RangeValues(0, 1000);
 
   @override
   void initState() {
@@ -243,6 +247,8 @@ Widget _buildFilters(bool isDarkMode) {
                       selectedBodyType = null;
                       selectedTransmission = null;
                       selectedFeatures.clear();
+                      _selectedPriceRange = RangeValues(_minPrice, _maxPrice);
+
                     });
                   },
                 ),
@@ -331,6 +337,8 @@ Widget _buildFilters(bool isDarkMode) {
               isDarkMode,
             ),
             const SizedBox(height: 10),
+            _buildPriceRangeFilter(isDarkMode), // Add price range filter here
+            const SizedBox(height: 10),
             _buildMultiSelectFilter(
                 'Features',
                 Feature.values
@@ -346,6 +354,54 @@ Widget _buildFilters(bool isDarkMode) {
       ),
     );
   }
+
+
+  Widget _buildPriceRangeFilter(bool isDarkMode) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Price Range',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: isDarkMode ? Colors.grey[300] : Colors.black,
+            ),
+          ),
+          Text(
+            '\$${_selectedPriceRange?.start.toInt()} - \$${_selectedPriceRange?.end.toInt()}',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: isDarkMode ? Colors.grey[300] : Colors.black,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      RangeSlider(
+        values: _selectedPriceRange,
+        min: _minPrice,
+        max: _maxPrice,
+        divisions: 100,
+        activeColor: isDarkMode ? Colors.grey[600] : const Color(0XFF97B3AE),
+        inactiveColor: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+        labels: RangeLabels(
+          '\$${_selectedPriceRange?.start.toInt()}',
+          '\$${_selectedPriceRange?.end.toInt()}'
+        ),
+        onChanged: (RangeValues values) {
+          setState(() {
+            _selectedPriceRange = values;
+          });
+        },
+      ),
+      const SizedBox(height: 10),
+    ],
+  );
+}
 
   Widget _buildDropdownFilter(
     String label,
@@ -482,6 +538,12 @@ Widget _buildFilters(bool isDarkMode) {
         return false;
       }
 
+      // Price filtering
+      if (car.price < _selectedPriceRange!.start || 
+          car.price > _selectedPriceRange!.end) {
+        return false;
+      }
+
       // Features filtering - check if ANY selected feature is present
       if (selectedFeatures.isNotEmpty &&
           !selectedFeatures.every((feature) => car.features.contains(Feature
@@ -614,6 +676,13 @@ Widget _buildFilters(bool isDarkMode) {
   Widget _buildFeaturedCars(CarProvider carsProvider) {
     final cars = carsProvider.cars;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    if (carsProvider.cars.isNotEmpty) {
+      _minPrice = carsProvider.cars.map((car) => car.price).reduce(min).toDouble();
+      _maxPrice = carsProvider.cars.map((car) => car.price).reduce(max).toDouble();
+      print("min : {$_minPrice}");
+      print("max : {$_maxPrice}");
+      _selectedPriceRange = RangeValues(_minPrice, _maxPrice);
+    }
 
     print(cars);
 
