@@ -149,6 +149,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   icon: Icons.directions_car,
   textColor: Colors.white,
   backgroundColor: const Color(0xFF2D3748), // Updated background color
+  iconColor: Colors.orange, 
 ),
                   ),
                   GestureDetector(
@@ -166,6 +167,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       icon: Icons.group,
                       textColor: Colors.white,
                       backgroundColor: const Color(0xFF2D3748),
+                      iconColor: Colors.blue, 
                     ),
                   ),
                 ],
@@ -176,6 +178,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
               const SizedBox(height: 10),
@@ -328,6 +331,15 @@ lastTwoUsers.isEmpty
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              const Text(
+                'Average Car Rent Duration',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                ),
+              ),
               const SizedBox(height: 10),
               SizedBox(
                 height: 300,
@@ -441,6 +453,7 @@ class StatsCard extends StatelessWidget {
   final IconData icon;
   final Color textColor;
   final Color backgroundColor;
+  final Color iconColor; 
 
   const StatsCard({
     super.key,
@@ -449,6 +462,7 @@ class StatsCard extends StatelessWidget {
     required this.icon,
     required this.textColor,
     required this.backgroundColor,
+    required this.iconColor,
   });
 
   @override
@@ -462,7 +476,7 @@ class StatsCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 40, color: textColor),
+             Icon(icon, size: 40, color: iconColor),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
