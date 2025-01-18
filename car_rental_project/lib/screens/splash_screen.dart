@@ -32,16 +32,15 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    
+
     // Check if user is already logged in
     try {
       // Assuming you have a method to check stored credentials
-      
       if (!mounted) return;
 
       print("result outside if : ${userProvider.currentUser?.email}");
 
-      if (userProvider.currentUser!=null) {
+      if (userProvider.currentUser != null) {
         // User is logged in, navigate to appropriate screen based on role
         print("result inside if : ${userProvider.currentUser?.email}");
 
@@ -53,46 +52,55 @@ class _SplashScreenState extends State<SplashScreen>
       } else {
         // No stored credentials, go to onboarding
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const OnboardingScreens())
+          MaterialPageRoute(builder: (_) => const OnboardingScreens()),
         );
       }
     } catch (e) {
       // Handle any errors during auto-login
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const OnboardingScreens())
+        MaterialPageRoute(builder: (_) => const OnboardingScreens()),
       );
     }
   }
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        color: const Color(0xFF070A0F),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/icons/app_icon.png',
-              height: 450,
-              width: 450,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 20),
-            // Optional loading indicator
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ],
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          color: const Color(0xFF070A0F),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Center(
+                  child: Image.asset(
+                    'assets/icons/app_icon.png',
+                    height: 300, // Adjusted height to fit better
+                    width: 300, // Adjusted width to fit better
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Optional loading indicator
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+              const SizedBox(height: 20), // Add some padding at the bottom
+            ],
+          ),
         ),
       ),
     );

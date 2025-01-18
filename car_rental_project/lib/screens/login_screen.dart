@@ -18,38 +18,40 @@ class LoginScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode? Colors.black:Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-               Text(
-                'Welcome back',
-                style: GoogleFonts.poppins(
-                  fontSize: 38.0,
-                  fontWeight: FontWeight.w900,
-                  color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE),
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome back',
+                  style: GoogleFonts.poppins(
+                    fontSize: 38.0,
+                    fontWeight: FontWeight.w900,
+                    color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              _buildEmailField(context),
-              const SizedBox(height: 10),
-              _buildPasswordField(context),
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: _buildForgotPasswordButton(context, userProvider,isDarkMode),
-              ),
-              const SizedBox(height: 10),
-              _buildLoginButton(userProvider, context,isDarkMode),
-              const SizedBox(height: 20),
-              _buildSignUpWithDivider(context),
-              const SizedBox(height: 10),
-              _buildSocialMediaButtons(userProvider,context),
-            ],
+                const SizedBox(height: 10),
+                _buildEmailField(context),
+                const SizedBox(height: 10),
+                _buildPasswordField(context),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: _buildForgotPasswordButton(context, userProvider, isDarkMode),
+                ),
+                const SizedBox(height: 10),
+                _buildLoginButton(userProvider, context, isDarkMode),
+                const SizedBox(height: 20),
+                _buildSignUpWithDivider(context),
+                const SizedBox(height: 10),
+                _buildSocialMediaButtons(userProvider, context),
+              ],
+            ),
           ),
         ),
       ),
@@ -57,14 +59,14 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildEmailField(BuildContext context) {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return TextFormField(
       controller: _emailController,
       validator: UserModel.validateEmail,
       decoration: InputDecoration(
         label: const Text('Email'),
-        hintStyle: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
+        hintStyle: GoogleFonts.poppins(color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE)),
       ),
     );
   }
@@ -79,15 +81,13 @@ class LoginScreen extends StatelessWidget {
       validator: UserModel.validatePassword,
       decoration: InputDecoration(
         label: const Text('Password'),
-        hintStyle:  GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
+        hintStyle: GoogleFonts.poppins(color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE)),
       ),
     );
   }
 
   Widget _buildForgotPasswordButton(
       BuildContext context, UserProvider userProvider, bool isDarkMode) {
-            final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return TextButton(
       onPressed: () {
         if (_emailController.text.isEmpty) {
@@ -101,9 +101,9 @@ class LoginScreen extends StatelessWidget {
 
         userProvider.resetPassword(_emailController.text, context);
       },
-      child:Text(
+      child: Text(
         'Forgot Password?',
-        style: GoogleFonts.poppins(color: isDarkMode?Colors.grey[300]: const Color(0XFF97B3AE)),
+        style: GoogleFonts.poppins(color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE)),
       ),
     );
   }
@@ -122,10 +122,10 @@ class LoginScreen extends StatelessWidget {
             );
           }
         },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: isDarkMode? Colors.black:Colors.white,
-                    backgroundColor: isDarkMode? Colors.white:const Color(0Xff997b3ae)
-                  ),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: isDarkMode ? Colors.black : Colors.white,
+          backgroundColor: isDarkMode ? Colors.white : const Color(0Xff997b3ae),
+        ),
         child: userProvider.isLoading
             ? const CircularProgressIndicator(color: Colors.white)
             : const Text('Login'),
@@ -134,7 +134,7 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildSignUpWithDivider(BuildContext context) {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -148,7 +148,7 @@ class LoginScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:const Color(0XFF97B3AE)),
+            style: GoogleFonts.poppins(color: isDarkMode ? Colors.white : const Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -160,7 +160,6 @@ class LoginScreen extends StatelessWidget {
       ],
     );
   }
-
 
   Widget _buildSocialMediaButtons(UserProvider userProvider, BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -174,7 +173,7 @@ class LoginScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
+              color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
@@ -192,7 +191,7 @@ class LoginScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
+              color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
