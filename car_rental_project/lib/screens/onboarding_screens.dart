@@ -126,26 +126,6 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 20,
-            child: InkWell(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginScreen()),
-                );
-              },
-              child: Text(
-                'Already have an account?',
-                style: GoogleFonts.poppins(
-                  color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

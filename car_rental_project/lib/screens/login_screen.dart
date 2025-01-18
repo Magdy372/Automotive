@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +51,37 @@ class LoginScreen extends StatelessWidget {
                 _buildSignUpWithDivider(context),
                 const SizedBox(height: 10),
                 _buildSocialMediaButtons(userProvider, context),
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: GoogleFonts.poppins(
+                        color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SignupScreen(),
+                                  ),
+                                );
+                      },
+                      child: Text(
+                        'Sign Up',
+                        style: GoogleFonts.poppins(
+                          color: isDarkMode ? Colors.white : const Color(0XFF97B3AE),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -147,7 +179,7 @@ class LoginScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
-            'Sign up with',
+            'Sign in with',
             style: GoogleFonts.poppins(color: isDarkMode ? Colors.white : const Color(0XFF97B3AE)),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../models/user_model.dart';
+import 'package:car_rental_project/screens/login_screen.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -85,6 +86,37 @@ class SignupScreen extends StatelessWidget {
                 _buildDivider(context),
                 const SizedBox(height: 10),
                 _buildSocialMediaButtons(userProvider, context),
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Already have an account? ',
+                      style: GoogleFonts.poppins(
+                        color: isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(),
+                                  ),
+                                );
+                      },
+                      child: Text(
+                        'Sign In',
+                        style: GoogleFonts.poppins(
+                          color: isDarkMode ? Colors.white : const Color(0XFF97B3AE),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

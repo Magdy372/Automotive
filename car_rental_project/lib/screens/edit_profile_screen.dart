@@ -43,20 +43,22 @@ class EditProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: GoogleFonts.poppins(),
+                  enabled: false,  // This will gray out the field
+                ),
+                readOnly: true, // This makes the email field uneditable
+              ),
+              const SizedBox(height: 16),
+              
+              TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Name',
                   labelStyle: GoogleFonts.poppins(),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: GoogleFonts.poppins(),
-                ),
-                readOnly: true, // This makes the email field uneditable
               ),
               const SizedBox(height: 16),
               TextFormField(

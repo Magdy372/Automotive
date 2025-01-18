@@ -12,6 +12,7 @@ import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/screens/admin_dashboard.dart';
 import 'package:car_rental_project/screens/home_screen.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
+import 'package:car_rental_project/screens/signup_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:car_rental_project/services/NotificationService.dart';
@@ -132,6 +133,7 @@ class MyApp extends StatelessWidget {
                 '/admin': (context) => const AdminDashboardScreen(),
                 '/home': (context) => const HomeScreen(),
                 '/login': (context) => LoginScreen(),
+                '/sigup': (context) => SignupScreen(),
                 '/profile': (context) => const ProfileScreen(),
                 '/CarUpload': (context) => const CarUploadScreen(),
               },
