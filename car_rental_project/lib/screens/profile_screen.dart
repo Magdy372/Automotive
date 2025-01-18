@@ -278,66 +278,129 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Widget _buildUserCars() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Consumer<CarProvider>(
-      builder: (context, carProvider, child) {
-        final userCars = carProvider.carsbysuser;
+  return Consumer<CarProvider>(
+    builder: (context, carProvider, child) {
+      final userCars = carProvider.carsbysuser;
 
-        if (userCars.isEmpty) {
-          return const Center(child: Text("You have no cars uploaded."));
-        }
+      if (userCars.isEmpty) {
+        return const Center(child: Text("You have no cars uploaded."));
+      }
 
-        return Card(
-          elevation: 5,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          color:isDarkMode? Colors.grey[900]:Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                 Text(
-                  "Your Cars",
-                  style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode? Colors.grey[300]:Colors.black),
+      return Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Your Cars",
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.grey[300] : Colors.black,
                 ),
-                const SizedBox(height: 10),
-                // Display cars owned by the user
-                for (var car in userCars)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Car brand and name
-                        Text(
-                          "${car.brand.toString().split('.').last} - ${car.name}",
-                          style:  GoogleFonts.poppins(
-                              fontSize: 16, color:isDarkMode? Colors.grey[300]:Colors.black),
+              ),
+              const SizedBox(height: 10),
+              // Display cars owned by the user
+              for (var car in userCars)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Car brand and name
+                      Text(
+                        "${car.brand.toString().split('.').last} - ${car.name}",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: isDarkMode ? Colors.grey[300] : Colors.black,
                         ),
-                        // Car availability status
-                        Text(
-                          car.isBooked ? "Booked" : "Available",
-                          style: GoogleFonts.poppins(
-                            color: car.isBooked ? Colors.red : Colors.green,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      // Car availability status and delete button
+                      Row(
+                        children: [
+                          Text(
+                            car.isBooked ? "Booked" : "Available",
+                            style: GoogleFonts.poppins(
+                              color: car.isBooked ? Colors.red : Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+                          const SizedBox(width: 10), // Spacing between status and delete button
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.red, // Red color for delete icon
+                            ),
+                            onPressed: () async {
+                              // Show a confirmation dialog before deleting
+                              bool confirmDelete = await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Delete Car"),
+                                  content: const Text("Are you sure you want to delete this car?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
+                                ),
+                              );
 
+                              // If user confirms deletion, delete the car
+                              if (confirmDelete == true) {
+                                if(car.isBooked){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:  Text("You cannot delete the car as is booked"),
+                                    duration:  Duration(seconds: 5), // SnackBar duration
+                                  ),
+                                );
+                                }else{
+                                await carProvider.deleteCar(car.id);
+
+                                // Show a SnackBar with an Undo action
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text("Car deleted"),
+                                    action: SnackBarAction(
+                                      label: "Undo",
+                                      onPressed: () async {
+                                        // Restore the car
+                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                                        final user = userProvider.currentUser;
+                                        await carProvider.restoreCar(user!);
+                                      },
+                                    ),
+                                    duration: const Duration(seconds: 5), // SnackBar duration
+                                  ),
+                                );
+                              }
+                            }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 // Recent Rentals Display
 Widget _buildRecentRentals() {
   final isDarkMode = Theme.of(context).brightness == Brightness.dark;

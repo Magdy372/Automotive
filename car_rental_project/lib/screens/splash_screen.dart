@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen>
     _isInitialized = true;
 
     // Wait for minimum splash duration
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 4));
 
     if (!mounted) return;
 

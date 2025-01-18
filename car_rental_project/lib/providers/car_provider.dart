@@ -1,3 +1,4 @@
+import 'package:car_rental_project/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +14,9 @@ class CarProvider with ChangeNotifier {
 
   List<Car> _carsbysuser = [];
   List<Car> get carsbysuser => _carsbysuser;
+
+  Car? _recentlyDeletedCar; // Store the recently deleted car
+
 
 
 Future<List<Car>> getNearestCars(Position userLocation) async {
@@ -88,14 +92,71 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
     }
   }
 
-  /// Remove a car from Firestore and the local list
+  // /// Remove a car from Firestore and the local list
+  // Future<void> deleteCar(String carId) async {
+  //   print("deleted car id: $carId");
+  //   try {
+  //     // Store the deleted car before removing it
+  //     _recentlyDeletedCar = _cars.firstWhere((car) => car.id == carId);
+
+  //     await _firestore.collection('Cars').doc(carId).delete();
+  //     _cars.removeWhere((car) => car.id == carId);
+  //     notifyListeners();
+  //   } catch (e) {
+  //     debugPrint('Error deleting car: $e');
+  //   }
+  // }
+
   Future<void> deleteCar(String carId) async {
+    print("Deleted car id: $carId");
     try {
-      await _firestore.collection('Cars').doc(carId).delete();
+      // Query Firestore to check if a car with the given ID exists
+      final carQuery = await _firestore
+          .collection('Cars')
+          .where('id', isEqualTo: carId) // Check if the 'id' field matches carId
+          .get();
+
+      // If no car with the given ID exists, throw an error
+      if (carQuery.docs.isEmpty) {
+        throw "Car with ID $carId does not exist in the database.";
+      }
+
+      // Get the first document from the query result (assuming 'id' is unique)
+      final carDoc = carQuery.docs.first;
+
+      // Store the deleted car before removing it
+      _recentlyDeletedCar = _cars.firstWhere((car) => car.id == carId);
+
+      // Delete the car from Firestore using the document reference from the query
+      await carDoc.reference.delete();
+
+      // Remove the car from the local list
       _cars.removeWhere((car) => car.id == carId);
+      _carsbysuser.removeWhere((car) => car.id == carId);
+
+
+      // Notify listeners to update the UI
       notifyListeners();
     } catch (e) {
       debugPrint('Error deleting car: $e');
+      rethrow; // Rethrow the error to handle it in the UI
+    }
+  }
+
+  Future<void> restoreCar(UserModel user) async {
+    if (_recentlyDeletedCar != null) {
+      try {
+        // Restore the car to Firestore
+        final sellerRef =  FirebaseFirestore.instance.collection('Users').doc(user.id);
+        _recentlyDeletedCar?.seller = sellerRef;
+        addCar(_recentlyDeletedCar!);
+        _carsbysuser.add(_recentlyDeletedCar!);
+        _recentlyDeletedCar = null; // Clear the stored car
+        
+        notifyListeners();
+      } catch (e) {
+        debugPrint('Error restoring car: $e');
+      }
     }
   }
 

@@ -15,7 +15,7 @@ class Car {
   final BodyType bodyType;
   final TransmissionType transmissionType;
   final List<Feature> features;
-  final DocumentReference seller;
+   DocumentReference seller;
    final double latitude; // Added field
   final double longitude;
   double? distance;

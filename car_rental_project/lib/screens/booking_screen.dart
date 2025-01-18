@@ -1,12 +1,14 @@
 import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/models/rental_model.dart';
 import 'package:car_rental_project/providers/rental_provider.dart';
+import 'package:car_rental_project/services/NotificationService.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+
 
 class BookingScreen extends StatefulWidget {
   final Car car;
@@ -300,6 +302,29 @@ class _BookingScreenState extends State<BookingScreen> {
             totalPrice: _totalPrice,
           ),
         );
+
+        // Calculate notification time (e.g., 1 hour before due date)
+        DateTime notificationTime = _endDate!.subtract(Duration(hours: 1));
+        DateTime notificationTime1 = DateTime.now().add(Duration(minutes: 1));
+
+
+        // Schedule notification
+        // await NotificationService.scheduleNotification(
+        //   id: _endDate.hashCode, // Unique ID for the notification
+        //   title: 'Car Rental Reminder',
+        //   body: 'Your rental for ${widget.car.name} is due soon!',
+        //   scheduledDate: notificationTime1,
+        // );
+
+        print('Car rental notification scheduled for ${widget.car.name}.');
+
+        // // Schedule a notification 1 day before the rental due date
+        // await NotificationService.scheduleRentalDueNotification(
+        //   rentalId: widget.car.id, // Use car ID or generate a unique ID
+        //   userId: user.id,
+        //   carId: widget.car.id,
+        //   endDate: _endDate!,
+        // );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Rental booked successfully!')),
