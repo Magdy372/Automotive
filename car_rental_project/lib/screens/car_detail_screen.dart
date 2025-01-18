@@ -1,4 +1,6 @@
+import 'package:car_rental_project/models/user_model.dart';
 import 'package:car_rental_project/screens/FavoritesScreen.dart';
+import 'package:car_rental_project/screens/edit_profile_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +11,8 @@ import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:car_rental_project/screens/settings_screen.dart';
 import 'package:car_rental_project/screens/booking_screen.dart'; // Import the BookingScreen
 import 'package:car_rental_project/services/FavoritesService.dart'; // Import the FavoritesService
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class CarDetailScreen extends StatefulWidget {
   final Car car;
@@ -58,6 +62,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      final userProvider = Provider.of<UserProvider>(context);
+      final user = userProvider.currentUser;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : const Color(0xFFF7F7F7),
@@ -112,7 +118,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   const SizedBox(height: 20),
                   _buildDescription(),
                   const SizedBox(height: 20),
-                  _buildFooter(context),
+                  buildFooter(context)
                 ],
               ),
             ),
@@ -279,37 +285,75 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget buildFooter(BuildContext context) {
+  return Consumer<UserProvider>(
+    builder: (context, userProvider, child) {
+      final user = userProvider.currentUser;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        ),
-        // Navigate to the booking screen when the button is pressed and pass the car data
-        onPressed: () {
+      // Ensure user is not null before building the footer
+      if (user == null) {
+        return Container(); // Return an empty container if the user is null
+      }
+      return _buildFooter(user, context); // Build the footer with the current user
+    },
+  );
+}
+
+Widget _buildFooter(UserModel user, BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 20),
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+      ),
+      onPressed: () {
+        if (user.address == null ||
+            user.phone == null ||
+            user.address == "unknown" ||
+            user.phone == "unknown") {
+          // Show snackbar message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please enter your phone and address before booking a car.',
+              ),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red,
+            ),
+          );
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BookingScreen(car: widget.car), // Pass the car to the BookingScreen
+              builder: (context) => EditProfileScreen(),
             ),
           );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text(
-            "Book Now",
-            style: GoogleFonts.poppins(fontSize: 16, color: isDarkMode ? Colors.grey[300] : Colors.white),
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BookingScreen(car: widget.car),
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          "Book Now",
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            color: isDarkMode ? Colors.grey[300] : Colors.white,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // Bottom Navigation Bar
   Widget _buildBottomNavBar(BuildContext context) {
