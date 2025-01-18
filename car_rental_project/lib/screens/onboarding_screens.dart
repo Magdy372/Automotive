@@ -21,13 +21,13 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
   @override
   Widget build(BuildContext context) {
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode? Colors.black:Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: isDarkMode? Colors.black:Colors.white,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20, top: 20),
@@ -49,7 +49,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                 child: Text(
                   'Skip',
                   style: GoogleFonts.poppins(
-                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
+                    color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
                     fontSize: 16.0,
                     fontWeight: FontWeight.w400,
                   ),
@@ -99,7 +99,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
+                color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
               ),
               child: IconButton(
                 onPressed: () {
@@ -121,7 +121,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                 icon: Icon(
                   Icons.arrow_forward_ios,
                   size: 24,
-                  color:isDarkMode? Colors.black: Colors.white,
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
               ),
             ),
@@ -138,7 +138,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
               child: Text(
                 'Already have an account?',
                 style: GoogleFonts.poppins(
-                    color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
+                  color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   decoration: TextDecoration.underline,
@@ -152,7 +152,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
   }
 
   Widget _indicator(bool isActive) {
-     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -160,7 +160,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
       width: isActive ? 20 : 8,
       margin: const EdgeInsets.only(right: 5.0),
       decoration: BoxDecoration(
-      color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
+        color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
         borderRadius: BorderRadius.circular(5),
       ),
     );
@@ -200,32 +200,38 @@ class createPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 350,
+          Expanded(
+            flex: 3, // Adjust the flex factor as needed
             child: Lottie.asset(image),
           ),
           const SizedBox(
             height: 20,
           ),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-            color:isDarkMode? Colors.grey[300]: const Color(0XFF97B3AE),
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
+          Flexible(
+            flex: 1, // Adjust the flex factor as needed
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey,
+          Flexible(
+            flex: 1, // Adjust the flex factor as needed
+            child: Text(
+              description,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey,
+              ),
             ),
           ),
         ],

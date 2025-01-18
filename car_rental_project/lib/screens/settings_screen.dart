@@ -16,6 +16,9 @@ class SettingsScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final userProvider = Provider.of<UserProvider>(context);
 
+    // Get screen size using MediaQuery
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
@@ -31,149 +34,159 @@ class SettingsScreen extends StatelessWidget {
           'Settings',
           style: GoogleFonts.poppins(
               color: isDarkMode ? Colors.grey[300] : Colors.black,
-              fontSize: 22,
+              fontSize: screenWidth * 0.06, // Responsive font size
               fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            _buildListTile(
-              icon: Icons.person,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'Account',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                );
-              }, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.car_rental,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'My bookings',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyBookingsScreen(),
-                  ),
-                );
-              }, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.notifications,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'Notifications',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationScreen(),
-                  ),
-                );
-              }, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.visibility,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'Appearance',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {}, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.lock,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'Privacy & Security',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {}, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.headphones,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'Help and Support',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {}, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.info,
-              iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-              label: 'About',
-              labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-              onTap: () {}, isDarkMode: isDarkMode,
-            ),
-           Divider(
-              color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-            ),
-            _buildListTile(
-              icon: Icons.logout,
-              iconColor: Colors.red,
-              label: 'Logout',
-              labelColor: Colors.red,
-              onTap: () {
-                // Show a confirmation dialog when the logout is tapped
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: Colors.white,
-                      title: const Text("Logout"),
-                      content: const Text("Do you really want to logout?"),
-                      actions: <Widget>[
-                        TextButton(
-                          child:  Text("No", style: GoogleFonts.poppins(color: Colors.black)),
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
-                        ),
-                        TextButton(
-                          child:  Text("Yes", style: GoogleFonts.poppins(color: Colors.red)),
-                          onPressed: () {
-                            userProvider.logout(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              children: [
+                _buildListTile(
+                  icon: Icons.person,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'Account',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
+                      ),
                     );
                   },
-                );
-              }, isDarkMode: isDarkMode,
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.car_rental,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'My bookings',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyBookingsScreen(),
+                      ),
+                    );
+                  },
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.notifications,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'Notifications',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationScreen(),
+                      ),
+                    );
+                  },
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.visibility,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'Appearance',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {},
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.lock,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'Privacy & Security',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {},
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.headphones,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'Help and Support',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {},
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.info,
+                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
+                  label: 'About',
+                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
+                  onTap: () {},
+                  isDarkMode: isDarkMode,
+                ),
+                Divider(
+                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
+                ),
+                _buildListTile(
+                  icon: Icons.logout,
+                  iconColor: Colors.red,
+                  label: 'Logout',
+                  labelColor: Colors.red,
+                  onTap: () {
+                    // Show a confirmation dialog when the logout is tapped
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: const Text("Logout"),
+                          content: const Text("Do you really want to logout?"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text("No", style: GoogleFonts.poppins(color: Colors.black)),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                            ),
+                            TextButton(
+                              child: Text("Yes", style: GoogleFonts.poppins(color: Colors.red)),
+                              onPressed: () {
+                                userProvider.logout(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  isDarkMode: isDarkMode,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -192,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
         label,
         style: GoogleFonts.poppins(fontSize: 16, color: labelColor),
       ),
-      trailing:  Icon(Icons.arrow_forward_ios, size: 16, color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE)),
+      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE)),
       onTap: onTap,
     );
   }

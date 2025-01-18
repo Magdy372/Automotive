@@ -21,70 +21,72 @@ class SignupScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode? Colors.black:Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0), // Add padding on top
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Get Started',
-                style: GoogleFonts.poppins(
-                  fontSize: 38.0,
-                  fontWeight: FontWeight.w900,
-                  color: isDarkMode? Colors.grey[300]:const Color(0XFF97B3AE),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildTextField(
-                controller: _nameController,
-                label: 'Full name',
-                validator: UserModel.validateName,
-              ),
-              const SizedBox(height: 10),
-              _buildTextField(
-                controller: _emailController,
-                label: 'Email',
-                validator: UserModel.validateEmail,
-              ),
-              const SizedBox(height: 10),
-              _buildTextField(
-                controller: _passwordController,
-                label: 'Password',
-                obscureText: true,
-                validator: UserModel.validatePassword,
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      userProvider.signup(
-                        name: _nameController.text,
-                        email: _emailController.text,
-                        password: _passwordController.text,
-                        context: context,
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: isDarkMode? Colors.black:Colors.white,
-                    backgroundColor: isDarkMode? Colors.white:const Color(0Xff997b3ae)
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0), // Add padding on top
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Get Started',
+                  style: GoogleFonts.poppins(
+                    fontSize: 38.0,
+                    fontWeight: FontWeight.w900,
+                    color: isDarkMode ? Colors.grey[300] : const Color(0XFF97B3AE),
                   ),
-                  child: userProvider.isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Sign up'),
                 ),
-              ),
-              const SizedBox(height: 20),
-              _buildDivider(context),
-              const SizedBox(height: 10),
-              _buildSocialMediaButtons(userProvider,context),
-            ],
+                const SizedBox(height: 10),
+                _buildTextField(
+                  controller: _nameController,
+                  label: 'Full name',
+                  validator: UserModel.validateName,
+                ),
+                const SizedBox(height: 10),
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email',
+                  validator: UserModel.validateEmail,
+                ),
+                const SizedBox(height: 10),
+                _buildTextField(
+                  controller: _passwordController,
+                  label: 'Password',
+                  obscureText: true,
+                  validator: UserModel.validatePassword,
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        userProvider.signup(
+                          name: _nameController.text,
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          context: context,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                      backgroundColor: isDarkMode ? Colors.white : const Color(0Xff997b3ae),
+                    ),
+                    child: userProvider.isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Sign up'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildDivider(context),
+                const SizedBox(height: 10),
+                _buildSocialMediaButtons(userProvider, context),
+              ],
+            ),
           ),
         ),
       ),
@@ -106,7 +108,6 @@ class SignupScreen extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintStyle: GoogleFonts.poppins(color: Colors.black26),
-
       ),
     );
   }
@@ -127,7 +128,7 @@ class SignupScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'Sign up with',
-            style: GoogleFonts.poppins(color: isDarkMode? Colors.white:const Color(0XFF97B3AE)),
+            style: GoogleFonts.poppins(color: isDarkMode ? Colors.white : const Color(0XFF97B3AE)),
           ),
         ),
         Expanded(
@@ -153,7 +154,7 @@ class SignupScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
+              color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
@@ -171,7 +172,7 @@ class SignupScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode? Colors.grey[800]:const Color(0XFF97B3AE),
+              color: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(16.0),
