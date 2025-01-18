@@ -315,6 +315,7 @@ class _BookingScreenState extends State<BookingScreen> {
         //   body: 'Your rental for ${widget.car.name} is due soon!',
         //   scheduledDate: notificationTime1,
         // );
+        await NotificationService.showImmediateNotification(widget.car.name);
 
         print('Car rental notification scheduled for ${widget.car.name}.');
 

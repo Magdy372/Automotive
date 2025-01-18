@@ -171,4 +171,50 @@ class NotificationService {
       DateTime.now(),
     );
   }
+
+
+   static Future<void> showImmediateNotification(carId) async {
+    try {
+      final id = DateTime.now().millisecondsSinceEpoch % 100000;
+      
+      // Check notification permission
+      final plugin = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final granted = await plugin?.areNotificationsEnabled() ?? false;
+      print('Notifications enabled: $granted');
+      print('Immediate notification triggered with ID: $id');
+
+      await _notificationsPlugin.show(
+        id,
+        'Rental Successfully Booked',
+        'Thank you for choosing our service! Your rental for car "$carId" has been confirmed. The car is ready for pickup. Enjoy your ride!',
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            importance: Importance.max,
+            priority: Priority.high,
+            fullScreenIntent: true,
+            category: AndroidNotificationCategory.message,
+            visibility: NotificationVisibility.public,
+            //sound: const RawResourceAndroidNotificationSound('notification_sound'),
+            playSound: true,
+            enableVibration: true,
+            showWhen: true,
+          ),
+        ),
+        payload: 'test_payload_$id',
+      );
+      print('Immediate notification triggered with ID: $id');
+      await saveNotification(
+            'Rental Successfully Booked',
+            'Thank you for choosing our service! Your rental for car $carId has been confirmed. The car is ready for pickup. Enjoy your ride!',
+            "",
+            DateTime.now(),
+          );
+    } catch (e) {
+      print('Error showing immediate notification: $e');
+    }
+  }
 }
