@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,12 +42,18 @@ class NearestCarsScreen extends StatelessWidget {
       )
     : Icon(Icons.image, size: 50),
 
-                  title: Text('${car.brand} ${car.name}'),
+                  title: Text('${car.brand.toString().split('.').last} ${car.name}'),
                   subtitle: Text('${car.price.toStringAsFixed(2)} per day'),
                   trailing: Text('${car.distance!.toStringAsFixed(1)} km'),
                   onTap: () {
-                    // Navigate to car details
-                  },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CarDetailScreen(car: car),
+    ),
+  );
+},
+
                 );
               },
             );

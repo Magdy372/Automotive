@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -92,8 +93,12 @@ class _CarListingScreenState extends State<CarListingScreen> {
                   ),
                 ),
                 onTap: () {
-                  // Navigate to car details screen
-                  // Navigator.push(...);
+                  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CarDetailScreen(car: car),
+    ),
+  );
                 },
               );
             },
