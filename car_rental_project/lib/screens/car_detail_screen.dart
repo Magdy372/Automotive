@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart'; // For launching phone dialer
+import 'package:car_rental_project/screens/LocationPickerScreen.dart';
 
 
 
@@ -156,6 +157,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   const SizedBox(height: 20),
                   _buildDescription(),
                   const SizedBox(height: 20),
+                  _buildLocation(), // Add the location section here
+                  const SizedBox(height: 20),
                   buildFooter(context)
                 ],
               ),
@@ -167,6 +170,46 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     );
   }
 
+Widget _buildLocation() {
+  return Card(
+    elevation: 2,
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.location_on, 
+                color: Theme.of(context).primaryColor),
+              const SizedBox(width: 8),
+              const Text(
+                'Location',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 200,
+            width: double.infinity,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: OpenStreetMapPicker(
+                initialLatitude: widget.car.latitude,
+                initialLongitude: widget.car.longitude,
+                isEditable: false,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
  // Build the seller info widget
   Widget _buildSellerInfo() {
     if (isLoading) {

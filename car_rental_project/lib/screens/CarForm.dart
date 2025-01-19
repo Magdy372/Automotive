@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/LocationPickerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import '../models/car_model.dart';
 import '../providers/car_provider.dart';
 import '../providers/user_provider.dart';
 import '../screens/home_screen.dart';
+
 
 
 class CarUploadScreen extends StatefulWidget {
@@ -70,6 +72,59 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
       }
     });
   }
+
+// Future<void> _pickLocation() async {
+//   LatLng? location = await Navigator.push(
+//     context,
+//     MaterialPageRoute(builder: (context) => LocationPickerScreen()),
+//   );
+
+//   if (location != null) {
+//     setState(() {
+//       latitudeController.text = location.latitude.toString();
+//       longitudeController.text = location.longitude.toString();
+//     });
+//   }
+// }
+Future<void> _pickLocation() async {
+  // First check location permissions
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+  
+  if (permission == LocationPermission.deniedForever || 
+      permission == LocationPermission.denied) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Location permissions are denied.'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  // Navigate to map picker
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => OpenStreetMapPicker(
+        initialLatitude: latitudeController.text.isEmpty 
+            ? null 
+            : double.parse(latitudeController.text),
+        initialLongitude: longitudeController.text.isEmpty 
+            ? null 
+            : double.parse(longitudeController.text),
+        onLocationSelected: (location) {
+          setState(() {
+            latitudeController.text = location.latitude.toString();
+            longitudeController.text = location.longitude.toString();
+          });
+        },
+      ),
+    ),
+  );
+}
 
 
 
@@ -489,7 +544,7 @@ Future<void> _detectLocation() async {
           : 'Location not selected'),
       trailing: IconButton(
         icon: const Icon(Icons.location_on),
-        onPressed: _detectLocation, // Trigger location detection
+        onPressed: _pickLocation, // Trigger location detection
       ),
     ),
 
