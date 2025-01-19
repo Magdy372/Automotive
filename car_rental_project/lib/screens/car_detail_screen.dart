@@ -13,6 +13,10 @@ import 'package:car_rental_project/screens/booking_screen.dart'; // Import the B
 import 'package:car_rental_project/services/FavoritesService.dart'; // Import the FavoritesService
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart'; // For launching phone dialer
+
+
 
 class CarDetailScreen extends StatefulWidget {
   final Car car;
@@ -26,11 +30,18 @@ class CarDetailScreen extends StatefulWidget {
 class _CarDetailScreenState extends State<CarDetailScreen> {
   bool _isFavorite = false;
   final FavoritesService _favoritesService = FavoritesService();
+  Map<String, dynamic>? seller;  // Initially set to null
+  bool isLoading = true;
+
+
 
   @override
   void initState() {
     super.initState();
     _checkIfFavorite();
+    fetchSellerInfo(widget.car.seller);
+    print("aaqqww : ${widget.car.seller}");
+
   }
 
   // Check if the car is already favorited
@@ -40,6 +51,31 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       _isFavorite = isFavorite;
     });
   }
+
+   
+  // Fetch the seller's information
+  Future<void> fetchSellerInfo(DocumentReference sellerRef) async {
+    try {
+      final sellerDoc = await sellerRef.get();
+      if (sellerDoc.exists) {
+        setState(() {
+          seller = sellerDoc.data() as Map<String, dynamic>?;  // Set the seller data
+          isLoading = false;
+        });
+      } else {
+        print("Seller document does not exist.");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching seller info: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   // Toggle favorite status
   Future<void> _toggleFavorite() async {
@@ -112,6 +148,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 children: [
                   _buildCarInfo(),
                   const SizedBox(height: 20),
+                  _buildSellerInfo(),
+                  const SizedBox(height: 20),
                   _buildSpecifications(),
                   const SizedBox(height: 20),
                   _buildFeatures(),
@@ -126,6 +164,55 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         ],
       ),
       bottomNavigationBar: _buildBottomNavBar(context), // Add the bottom navigation bar here
+    );
+  }
+
+ // Build the seller info widget
+  Widget _buildSellerInfo() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Check if seller is null
+    if (seller == null) {
+      return const Center(child: Text('Seller info not available'));
+    }
+
+    final sellerPhone = seller?['phone'] ?? 'Not available'; // Fallback for null values
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensures space between the elements
+      children: [
+        Expanded(
+          child: Text(
+            "Seller: ${seller?['name'] ?? 'Unknown'}", // Fallback for name
+            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(width: 8),
+        sellerPhone != 'Not available'
+            ? InkWell(
+                onTap: () {
+                  final phoneUrl = 'tel:$sellerPhone';
+                  launchUrl(Uri.parse(phoneUrl));
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.phone, color: Colors.blue),
+                    const SizedBox(width: 8),
+                    Text(
+                      sellerPhone,
+                      style: GoogleFonts.poppins(color: Colors.blue, fontSize: 16),
+                    ),
+                  ],
+                ),
+              )
+            : Text(
+                sellerPhone, // Display "Not available" if phone is null
+                style: GoogleFonts.poppins(color: Colors.red, fontSize: 16),
+              ),
+        const SizedBox(width: 10),
+      ],
     );
   }
 

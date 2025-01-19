@@ -86,7 +86,7 @@ class Car {
     features: (data['features'] ?? [])
         .map<Feature>((feature) => _stringToEnum(feature, Feature.values))
         .toList(),
-    seller: reference,
+    seller: data['seller'] as DocumentReference<Map<String, dynamic>>,
     isBooked: data['isBooked'] ?? false,
     availableFrom: (data['availableFrom'] != null)
         ? (data['availableFrom'] as Timestamp).toDate()

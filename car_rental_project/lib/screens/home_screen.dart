@@ -2,6 +2,7 @@ import 'package:car_rental_project/screens/CarForm.dart';
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/nearest_cars_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
+import 'package:car_rental_project/screens/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -128,12 +129,33 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                 // Sell Your Car Icon
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CarUploadScreen(),
-                      ),
-                    );
+                    if(userProvider.currentUser?.address == null ||
+                        userProvider.currentUser?.phone == null ||
+                        userProvider.currentUser?.address == "unknown" ||
+                        userProvider.currentUser?.phone == "unknown"){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Please enter your phone and address before booking a car.',
+                              ),
+                              duration: Duration(seconds: 3),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProfileScreen(),
+                            ),
+                          );
+                    }else{
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CarUploadScreen(),
+                        ),
+                      );
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 25, left: 10, right: 10),

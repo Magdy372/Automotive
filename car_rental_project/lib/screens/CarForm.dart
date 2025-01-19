@@ -228,7 +228,7 @@ Future<void> _detectLocation() async {
     var uuid = const Uuid();
     final uniqueCarId = uuid.v4();
     final sellerRef =
-        FirebaseFirestore.instance.collection('Users').doc(user.id);
+        FirebaseFirestore.instance.collection('users').doc(user.id);
 
     try {
       // Upload the image and get the image URL
