@@ -1,3 +1,4 @@
+import 'package:car_rental_project/screens/BuyerCarListing.dart';
 import 'package:car_rental_project/screens/UserCarListingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,7 +60,7 @@ class CarRentalsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => UserCarListingScreen(
+                                builder: (context) => BuyerCarListingScreen(
                                   userId: rental.buyerRef.id, // Pass the buyer's ID
                                 ),
                               ),

@@ -1,29 +1,13 @@
-import 'package:car_rental_project/screens/CarForm.dart';
-import 'package:car_rental_project/screens/CarRentalsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/car_provider.dart';
-import '../providers/rental_provider.dart'; // Import RentalProvider
 import 'car_detail_screen.dart';
 
-
-class UserCarListingScreen extends StatefulWidget {
+class BuyerCarListingScreen extends StatelessWidget {
   final String userId; // User ID to fetch cars for
 
-  const UserCarListingScreen({super.key, required this.userId});
-
-  @override
-  _UserCarListingScreenState createState() => _UserCarListingScreenState();
-}
-
-class _UserCarListingScreenState extends State<UserCarListingScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch cars uploaded by the specific user when the screen is initialized
-    Provider.of<CarProvider>(context, listen: false).getUserCars(widget.userId);
-  }
+  const BuyerCarListingScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +25,7 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
             ),
             const SizedBox(width: 10), // Add spacing between icon and title
             Text(
-              ' My Cars',
+              'Cars',
               style: GoogleFonts.poppins(
                 color: isDarkMode ? Colors.white : Colors.black,
                 fontSize: 22,
@@ -52,24 +36,6 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
         ),
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         centerTitle: false, // Set to false to align the title with the icon
-        actions: [
-          // Add Car Button
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-            onPressed: () {
-              // Navigate to the CarForm screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CarUploadScreen(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Consumer<CarProvider>(
         builder: (context, carProvider, child) {
@@ -78,7 +44,7 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
           if (userCars.isEmpty) {
             return Center(
               child: Text(
-                'No cars uploaded by you',
+                'No cars found for this user.',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: isDarkMode ? Colors.grey[300] : Colors.black,
@@ -121,37 +87,15 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
                       color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
                     ),
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        car.brand.toString().split('.').last,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.list, color: Colors.blue),
-                        onPressed: () async {
-                          // Fetch rentals for this car
-                          final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
-                          await rentalProvider.fetchRentalsByCar(car.id);
-
-                          // Navigate to the CarRentalsScreen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CarRentalsScreen(
-                                rentals: rentalProvider.rentalsForCar,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  trailing: Text(
+                    car.brand.toString().split('.').last,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
+                    ),
                   ),
                   onTap: () {
+                    // Navigate to the car detail screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(
