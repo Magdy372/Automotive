@@ -69,15 +69,24 @@ class RentalModel {
   }
 
   // Helper method to fetch the buyer's user document
-  Future<DocumentSnapshot?> getBuyer() async {
-    try {
-      final buyerDoc = await buyerRef.get();
-      return buyerDoc.exists ? buyerDoc : null;
-    } catch (e) {
-      debugPrint('Error fetching buyer details: $e');
-      return null;
+Future<Map<String, dynamic>?> getBuyerDetails() async {
+  try {
+    debugPrint('Buyer Ref Path: ${buyerRef.path}'); // Log the buyerRef path
+    final buyerDoc = await buyerRef.get();
+    if (buyerDoc.exists) {
+      debugPrint('Buyer Document Data: ${buyerDoc.data()}'); // Log buyer data
+      return {
+        'name': buyerDoc['name'] ?? 'Unknown',
+        'phone': buyerDoc['phone'] ?? 'No Phone',
+      };
+    } else {
+      debugPrint('Buyer document does not exist'); // Log if document doesn't exist
     }
+    return null;
+  } catch (e) {
+    debugPrint('Error fetching buyer details: $e');
+    return null;
   }
-
+}
  
 }

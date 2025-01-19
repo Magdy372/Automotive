@@ -21,7 +21,7 @@ class RentalProvider with ChangeNotifier {
       // Query rentals where buyerRef matches the user's document reference
       QuerySnapshot snapshot = await _firestore
           .collection('Rentals')
-          .where('buyerRef', isEqualTo: _firestore.doc('Users/$userId'))
+          .where('buyerRef', isEqualTo: _firestore.doc('users/$userId'))
           .get();
 
       // Clear existing car names
@@ -238,8 +238,47 @@ Future<void> _removeBookedDatesFromCar(RentalModel rental) async {
   await rental.car.update({
     'bookedDates': updatedBookedDates,
   });
-}
+}Future<void> fetchRentalsByCar(String carId) async {
+  try {
+    _isLoading = true;
+    notifyListeners();
 
+    debugPrint('Fetching rentals for car ID: $carId');
+
+    // Create a DocumentReference for the car
+    final carRef = FirebaseFirestore.instance.collection('Cars').doc(carId);
+
+    // Query rentals where carRef matches the provided car reference
+    QuerySnapshot snapshot = await _firestore
+        .collection('Rentals')
+        .where('carRef', isEqualTo: carRef) // Use DocumentReference
+        .get();
+
+    // Log query results
+    debugPrint('Query results: ${snapshot.docs.length} documents found');
+    for (var doc in snapshot.docs) {
+      debugPrint('Document ID: ${doc.id}, Data: ${doc.data()}');
+    }
+
+    // Convert documents to RentalModel asynchronously
+    _rentalsForCar = await Future.wait(
+      snapshot.docs.map((doc) async {
+        return await RentalModel.fromDocumentSnapshot(doc);
+      }),
+    );
+
+    debugPrint('Fetched ${_rentalsForCar.length} rentals for car ID: $carId');
+
+    _isLoading = false;
+    notifyListeners();
+  } catch (e) {
+    _isLoading = false;
+    debugPrint('Error fetching rentals by car ID: $e');
+    notifyListeners();
+  }
+}
+List<RentalModel> _rentalsForCar = [];
+List<RentalModel> get rentalsForCar => _rentalsForCar;
   void clearRentals() {
     _rentals = [];
     carNames.clear();  // Also clear car names when clearing rentals

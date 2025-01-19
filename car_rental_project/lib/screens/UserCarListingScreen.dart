@@ -1,8 +1,10 @@
 import 'package:car_rental_project/screens/CarForm.dart';
+import 'package:car_rental_project/screens/CarRentalsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/car_provider.dart';
+import '../providers/rental_provider.dart'; // Import RentalProvider
 import 'car_detail_screen.dart';
 
 
@@ -39,7 +41,7 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
             ),
             const SizedBox(width: 10), // Add spacing between icon and title
             Text(
-              'My Cars',
+              ' Cars',
               style: GoogleFonts.poppins(
                 color: isDarkMode ? Colors.white : Colors.black,
                 fontSize: 22,
@@ -89,49 +91,75 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
             itemCount: userCars.length,
             itemBuilder: (context, index) {
               final car = userCars[index];
-              return ListTile(
-                leading: car.image != null && car.image!.isNotEmpty
-                    ? ClipOval(
-                        child: Image.network(
-                          car.image!,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.error, size: 50); // Fallback icon in case of error
-                          },
-                        ),
-                      )
-                    : Icon(Icons.image, size: 50), // Placeholder for car image
-                title: Text(
-                  car.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(
-                  '${car.price.toStringAsFixed(2)} per day',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
-                  ),
-                ),
-                trailing: Text(
-                  car.brand.toString().split('.').last,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
-                  ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CarDetailScreen(car: car),
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: ListTile(
+                  leading: car.image != null && car.image!.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            car.image!,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.error, size: 50); // Fallback icon in case of error
+                            },
+                          ),
+                        )
+                      : Icon(Icons.image, size: 50), // Placeholder for car image
+                  title: Text(
+                    car.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
+                  ),
+                  subtitle: Text(
+                    '${car.price.toStringAsFixed(2)} per day',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        car.brand.toString().split('.').last,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.list, color: Colors.blue),
+                        onPressed: () async {
+                          // Fetch rentals for this car
+                          final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
+                          await rentalProvider.fetchRentalsByCar(car.id);
+
+                          // Navigate to the CarRentalsScreen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CarRentalsScreen(
+                                rentals: rentalProvider.rentalsForCar,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CarDetailScreen(car: car),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );
