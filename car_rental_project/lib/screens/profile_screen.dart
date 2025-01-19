@@ -406,101 +406,148 @@ Widget _buildRecentRentals() {
   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
   return Consumer<RentalProvider>(
-    builder: (context, rentalProvider, child) 
-    {
-    final recentRentals = rentalProvider.rentalsForUser;
+    builder: (context, rentalProvider, child) {
+      final recentRentals = rentalProvider.rentalsForUser;
 
-    if (recentRentals.isEmpty) {
-      return const Center(child: Text("No recent rentals found."));
-    }
+      if (recentRentals.isEmpty) {
+        return const Center(child: Text("No recent rentals found."));
+      }
 
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: isDarkMode? Colors.grey[900]:Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-             Text(
-              "Recent Rentals",
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode? Colors.grey[300]:Colors.black,
+      return Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Recent Rentals",
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.grey[300] : Colors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            for (var rental in recentRentals)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                         Text(
-                          'Car Name',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color:isDarkMode? Colors.grey[300]:Colors.black,
+              const SizedBox(height: 10),
+              for (var rental in recentRentals)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Car Name',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: isDarkMode ? Colors.grey[300] : Colors.black,
+                            ),
                           ),
-                        ),
-                        Builder(
-                          builder: (context) {
-                            final carName = rental.id != null 
-                              ? rentalProvider.carNames[rental.id] 
-                              : null;
-                            debugPrint('Rental ${rental.id}: Car name: $carName'); // Debug print
-                            return Text(
-                              carName ?? 'Unknown Car',
-                              style:  GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                                color: isDarkMode? Colors.grey[300]:Colors.black,
-                              ),
-                            );
-                          }
-                        ),
-                      ],
-                    ),
-                    // Label and rental duration
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                         Text(
-                          'Number of Days', // Label for the number of days
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color: isDarkMode? Colors.grey[300]:Colors.black,
+                          Builder(
+                            builder: (context) {
+                              final carName = rental.id != null
+                                  ? rentalProvider.carNames[rental.id]
+                                  : null;
+                              debugPrint('Rental ${rental.id}: Car name: $carName'); // Debug print
+                              return Text(
+                                carName ?? 'Unknown Car',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: isDarkMode ? Colors.grey[300] : Colors.black,
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                        Text(
-                          "${rental.endDate.difference(rental.startDate).inDays} days", // Display the number of days
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color: isDarkMode? Colors.grey[300]:Colors.black,
+                        ],
+                      ),
+                      // Label and rental duration
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Number of Days', // Label for the number of days
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: isDarkMode ? Colors.grey[300] : Colors.black,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    // Rating
+                          Text(
+                            "${rental.endDate.difference(rental.startDate).inDays} days", // Display the number of days
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: isDarkMode ? Colors.grey[300] : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Rating and Remove buttons
+                      Row(
+                        children: [
+                          // Rate Button
+                          IconButton(
+                            icon: const Icon(Icons.star_border),
+                            onPressed: () {
+                              final carId = rental.car.id; // Get the carId directly from the rental
+                              showRatingDialog(
+                                context,
+                                carId,
+                                Provider.of<CarProvider>(context, listen: false),
+                              );
+                            },
+                          ),
+                          // Remove Button
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              // Show a confirmation dialog before deleting
+                              bool confirmDelete = await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Delete Rental"),
+                                  content: const Text("Are you sure you want to delete this rental?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
+                                ),
+                              );
 
-                      IconButton(
-                        icon: const Icon(Icons.star_border),
-                        onPressed: () {
-                          final carId = rental.car.id; // Get the carId directly from the rental
-                          showRatingDialog(
-                            context,
-                            carId,
-                            Provider.of<CarProvider>(context, listen: false),
-                          );
-                                                },
+                              // If user confirms deletion, delete the rental
+                              if (confirmDelete == true) {
+                                await rentalProvider.deleteRental(rental.id!);
+
+                                // Show a SnackBar with an Undo action
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text("Rental deleted"),
+                                    action: SnackBarAction(
+                                      label: "Undo",
+                                      onPressed: () async {
+                                        // Restore the rental (if needed)
+                                        // Note: You may need to implement a restoreRental method in the provider
+                                      },
+                                    ),
+                                    duration: const Duration(seconds: 5), // SnackBar duration
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -511,9 +558,7 @@ Widget _buildRecentRentals() {
       );
     },
   );
-
 }
-
 
   // Helper function to create settings options
   // Widget _buildSettingsOption(

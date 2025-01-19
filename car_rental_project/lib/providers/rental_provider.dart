@@ -57,7 +57,6 @@ class RentalProvider with ChangeNotifier {
    
     }
   }
-
   Future<RentalModel> addRental(RentalModel rental) async {
   try {
     await _validateCarAvailability(rental);
@@ -84,7 +83,6 @@ class RentalProvider with ChangeNotifier {
     rethrow;
   }
 }
-
 
   Future<void> _validateCarAvailability(RentalModel rental) async {
     DocumentSnapshot carDoc = await rental.car.get();
@@ -152,6 +150,95 @@ class RentalProvider with ChangeNotifier {
       rethrow;
     }
   }
+  Future<void> deleteRental(String rentalId) async {
+  try {
+    _isLoading = true;
+    notifyListeners();
+
+    // Fetch the rental document
+    DocumentSnapshot rentalDoc = await _firestore.collection('Rentals').doc(rentalId).get();
+    if (!rentalDoc.exists) {
+      throw Exception('Rental not found');
+    }
+
+    // Convert the document to a RentalModel
+    RentalModel rental = await RentalModel.fromDocumentSnapshot(rentalDoc);
+
+    // Fetch the associated car document
+    DocumentSnapshot carDoc = await rental.car.get();
+    if (!carDoc.exists) {
+      throw Exception('Car not found');
+    }
+
+    // Remove the booked dates from the car
+    await _removeBookedDatesFromCar(rental);
+
+    // Delete the rental document
+    await _firestore.collection('Rentals').doc(rentalId).delete();
+
+    // Remove the rental from the local lists
+    _rentals.removeWhere((r) => r.id == rentalId);
+    _rentalsForUser.removeWhere((r) => r.id == rentalId);
+
+    // Clean up outdated booked dates in the car
+    await _cleanUpOutdatedBookedDates(rental.car);
+
+    _isLoading = false;
+    notifyListeners();
+  } catch (e) {
+    _isLoading = false;
+    debugPrint('Error deleting rental: $e');
+    notifyListeners();
+    rethrow;
+  }
+}
+
+  Future<void> _cleanUpOutdatedBookedDates(DocumentReference carRef) async {
+    // Fetch the car document
+    DocumentSnapshot carDoc = await carRef.get();
+    if (!carDoc.exists) {
+      throw Exception('Car not found');
+    }
+
+    // Get the current booked dates
+    List<dynamic> bookedDates = (carDoc['bookedDates'] ?? []) as List<dynamic>;
+
+    // Filter out outdated dates (dates before today)
+    List<dynamic> updatedBookedDates = bookedDates.where((date) {
+      DateTime bookedDate = (date as Timestamp).toDate();
+      return bookedDate.isAfter(DateTime.now());
+    }).toList();
+
+    // Update the car document with the new booked dates
+    await carRef.update({
+      'bookedDates': updatedBookedDates,
+    });
+  }
+
+Future<void> _removeBookedDatesFromCar(RentalModel rental) async {
+  // Fetch the car document
+  DocumentSnapshot carDoc = await rental.car.get();
+  if (!carDoc.exists) {
+    throw Exception('Car not found');
+  }
+
+  // Get the current booked dates
+  List<dynamic> bookedDates = (carDoc['bookedDates'] ?? []) as List<dynamic>;
+
+  // Convert the rental's start and end dates to Timestamps for comparison
+  Timestamp rentalStartTimestamp = Timestamp.fromDate(rental.startDate);
+  Timestamp rentalEndTimestamp = Timestamp.fromDate(rental.endDate);
+
+  // Remove the rental's start and end dates from the bookedDates array
+  List<dynamic> updatedBookedDates = bookedDates.where((date) {
+    return date != rentalStartTimestamp && date != rentalEndTimestamp;
+  }).toList();
+
+  // Update the car document with the new booked dates
+  await rental.car.update({
+    'bookedDates': updatedBookedDates,
+  });
+}
 
   void clearRentals() {
     _rentals = [];

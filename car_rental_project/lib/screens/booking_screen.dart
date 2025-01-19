@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-
 class BookingScreen extends StatefulWidget {
   final Car car;
 
@@ -28,12 +27,13 @@ class _BookingScreenState extends State<BookingScreen> {
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
 
   late List<DateTime> _bookedDates;
-   void _debugPrintBookedDates() {
+  void _debugPrintBookedDates() {
     debugPrint('=== Debug Booked Dates ===');
     for (int i = 0; i < _bookedDates.length; i += 2) {
       DateTime start = _bookedDates[i];
       DateTime? end = i + 1 < _bookedDates.length ? _bookedDates[i + 1] : null;
-      debugPrint('Range ${i ~/ 2}: ${start.toString()} to ${end?.toString() ?? 'N/A'}');
+      debugPrint(
+          'Range ${i ~/ 2}: ${start.toString()} to ${end?.toString() ?? 'N/A'}');
     }
   }
 
@@ -49,9 +49,9 @@ class _BookingScreenState extends State<BookingScreen> {
 
   bool _isBooked(DateTime day) {
     final DateTime dateToCheck = DateTime(day.year, day.month, day.day);
-    
+
     debugPrint('Checking if date is booked: $dateToCheck');
-    
+
     if (_bookedDates.isEmpty) {
       debugPrint('No booked dates available');
       return false;
@@ -68,17 +68,17 @@ class _BookingScreenState extends State<BookingScreen> {
         _bookedDates[i + 1].month,
         _bookedDates[i + 1].day,
       );
-      
+
       debugPrint('Comparing with range: $start to $end');
 
-      if (dateToCheck.isAtSameMomentAs(start) || 
-          dateToCheck.isAtSameMomentAs(end) || 
+      if (dateToCheck.isAtSameMomentAs(start) ||
+          dateToCheck.isAtSameMomentAs(end) ||
           (dateToCheck.isAfter(start) && dateToCheck.isBefore(end))) {
         debugPrint('Date $dateToCheck is booked');
         return true;
       }
     }
-    
+
     debugPrint('Date $dateToCheck is not booked');
     return false;
   }
@@ -98,78 +98,136 @@ class _BookingScreenState extends State<BookingScreen> {
       return await showDialog<DateTime>(
         context: context,
         builder: (context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: TableCalendar(
-              firstDay: firstDate,
-              lastDay: lastDate,
-              focusedDay: focusedDay!,
-              calendarFormat: CalendarFormat.month,
-              headerStyle: const HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-                titleTextStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              calendarStyle: const CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Colors.blueGrey,
-                  shape: BoxShape.circle,
+              child: TableCalendar(
+                firstDay: firstDate,
+                lastDay: lastDate,
+                focusedDay: focusedDay!,
+                calendarFormat: CalendarFormat.month,
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  titleTextStyle: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-                todayTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                calendarStyle: CalendarStyle(
+                  defaultTextStyle: TextStyle(color: Colors.black87),
+                  weekendTextStyle: TextStyle(color: Colors.black87),
+                  outsideTextStyle: TextStyle(color: Colors.grey),
+                  disabledTextStyle: TextStyle(color: Colors.grey),
+                  disabledDecoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-                defaultTextStyle: TextStyle(color: Colors.black87),
-                weekendTextStyle: TextStyle(color: Colors.black87),
-                outsideTextStyle: TextStyle(color: Colors.grey),
-                disabledTextStyle: TextStyle(color: Colors.grey),
-              ),
-              calendarBuilders: CalendarBuilders(
-                defaultBuilder: (context, day, focusedDay) {
-                  bool isBooked = _isBooked(day);
-                  bool isToday = isSameDay(day, DateTime.now());
-                  
-                  // Always return a container for all dates
-                  return Container(
-                    margin: const EdgeInsets.all(4.0),
-                    decoration: BoxDecoration(
-                      color: isBooked 
-                          ? Colors.red.shade400
-                          : isToday 
-                              ? Colors.blueGrey
-                              : Colors.green.shade400,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${day.day}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: isToday || isBooked ? FontWeight.bold : FontWeight.normal,
+                enabledDayPredicate: (day) {
+                  // Convert to start of day for consistent comparison
+                  final today = DateTime(DateTime.now().year,
+                      DateTime.now().month, DateTime.now().day);
+                  final checkDay = DateTime(day.year, day.month, day.day);
+
+                  // Check if the day is within the available range AND not before today
+                  return !checkDay.isBefore(today) &&
+                      !checkDay.isBefore(widget.car.availableFrom!) &&
+                      !checkDay.isAfter(widget.car.availableTo!);
+                },
+                calendarBuilders: CalendarBuilders(
+                  defaultBuilder: (context, day, focusedDay) {
+                    bool isToday = isSameDay(day, DateTime.now());
+                    bool isBooked = _isBooked(day);
+
+                    // Check if date is before today or outside available range
+                    bool isDisabled = day.isBefore(DateTime(
+                          DateTime.now().year,
+                          DateTime.now().month,
+                          DateTime.now().day,
+                        )) ||
+                        day.isBefore(widget.car.availableFrom!) ||
+                        day.isAfter(widget.car.availableTo!);
+
+                    // Handle outdated and disabled dates
+                    if (isDisabled) {
+                      return Container(
+                        margin: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${day.day}',
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    // Prioritize today's date
+                    if (isToday) {
+                      return Container(
+                        margin: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${day.day}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    // Handle booked and available dates
+                    return Container(
+                      margin: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: isBooked
+                            ? Colors.red.shade400
+                            : Colors.green.shade400,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${day.day}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight:
+                                isBooked ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                       ),
-                    ),
-                  );
+                    );
+                  },
+                ),
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!_isBooked(selectedDay)) {
+                    Navigator.pop(context, selectedDay);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("This date is already booked!"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
               ),
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!_isBooked(selectedDay)) {
-                  Navigator.pop(context, selectedDay);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("This date is already booked!"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
             ),
           );
         },
@@ -179,6 +237,7 @@ class _BookingScreenState extends State<BookingScreen> {
       return null;
     }
   }
+
   void _selectStartDate() async {
     debugPrint(
         'Selecting start date...'); // Log the start date selection process
@@ -234,118 +293,84 @@ class _BookingScreenState extends State<BookingScreen> {
       });
     }
   }
+Future<void> _submitBooking() async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final user = userProvider.currentUser;
 
-  Future<void> _submitBooking() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.currentUser;
-
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to book a car.')),
-      );
-      return;
-    }
-
-    if (_startDate == null || _endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select start and end dates.')),
-      );
-      return;
-    }
-
-    debugPrint('Car Details:');
-    debugPrint('ID: ${widget.car.id}');
-    debugPrint('Name: ${widget.car.name}');
-    debugPrint(
-        'Booking Details: Start Date = $_startDate, End Date = $_endDate, Total Price = $_totalPrice');
-
-    try {
-      final carSnapshot = await FirebaseFirestore.instance
-          .collection('Cars')
-          .doc(widget.car.id)
-          .get();
-      debugPrint('Car snapshot exists: ${carSnapshot.exists}');
-      if (!carSnapshot.exists) {
-        debugPrint('Car not found in Firestore, trying alternative query...');
-        final querySnapshot = await FirebaseFirestore.instance
-            .collection('Cars')
-            .where('id', isEqualTo: widget.car.id)
-            .get();
-
-        if (querySnapshot.docs.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Car not found. ID: ${widget.car.id}')),
-          );
-          return;
-        } else {
-          var doc = querySnapshot.docs.first;
-          widget.car.id = doc.id;
-          debugPrint('Car found via query: ${widget.car.id}');
-        }
-      }
-
-      final buyerRef =
-          FirebaseFirestore.instance.collection('Users').doc(user.id);
-      final carRef =
-          FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
-
-      final rentalProvider =
-          Provider.of<RentalProvider>(context, listen: false);
-
-      try {
-        await rentalProvider.addRental(
-          RentalModel(
-            car: carRef,
-            buyerRef: buyerRef,
-            startDate: _startDate!,
-            endDate: _endDate!,
-            totalPrice: _totalPrice,
-          ),
-        );
-
-        // Calculate notification time (e.g., 1 hour before due date)
-        DateTime notificationTime = _endDate!.subtract(Duration(hours: 1));
-        DateTime notificationTime1 = DateTime.now().add(Duration(minutes: 1));
-
-
-        // Schedule notification
-        // await NotificationService.scheduleNotification(
-        //   id: _endDate.hashCode, // Unique ID for the notification
-        //   title: 'Car Rental Reminder',
-        //   body: 'Your rental for ${widget.car.name} is due soon!',
-        //   scheduledDate: notificationTime1,
-        // );
-        await NotificationService.showImmediateNotification(widget.car.name);
-
-        print('Car rental notification scheduled for ${widget.car.name}.');
-
-        // // Schedule a notification 1 day before the rental due date
-        // await NotificationService.scheduleRentalDueNotification(
-        //   rentalId: widget.car.id, // Use car ID or generate a unique ID
-        //   userId: user.id,
-        //   carId: widget.car.id,
-        //   endDate: _endDate!,
-        // );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rental booked successfully!')),
-        );
-
-        Navigator.pop(context);
-      } catch (e) {
-        debugPrint('Booking error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Booking failed: ${e.toString()}')),
-        );
-      }
-    } catch (queryError) {
-      debugPrint('Query Error: $queryError');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error querying car: $queryError')),
-      );
-    }
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please log in to book a car.')),
+    );
+    return;
   }
 
+  if (_startDate == null || _endDate == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select start and end dates.')),
+    );
+    return;
+  }
+
+  debugPrint('Car Details:');
+  debugPrint('ID: ${widget.car.id}');
+  debugPrint('Name: ${widget.car.name}');
+  debugPrint(
+      'Booking Details: Start Date = $_startDate, End Date = $_endDate, Total Price = $_totalPrice');
+
+  // Fetch the seller's ID from the car document
+  final sellerRef = widget.car.seller;
+  final sellerId = sellerRef.id;
+
+  // Check if the current user is the seller
+  if (sellerId == user.id) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('You cannot rent your own car.'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  final buyerRef =
+      FirebaseFirestore.instance.collection('Users').doc(user.id);
+  final carRef =
+      FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
+
+  final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
+
+  try {
+    await rentalProvider.addRental(
+      RentalModel(
+        car: carRef,
+        buyerRef: buyerRef,
+        startDate: _startDate!,
+        endDate: _endDate!,
+        totalPrice: _totalPrice,
+      ),
+    );
+
+    // Calculate notification time (e.g., 1 hour before due date)
+    DateTime notificationTime = _endDate!.subtract(Duration(hours: 1));
+    DateTime notificationTime1 = DateTime.now().add(Duration(minutes: 1));
+
+    // Schedule notification
+    await NotificationService.showImmediateNotification(widget.car.name);
+
+    print('Car rental notification scheduled for ${widget.car.name}.');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Rental booked successfully!')),
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    debugPrint('Booking error: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Booking failed: ${e.toString()}')),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -410,8 +435,9 @@ class _BookingScreenState extends State<BookingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildLegendItem(Colors.blueGrey, 'Today'),
-                      _buildLegendItem(const Color.fromARGB(255, 210, 48, 48), 'Booked'),
-                      _buildLegendItem( Colors.green.shade400, 'Available'),
+                      _buildLegendItem(
+                          const Color.fromARGB(255, 210, 48, 48), 'Booked'),
+                      _buildLegendItem(Colors.green.shade400, 'Available'),
                     ],
                   ),
                 ),
@@ -542,8 +568,7 @@ class _BookingScreenState extends State<BookingScreen> {
       enabled: false,
       decoration: InputDecoration(
         // When a date is selected, show it as the label
-        labelText:
-            date != null ? '$label: ${_dateFormat.format(date)}' : label,
+        labelText: date != null ? '$label: ${_dateFormat.format(date)}' : label,
         // If no date is selected, show hint
         hintText: date == null ? 'Select date' : null,
         prefixIcon: icon != null ? Icon(icon, color: Colors.black) : null,
@@ -564,5 +589,3 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 }
-
-

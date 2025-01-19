@@ -1,4 +1,5 @@
 import 'package:car_rental_project/screens/CarForm.dart';
+import 'package:car_rental_project/screens/UserCarListingScreen.dart';
 import 'package:car_rental_project/screens/car_listing_screen.dart';
 import 'package:car_rental_project/screens/nearest_cars_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
@@ -152,8 +153,9 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const CarUploadScreen(),
-                        ),
+        builder: (context) => UserCarListingScreen(
+          userId: userProvider.currentUser!.id, // Pass the userId here
+        )),
                       );
                     }
                   },
