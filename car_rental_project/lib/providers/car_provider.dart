@@ -165,7 +165,7 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('Cars')
-          .where('seller', isEqualTo: _firestore.doc('Users/$userId'))
+          .where('seller', isEqualTo: _firestore.doc('users/$userId'))
           .get();
 
       if (snapshot.docs.isEmpty) {

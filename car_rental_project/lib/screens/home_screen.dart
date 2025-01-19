@@ -136,7 +136,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Please enter your phone and address before booking a car.',
+                                'Please enter your phone and address before proceeding.',
                               ),
                               duration: Duration(seconds: 3),
                               backgroundColor: Colors.red,
