@@ -66,8 +66,34 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
   }
 
   /// Add a new car to Firestore and the local list
-  Future<void> addCar(Car car) async {
+   Future<void> addCar(Car car) async {
     try {
+     // DocumentReference docRef = _firestore.collection('Cars').doc(car.id);
+
+   //   await docRef.set(car.toMap()); // Save the car data to Firestore
+      // Validate car data before uploading
+      final validationError = Car.validateCarData(
+        name: car.name,
+        price: car.price.toString(),
+        horsepower: car.horsepower.toString(),
+        acceleration: car.acceleration.toString(),
+        tankCapacity: car.tankCapacity.toString(),
+        topSpeed: car.topSpeed.toString(),
+        bodyType: car.bodyType,
+        transmissionType: car.transmissionType,
+        features: car.features,
+        description: car.description,
+        availableFrom: car.availableFrom,
+        availableTo: car.availableTo,
+        latitude: car.latitude.toString(),
+        longitude: car.longitude.toString(),
+        imageFile: car.image.toString(),
+      );
+
+      if (validationError != null) {
+        throw Exception(validationError);
+      }
+
       DocumentReference docRef = _firestore.collection('Cars').doc(car.id);
 
       await docRef.set(car.toMap()); // Save the car data to Firestore
@@ -75,6 +101,7 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
       notifyListeners();
     } catch (e) {
       debugPrint('Error adding car: $e');
+      rethrow; // Rethrow the error to handle it in the UI
     }
   }
 

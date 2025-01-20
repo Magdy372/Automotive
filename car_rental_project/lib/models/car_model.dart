@@ -51,6 +51,103 @@ class Car {
     this.ratings = const [], // Add this line
   });
 
+    static String? validateCarData({
+    required String name,
+    required String price,
+    required String horsepower,
+    required String acceleration,
+    required String tankCapacity,
+    required String topSpeed,
+    required BodyType? bodyType,
+    required TransmissionType? transmissionType,
+    required List<Feature> features,
+    required String description,
+    required DateTime? availableFrom,
+    required DateTime? availableTo,
+    required String latitude,
+    required String longitude,
+    required String? imageFile,
+  }) {
+   // if (imageFile.isEmpty) return 'Car image is required';
+    if (name.isEmpty) return 'Car name is required';
+    if (price.isEmpty) return 'Price is required';
+    if (horsepower.isEmpty) return 'Horsepower is required';
+    if (acceleration.isEmpty) return 'Acceleration is required';
+    if (tankCapacity.isEmpty) return 'Tank capacity is required';
+    if (topSpeed.isEmpty) return 'Top speed is required';
+    if (bodyType == null) return 'Body type is required';
+    if (transmissionType == null) return 'Transmission type is required';
+    if (features.isEmpty) return 'At least one feature is required';
+    if (description.isEmpty) return 'Description is required';
+    if (latitude.isEmpty) return 'Location is required';
+    if (longitude.isEmpty) return 'Location is required';
+    if (imageFile==null) return 'Car image is required';
+
+     if (availableFrom == null) return 'Available from date is required';
+  if (availableTo == null) return 'Available to date is required';
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day); // Remove time part
+
+  // Check if availableFrom is today or later
+  if (availableFrom.isBefore(today)) {
+    return 'Available from date must be today or later';
+  }
+
+  // Check if availableTo is after availableFrom
+  if (availableTo.isBefore(availableFrom) || availableTo.isAtSameMomentAs(availableFrom)) {
+    return 'Available to date must be after available from date';
+  }
+
+    return null; // Return null if all validations pass
+  }
+
+  // Validation function to check if the price is a valid number
+  static String? validatePrice(String price) {
+    if (price.isEmpty) return 'Price is required';
+    if (double.tryParse(price) == null) return 'Invalid price format';
+    return null;
+  }
+
+  // Validation function to check if the horsepower is a valid number
+  static String? validateHorsepower(String horsepower) {
+    if (horsepower.isEmpty) return 'Horsepower is required';
+    if (double.tryParse(horsepower) == null) return 'Invalid horsepower format';
+    return null;
+  }
+
+  // Validation function to check if the acceleration is a valid number
+  static String? validateAcceleration(String acceleration) {
+    if (acceleration.isEmpty) return 'Acceleration is required';
+    if (double.tryParse(acceleration) == null) return 'Invalid acceleration format';
+    return null;
+  }
+
+  // Validation function to check if the tank capacity is a valid number
+  static String? validateTankCapacity(String tankCapacity) {
+    if (tankCapacity.isEmpty) return 'Tank capacity is required';
+    if (double.tryParse(tankCapacity) == null) return 'Invalid tank capacity format';
+    return null;
+  }
+
+  // Validation function to check if the top speed is a valid number
+  static String? validateTopSpeed(String topSpeed) {
+    if (topSpeed.isEmpty) return 'Top speed is required';
+    if (int.tryParse(topSpeed) == null) return 'Invalid top speed format';
+    return null;
+  }
+
+  // Validation function to check if the latitude and longitude are valid numbers
+  static String? validateLocation(String latitude, String longitude) {
+    if (latitude.isEmpty) return 'Latitude is required';
+    if (longitude.isEmpty) return 'Longitude is required';
+    if (double.tryParse(latitude) == null) return 'Invalid latitude format';
+    if (double.tryParse(longitude) == null) return 'Invalid longitude format';
+    return null;
+  }
+
+
+
   // Add this method to calculate the average rating
   double get averageRating {
     if (ratings.isEmpty) return 0.0; // Return 0 if there are no ratings

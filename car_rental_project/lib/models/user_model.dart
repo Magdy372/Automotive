@@ -56,7 +56,7 @@ class UserModel {
 
   static String? validatePhone(String? phone) {
     if (phone == null || phone.isEmpty) {
-      return null; // Phone is optional
+      return 'Phone number is required'; // Phone is optional
     }
 
     if (phone.length != 11) {
@@ -72,7 +72,7 @@ class UserModel {
 
   static String? validateAddress(String? address) {
     if (address == null || address.isEmpty) {
-      return null; // Address is optional
+      return 'Address is required'; // Address is optional
     }
     if (address.length < 5) {
       return 'Address must be at least 5 characters';

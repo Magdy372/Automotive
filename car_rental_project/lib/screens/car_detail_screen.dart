@@ -529,12 +529,7 @@ Widget _buildFooter(UserModel user, BuildContext context) {
                     MaterialPageRoute(builder: (context) => const SettingsScreen()),
                   );
                   break;
-                     case 4:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FavoritesScreen()),
-                  );
-                  break;
+               
               }
             },
             tabs: const [
@@ -543,7 +538,7 @@ Widget _buildFooter(UserModel user, BuildContext context) {
               GButton(icon: Icons.person),
              
               GButton(icon: Icons.settings),
-               GButton(icon: Icons.favorite),
+              
             ],
           ),
         ),

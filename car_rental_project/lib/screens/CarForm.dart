@@ -12,8 +12,6 @@ import '../providers/car_provider.dart';
 import '../providers/user_provider.dart';
 import '../screens/home_screen.dart';
 
-
-
 class CarUploadScreen extends StatefulWidget {
   const CarUploadScreen({super.key});
 
@@ -29,7 +27,7 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   final TextEditingController accelerationController = TextEditingController();
   final TextEditingController tankCapacityController = TextEditingController();
   final TextEditingController topspeedController = TextEditingController();
-    final TextEditingController latitudeController = TextEditingController();
+  final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
 
   DateTime? _availableFrom;
@@ -39,7 +37,7 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
   TransmissionType? _selectedTransmissionType;
   Brand? _selectedBrand;
   final List<Feature> _selectedFeatures = [];
-  File? _imageFile; // To store the picked image
+  File? _imageFile; // To store the picked image file
   final ImagePicker _picker = ImagePicker(); // Image Picker instance
 
   // DatePicker functions to select availableFrom and availableTo
@@ -73,62 +71,49 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
     });
   }
 
-// Future<void> _pickLocation() async {
-//   LatLng? location = await Navigator.push(
-//     context,
-//     MaterialPageRoute(builder: (context) => LocationPickerScreen()),
-//   );
+  // Pick location using a map picker
+  Future<void> _pickLocation() async {
+    // First check location permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
 
-//   if (location != null) {
-//     setState(() {
-//       latitudeController.text = location.latitude.toString();
-//       longitudeController.text = location.longitude.toString();
-//     });
-//   }
-// }
-Future<void> _pickLocation() async {
-  // First check location permissions
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-  }
-  
-  if (permission == LocationPermission.deniedForever || 
-      permission == LocationPermission.denied) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Location permissions are denied.'),
-        backgroundColor: Colors.red,
+    if (permission == LocationPermission.deniedForever ||
+        permission == LocationPermission.denied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Location permissions are denied.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Navigate to map picker
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OpenStreetMapPicker(
+          initialLatitude: latitudeController.text.isEmpty
+              ? null
+              : double.parse(latitudeController.text),
+          initialLongitude: longitudeController.text.isEmpty
+              ? null
+              : double.parse(longitudeController.text),
+          onLocationSelected: (location) {
+            setState(() {
+              latitudeController.text = location.latitude.toString();
+              longitudeController.text = location.longitude.toString();
+            });
+          },
+        ),
       ),
     );
-    return;
   }
 
-  // Navigate to map picker
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => OpenStreetMapPicker(
-        initialLatitude: latitudeController.text.isEmpty 
-            ? null 
-            : double.parse(latitudeController.text),
-        initialLongitude: longitudeController.text.isEmpty 
-            ? null 
-            : double.parse(longitudeController.text),
-        onLocationSelected: (location) {
-          setState(() {
-            latitudeController.text = location.latitude.toString();
-            longitudeController.text = location.longitude.toString();
-          });
-        },
-      ),
-    ),
-  );
-}
-
-
-
-Future<void> _detectLocation() async {
+  // Detect current location
+  Future<void> _detectLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -164,105 +149,75 @@ Future<void> _detectLocation() async {
     }
   }
 
-
   // Pick an image from the gallery
   Future<void> pickImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path); // Store the picked image
+        _imageFile = File(pickedFile.path); // Store the picked image file
       });
     }
   }
 
-  // Upload image to Supabase
-  // Upload image to Supabase
+  // Upload image to Supabase and return the URL
   Future<String> uploadImage(File image) async {
     try {
       final supabaseClient = Supabase.instance.client;
-      final fileName = 'car_image/${DateTime.now().millisecondsSinceEpoch}.jpg'; // Unique file name
+      final fileName =
+          'car_image/${DateTime.now().millisecondsSinceEpoch}.jpg'; // Unique file name
 
       // Upload the image to Supabase
-      final response = await supabaseClient.storage.from('cars').upload(fileName, image);
+      await supabaseClient.storage.from('cars').upload(fileName, image);
 
-
-      // If successful, get the public URL for the image
-      final imageUrl = supabaseClient.storage.from('cars').getPublicUrl(fileName);
+      // Get the public URL for the image
+      final imageUrl =
+          supabaseClient.storage.from('cars').getPublicUrl(fileName);
       return imageUrl; // Return the image URL
     } catch (e) {
       throw Exception('Error uploading image: $e');
     }
   }
-  Future<String> uploadCarImage(File imageFile) async {
-  try {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) {
-      throw Exception('User must be logged in to upload');
-    }
-
-    final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    
-    // Ensure the file is not too large
-    if (imageFile.lengthSync() > 5 * 1024 * 1024) { // 5MB limit
-      throw Exception('File size exceeds 5MB');
-    }
-
-    final response = await Supabase.instance.client.storage
-        .from('car_images')
-        .upload(
-          fileName, 
-          imageFile,
-          fileOptions: const FileOptions(
-            upsert: true,
-            contentType: 'image/jpeg',
-          ),
-        );
-
-    final imageUrl = Supabase.instance.client.storage
-        .from('car_images')
-        .getPublicUrl(fileName);
-
-    return imageUrl;
-  } on StorageException catch (e) {
-    print('Supabase Storage Error: ${e.message}');
-    throw Exception('Failed to upload image: ${e.message}');
-  } catch (e) {
-    print('Unexpected upload error: $e');
-    rethrow;
-  }
-}
-
 
   // Upload car to database (including image URL)
   void _uploadCarForRent(BuildContext context) async {
-    if (nameController.text.isEmpty ||
-        priceController.text.isEmpty ||
-        horsepowerController.text.isEmpty ||
-        accelerationController.text.isEmpty ||
-        tankCapacityController.text.isEmpty ||
-        topspeedController.text.isEmpty ||
-        _selectedBodyType == null ||
-        _selectedTransmissionType == null ||
-        _selectedFeatures.isEmpty ||
-        descriptionController.text.isEmpty ||
-        _availableFrom == null ||
-         latitudeController.text.isEmpty ||
-        longitudeController.text.isEmpty ||
-        _availableTo == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please fill in all fields'),
-            backgroundColor: Colors.red),
-      );
-      return;
-    }
+    // Validate car data
 
-    if (_imageFile == null) {
+  
+  // Upload the image and get the URL
+  if (_imageFile == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Car image is required'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+    final validationError = Car.validateCarData(
+      name: nameController.text,
+      price: priceController.text,
+      horsepower: horsepowerController.text,
+      acceleration: accelerationController.text,
+      tankCapacity: tankCapacityController.text,
+      topSpeed: topspeedController.text,
+      bodyType: _selectedBodyType,
+      transmissionType: _selectedTransmissionType,
+      features: _selectedFeatures,
+      description: descriptionController.text,
+      availableFrom: _availableFrom,
+      availableTo: _availableTo,
+      latitude: latitudeController.text,
+      longitude: longitudeController.text,
+     imageFile: _imageFile.toString(),
+    );
+
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please upload an image for the car'),
-            backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(validationError),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -273,8 +228,9 @@ Future<void> _detectLocation() async {
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('You need to be logged in to upload a car for rent'),
-            backgroundColor: Colors.red),
+          content: Text('You need to be logged in to upload a car for rent'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -343,8 +299,9 @@ Future<void> _detectLocation() async {
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Error uploading car: $error'),
-            backgroundColor: Colors.red),
+          content: Text('Error uploading car: $error'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -353,11 +310,10 @@ Future<void> _detectLocation() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title:
-              const Text("Upload Car", style: TextStyle(color: Colors.white))),
+        title: const Text("Upload Car", style: TextStyle(color: Colors.white)),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          // Add this widget to make the page scrollable
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -365,8 +321,7 @@ Future<void> _detectLocation() async {
               children: [
                 const SizedBox(height: 20),
                 const Text('Upload a Car for Rent',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 // Form fields
                 Column(
@@ -387,7 +342,8 @@ Future<void> _detectLocation() async {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.image_outlined, size: 40, color: Colors.grey),
+                                  const Icon(Icons.image_outlined,
+                                      size: 40, color: Colors.grey),
                                   const SizedBox(height: 8),
                                   Text(
                                     "Tap to select image",
@@ -412,96 +368,107 @@ Future<void> _detectLocation() async {
                     const SizedBox(height: 20),
                     // Car name field
                     TextField(
-                        controller: nameController,
-                        decoration:
-                            const InputDecoration(labelText: "Car Name")),
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: "Car Name"),
+                    ),
                     const SizedBox(height: 20),
                     // Price per day field
                     TextField(
-                        controller: priceController,
-                        decoration:
-                            const InputDecoration(labelText: "Price per Day"),
-                        keyboardType: TextInputType.number),
+                      controller: priceController,
+                      decoration:
+                          const InputDecoration(labelText: "Price per Day"),
+                      keyboardType: TextInputType.number,
+                    ),
                     const SizedBox(height: 20),
                     // Horsepower field
                     TextField(
-                        controller: horsepowerController,
-                        decoration:
-                            const InputDecoration(labelText: "Horsepower (HP)"),
-                        keyboardType: TextInputType.number),
+                      controller: horsepowerController,
+                      decoration:
+                          const InputDecoration(labelText: "Horsepower (HP)"),
+                      keyboardType: TextInputType.number,
+                    ),
                     const SizedBox(height: 20),
                     // Acceleration field
                     TextField(
-                        controller: accelerationController,
-                        decoration: const InputDecoration(
-                            labelText: "Acceleration (0-100 km/h in seconds)"),
-                        keyboardType: TextInputType.number),
+                      controller: accelerationController,
+                      decoration: const InputDecoration(
+                          labelText: "Acceleration (0-100 km/h in seconds)"),
+                      keyboardType: TextInputType.number,
+                    ),
                     const SizedBox(height: 20),
                     // Tank Capacity field
                     TextField(
-                        controller: tankCapacityController,
-                        decoration: const InputDecoration(
-                            labelText: "Tank Capacity (liters)"),
-                        keyboardType: TextInputType.number),
+                      controller: tankCapacityController,
+                      decoration:
+                          const InputDecoration(labelText: "Tank Capacity (liters)"),
+                      keyboardType: TextInputType.number,
+                    ),
                     const SizedBox(height: 20),
                     // TopSpeed field
                     TextField(
-                        controller: topspeedController,
-                        decoration: const InputDecoration(
-                            labelText: "Top Speed (km/h)"),
-                        keyboardType: TextInputType.number),
+                      controller: topspeedController,
+                      decoration:
+                          const InputDecoration(labelText: "Top Speed (km/h)"),
+                      keyboardType: TextInputType.number,
+                    ),
                     const SizedBox(height: 20),
                     // Car description field
                     TextField(
-                        controller: descriptionController,
-                        decoration:
-                            const InputDecoration(labelText: "Description")),
+                      controller: descriptionController,
+                      decoration:
+                          const InputDecoration(labelText: "Description"),
+                    ),
                     const SizedBox(height: 20),
                     // Body Type Dropdown
                     DropdownButton<BodyType>(
-                        value: _selectedBodyType,
-                        hint: const Text('Select Body Type'),
-                        onChanged: (BodyType? value) {
-                          setState(() {
-                            _selectedBodyType = value;
-                          });
-                        },
-                        items: BodyType.values.map((BodyType value) {
-                          return DropdownMenuItem<BodyType>(
-                              value: value,
-                              child: Text(value.toString().split('.').last));
-                        }).toList()),
+                      value: _selectedBodyType,
+                      hint: const Text('Select Body Type'),
+                      onChanged: (BodyType? value) {
+                        setState(() {
+                          _selectedBodyType = value;
+                        });
+                      },
+                      items: BodyType.values.map((BodyType value) {
+                        return DropdownMenuItem<BodyType>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 20),
                     // Transmission Type Dropdown
                     DropdownButton<TransmissionType>(
-                        value: _selectedTransmissionType,
-                        hint: const Text('Select Transmission Type'),
-                        onChanged: (TransmissionType? value) {
-                          setState(() {
-                            _selectedTransmissionType = value;
-                          });
-                        },
-                        items: TransmissionType.values
-                            .map((TransmissionType value) {
-                          return DropdownMenuItem<TransmissionType>(
-                              value: value,
-                              child: Text(value.toString().split('.').last));
-                        }).toList()),
+                      value: _selectedTransmissionType,
+                      hint: const Text('Select Transmission Type'),
+                      onChanged: (TransmissionType? value) {
+                        setState(() {
+                          _selectedTransmissionType = value;
+                        });
+                      },
+                      items: TransmissionType.values.map((TransmissionType value) {
+                        return DropdownMenuItem<TransmissionType>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 20),
                     // Brand Dropdown
                     DropdownButton<Brand>(
-                        value: _selectedBrand,
-                        hint: const Text('Select Brand'),
-                        onChanged: (Brand? value) {
-                          setState(() {
-                            _selectedBrand = value;
-                          });
-                        },
-                        items: Brand.values.map((Brand value) {
-                          return DropdownMenuItem<Brand>(
-                              value: value,
-                              child: Text(value.toString().split('.').last));
-                        }).toList()),
+                      value: _selectedBrand,
+                      hint: const Text('Select Brand'),
+                      onChanged: (Brand? value) {
+                        setState(() {
+                          _selectedBrand = value;
+                        });
+                      },
+                      items: Brand.values.map((Brand value) {
+                        return DropdownMenuItem<Brand>(
+                          value: value,
+                          child: Text(value.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 20),
                     // Select Features
                     const Text('Select Features:'),
@@ -521,35 +488,34 @@ Future<void> _detectLocation() async {
                     const SizedBox(height: 20),
                     // Available from Date Picker
                     ListTile(
-                        title: const Text('Available From:'),
-                        subtitle: Text(_availableFrom != null
-                            ? _availableFrom!.toLocal().toString().split(' ')[0]
-                            : 'Not selected'),
-                        onTap: () => _selectDate(context, true)),
+                      title: const Text('Available From:'),
+                      subtitle: Text(_availableFrom != null
+                          ? _availableFrom!.toLocal().toString().split(' ')[0]
+                          : 'Not selected'),
+                      onTap: () => _selectDate(context, true),
+                    ),
                     const SizedBox(height: 20),
                     // Available to Date Picker
                     ListTile(
-                        title: const Text('Available To:'),
-                        subtitle: Text(_availableTo != null
-                            ? _availableTo!.toLocal().toString().split(' ')[0]
-                            : 'Not selected'),
-                        onTap: () => _selectDate(context, false)),
+                      title: const Text('Available To:'),
+                      subtitle: Text(_availableTo != null
+                          ? _availableTo!.toLocal().toString().split(' ')[0]
+                          : 'Not selected'),
+                      onTap: () => _selectDate(context, false),
+                    ),
                     const SizedBox(height: 20),
-
-// Latitude field
-                ListTile(
-      title: const Text('Select Location'),
-      subtitle: Text(latitudeController.text.isNotEmpty
-          ? 'Latitude: ${latitudeController.text}, Longitude: ${longitudeController.text}'
-          : 'Location not selected'),
-      trailing: IconButton(
-        icon: const Icon(Icons.location_on),
-        onPressed: _pickLocation, // Trigger location detection
-      ),
-    ),
-
-
-
+                    // Latitude field
+                    ListTile(
+                      title: const Text('Select Location'),
+                      subtitle: Text(latitudeController.text.isNotEmpty
+                          ? 'Latitude: ${latitudeController.text}, Longitude: ${longitudeController.text}'
+                          : 'Location not selected'),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.location_on),
+                        onPressed: _pickLocation, // Trigger location detection
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     // Upload Button
                     Align(
                       alignment: Alignment.center,
@@ -562,29 +528,6 @@ Future<void> _detectLocation() async {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Align(
-                    //   alignment: Alignment.center,
-                    //   child: Column(
-                    //     children: [
-                    //       const SizedBox(height: 20),
-                    //       // Enhanced Upload Button
-                    //       ElevatedButton(
-                    //         style: ElevatedButton.styleFrom(
-                    //           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                    //           shape: RoundedRectangleBorder(
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           backgroundColor: Colors.blueAccent,
-                    //           foregroundColor: Colors.white,
-                    //           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    //         ),
-                    //         onPressed: pickImage,
-                    //         child: const Text("Select Image"),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
                   ],
                 ),
               ],
