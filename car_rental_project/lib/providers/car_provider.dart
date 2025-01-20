@@ -68,9 +68,9 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
   /// Add a new car to Firestore and the local list
   Future<void> addCar(Car car) async {
     try {
-      DocumentReference docRef =
-          await _firestore.collection('Cars').add(car.toMap());
-      car.id = docRef.id; // Assign Firestore document ID to the car
+      DocumentReference docRef = _firestore.collection('Cars').doc(car.id);
+
+      await docRef.set(car.toMap()); // Save the car data to Firestore
       _cars.add(car); // Update the local list
       notifyListeners();
     } catch (e) {

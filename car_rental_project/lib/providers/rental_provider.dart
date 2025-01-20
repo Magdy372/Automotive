@@ -71,7 +71,7 @@ class RentalProvider with ChangeNotifier {
     await _updateCarBookedDates(rental);
 
     // Add to the appropriate list based on the current user
-    if (rental.buyerRef == _firestore.doc('Users/${rental.buyerRef.id}')) {
+    if (rental.buyerRef == _firestore.doc('users/${rental.buyerRef.id}')) {
       _rentalsForUser.add(rental);
     }
     _rentals.add(rental);
@@ -87,7 +87,8 @@ class RentalProvider with ChangeNotifier {
   Future<void> _validateCarAvailability(RentalModel rental) async {
     DocumentSnapshot carDoc = await rental.car.get();
     if (!carDoc.exists) {
-      throw Exception('Car not found');
+      
+      throw Exception('Car not found : id ${rental.car.id}');
     }
 
     List<dynamic> bookedDates = (carDoc['bookedDates'] ?? []) as List<dynamic>;

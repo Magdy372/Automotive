@@ -333,7 +333,7 @@ Future<void> _submitBooking() async {
   }
 
   final buyerRef =
-      FirebaseFirestore.instance.collection('Users').doc(user.id);
+      FirebaseFirestore.instance.collection('users').doc(user.id);
   final carRef =
       FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
 

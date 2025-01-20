@@ -86,7 +86,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Hello, ${userProvider.currentUser?.name ?? 'Guest'}",
+                  "Hello, ${userProvider.currentUser?.name.split(' ').first ?? 'Guest'}",
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                     );
                   },
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 25, left: 10, right: 10),
+                    padding: const EdgeInsets.only(top: 25, left: 10),
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -126,7 +126,7 @@ Widget _buildHeader(UserProvider userProvider, bool isDarkMode) {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 // Sell Your Car Icon
                 GestureDetector(
                   onTap: () {
