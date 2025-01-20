@@ -4,7 +4,6 @@ import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart'; // Import the UserModel
-import 'package:fl_chart/fl_chart.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -105,7 +104,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) =>  LoginScreen()),
+                MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
           ),
@@ -143,14 +142,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         ),
                       );
                     },
-                   child: StatsCard(
-  title: 'Total Cars',
-  count: totalCars.toString(), // Display the actual number of cars
-  icon: Icons.directions_car,
-  textColor: Colors.white,
-  backgroundColor: const Color(0xFF2D3748), // Updated background color
-  iconColor: Colors.orange, 
-),
+                    child: StatsCard(
+                      title: 'Total Cars',
+                      count: totalCars.toString(), // Display the actual number of cars
+                      icon: Icons.directions_car,
+                      textColor: Colors.white,
+                      backgroundColor: const Color(0xFF2D3748), // Updated background color
+                      iconColor: Colors.orange,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -167,7 +166,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       icon: Icons.group,
                       textColor: Colors.white,
                       backgroundColor: const Color(0xFF2D3748),
-                      iconColor: Colors.blue, 
+                      iconColor: Colors.blue,
                     ),
                   ),
                 ],
@@ -182,54 +181,53 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-lastTwoUsers.isEmpty
-    ? const Center(child: CircularProgressIndicator())
-    : Container(
-        width: double.infinity, // Full width of the page
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color:const Color(0xFF2D3748),
-        ),
-        child: DataTable(
-          headingRowHeight: 48, // Consistent height for the heading row
-          dataRowHeight: 48, // Consistent height for data rows
-          horizontalMargin: 16, // Consistent padding
-          columnSpacing: 24, // Space between columns
-          columns: const [
-            DataColumn(
-              label: Text(
-                'User',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Email',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-          ],
-          rows: lastTwoUsers.map((user) {
-            return DataRow(
-              cells: [
-                DataCell(
-                  Text(
-                    user.name,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    user.email,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-
+              lastTwoUsers.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : Container(
+                      width: double.infinity, // Full width of the page
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFF2D3748),
+                      ),
+                      child: DataTable(
+                        headingRowHeight: 48, // Consistent height for the heading row
+                        dataRowHeight: 48, // Consistent height for data rows
+                        horizontalMargin: 16, // Consistent padding
+                        columnSpacing: 24, // Space between columns
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              'User',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Email',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                        rows: lastTwoUsers.map((user) {
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(
+                                  user.name,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  user.email,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -249,196 +247,6 @@ lastTwoUsers.isEmpty
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'App Growth Over Time',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 300,
-                child: LineChart(
-                  LineChartData(
-                    gridData: const FlGridData(show: true),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          interval: 1,
-                          getTitlesWidget: (value, meta) {
-                            return Text(
-                              value.toStringAsFixed(0), // Display as integer
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            );
-                          },
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          interval: 1,
-                          getTitlesWidget: (value, meta) {
-                            switch (value.toInt()) {
-                              case 0:
-                                return const Text('Jan');
-                              case 1:
-                                return const Text('Feb');
-                              case 2:
-                                return const Text('Mar');
-                              case 3:
-                                return const Text('Apr');
-                              case 4:
-                                return const Text('May');
-                              case 5:
-                                return const Text('Jun');
-                              default:
-                                return const Text('');
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border: Border.all(color: const Color(0xff37434d), width: 1),
-                    ),
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: [
-                          const FlSpot(0, 1),  // Jan
-                          const FlSpot(1, 1.5), // Feb
-                          const FlSpot(2, 1.8), // Mar
-                          const FlSpot(3, 2),  // Apr
-                          const FlSpot(4, 2.5), // May
-                          const FlSpot(5, 3),  // Jun
-                        ],
-                        isCurved: true,
-                        color: Colors.blue,
-                        barWidth: 4,
-                        belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.2)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Average Car Rent Duration',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 300,
-                child: PieChart(
-                  PieChartData(
-                    sections: [
-                      PieChartSectionData(
-                        value: 40,
-                        color: Colors.teal,
-                        title: '',
-                        titleStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        radius: 50,
-                        badgeWidget: Transform.rotate(
-                          angle: -0.1,
-                          child: const Text(
-                            '1-3 Days',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                      PieChartSectionData(
-                        value: 30,
-                        color: Colors.orange,
-                        title: '',
-                        titleStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        radius: 50,
-                        badgeWidget: Transform.rotate(
-                          angle: -1.1,
-                          child: const Text(
-                            '4-7 Days',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                      PieChartSectionData(
-                        value: 20,
-                        color: Colors.blue,
-                        title: '',
-                        titleStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        radius: 50,
-                        badgeWidget: Transform.rotate(
-                          angle: 0.2,
-                          child: const Text(
-                            '8-14 Days',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                      PieChartSectionData(
-                        value: 10,
-                        color: Colors.red,
-                        title: '',
-                        titleStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        radius: 50,
-                        badgeWidget: Transform.rotate(
-                          angle: 1.1,
-                          child: const Text(
-                            '15+ Days',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -453,7 +261,7 @@ class StatsCard extends StatelessWidget {
   final IconData icon;
   final Color textColor;
   final Color backgroundColor;
-  final Color iconColor; 
+  final Color iconColor;
 
   const StatsCard({
     super.key,
@@ -476,7 +284,7 @@ class StatsCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-             Icon(icon, size: 40, color: iconColor),
+            Icon(icon, size: 40, color: iconColor),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
