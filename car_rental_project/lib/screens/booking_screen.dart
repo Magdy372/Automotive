@@ -1,5 +1,6 @@
 import 'package:car_rental_project/models/car_model.dart';
 import 'package:car_rental_project/models/rental_model.dart';
+import 'package:car_rental_project/paymob_manager/paymob_manager.dart';
 import 'package:car_rental_project/providers/rental_provider.dart';
 import 'package:car_rental_project/services/NotificationService.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookingScreen extends StatefulWidget {
   final Car car;
@@ -22,9 +24,24 @@ class _BookingScreenState extends State<BookingScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
   double _totalPrice = 0.0;
+  bool isPaid = false;
   final _formKey = GlobalKey<FormState>();
 
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
+  Future<void> _pay() async {
+       PaymobManager().getPaymentKey(
+      _totalPrice, "EGP"
+    ).then((String paymentKey) {
+      launchUrl(Uri.parse(
+        "https://accept.paymob.com/api/acceptance/iframes/895291?payment_token=$paymentKey"
+      )).then((_) {
+        // After successful payment, mark it as paid
+        setState(() {
+          isPaid = true;  // Update isPaid to true after successful payment
+        });
+      });
+    });
+  }
 
   late List<DateTime> _bookedDates;
   void _debugPrintBookedDates() {
@@ -293,256 +310,265 @@ class _BookingScreenState extends State<BookingScreen> {
       });
     }
   }
-Future<void> _submitBooking() async {
-  final userProvider = Provider.of<UserProvider>(context, listen: false);
-  final user = userProvider.currentUser;
 
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please log in to book a car.')),
-    );
-    return;
+  Future<void> _submitBooking() async {
+    if (!isPaid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete payment first.')),
+      );
+      return;
+    }
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to book a car.')),
+      );
+      return;
+    }
+
+    if (_startDate == null || _endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select start and end dates.')),
+      );
+      return;
+    }
+
+    // Submit booking details and perform the necessary actions
+    final sellerRef = widget.car.seller;
+    final sellerId = sellerRef.id;
+
+    if (sellerId == user.id) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot rent your own car.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final buyerRef = FirebaseFirestore.instance.collection('users').doc(user.id);
+    final carRef = FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
+    final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
+
+    try {
+      await rentalProvider.addRental(
+        RentalModel(
+          car: carRef,
+          buyerRef: buyerRef,
+          startDate: _startDate!,
+          endDate: _endDate!,
+          totalPrice: _totalPrice,
+        ),
+      );
+
+      DateTime notificationTime = _endDate!.subtract(Duration(hours: 1));
+      await NotificationService.showImmediateNotification(widget.car.name);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rental booked successfully!')),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('Booking error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking failed: ${e.toString()}')),
+      );
+    }
+  
   }
 
-  if (_startDate == null || _endDate == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please select start and end dates.')),
-    );
-    return;
-  }
-
-  debugPrint('Car Details:');
-  debugPrint('ID: ${widget.car.id}');
-  debugPrint('Name: ${widget.car.name}');
-  debugPrint(
-      'Booking Details: Start Date = $_startDate, End Date = $_endDate, Total Price = $_totalPrice');
-
-  // Fetch the seller's ID from the car document
-  final sellerRef = widget.car.seller;
-  final sellerId = sellerRef.id;
-
-  // Check if the current user is the seller
-  if (sellerId == user.id) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('You cannot rent your own car.'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  final buyerRef =
-      FirebaseFirestore.instance.collection('users').doc(user.id);
-  final carRef =
-      FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
-
-  final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
-
-  try {
-    await rentalProvider.addRental(
-      RentalModel(
-        car: carRef,
-        buyerRef: buyerRef,
-        startDate: _startDate!,
-        endDate: _endDate!,
-        totalPrice: _totalPrice,
-      ),
-    );
-
-    // Calculate notification time (e.g., 1 hour before due date)
-    DateTime notificationTime = _endDate!.subtract(Duration(hours: 1));
-    DateTime notificationTime1 = DateTime.now().add(Duration(minutes: 1));
-
-    // Schedule notification
-    await NotificationService.showImmediateNotification(widget.car.name);
-
-    print('Car rental notification scheduled for ${widget.car.name}.');
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Rental booked successfully!')),
-    );
-
-    Navigator.pop(context);
-  } catch (e) {
-    debugPrint('Booking error: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Booking failed: ${e.toString()}')),
-    );
-  }
-}
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Book Your Rental'),
-        backgroundColor: Colors.black, // Changed from deepPurple to black
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Car details card
-              Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Book: ${widget.car.name}',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // Changed from deepPurple
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          const Icon(Icons.car_rental,
-                              color: Colors.black), // Changed from deepPurple
-                          const SizedBox(width: 10),
-                          Text(
-                            '\$${widget.car.price}/day',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+     return Scaffold(
+    appBar: AppBar(
+      title: const Text('Book Your Rental'),
+      backgroundColor: Colors.black, // Changed from deepPurple to black
+    ),
+    body: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Car details card
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              const SizedBox(height: 20),
-              // Color legend
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildLegendItem(Colors.blueGrey, 'Today'),
-                      _buildLegendItem(
-                          const Color.fromARGB(255, 210, 48, 48), 'Booked'),
-                      _buildLegendItem(Colors.green.shade400, 'Available'),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Date selection and pricing
-              Form(
-                key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Start Date Selection
-                    GestureDetector(
-                      onTap: _selectStartDate,
-                      child: _buildReadOnlyInputField('Start Date', _startDate,
-                          icon: Icons.calendar_today),
-                    ),
-                    const SizedBox(height: 20),
-                    // End Date Selection
-                    GestureDetector(
-                      onTap: _selectEndDate,
-                      child: _buildReadOnlyInputField('End Date', _endDate,
-                          icon: Icons.calendar_today),
-                    ),
-                    const SizedBox(height: 20),
-                    // Total Price Display
-                    Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Total Price',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              _totalPrice > 0
-                                  ? '\$${_totalPrice.toStringAsFixed(2)}'
-                                  : 'Select dates',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Changed from deepPurple
-                              ),
-                            ),
-                          ],
-                        ),
+                    Text(
+                      'Book: ${widget.car.name}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black, // Changed from deepPurple
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    // Confirm and Book Button
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black,
-                            Colors.grey.shade800,
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _submitBooking,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                        ),
-                        child: const Text(
-                          'Confirm and Book',
-                          style: TextStyle(
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(Icons.car_rental, color: Colors.black), // Changed from deepPurple
+                        const SizedBox(width: 10),
+                        Text(
+                          '\$${widget.car.price}/day',
+                          style: const TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black87,
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            // Color legend
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildLegendItem(Colors.blueGrey, 'Today'),
+                    _buildLegendItem(
+                      const Color.fromARGB(255, 210, 48, 48), 
+                      'Booked'
+                    ),
+                    _buildLegendItem(Colors.green.shade400, 'Available'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Date selection and pricing
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  // Start Date Selection
+                  GestureDetector(
+                    onTap: _selectStartDate,
+                    child: _buildReadOnlyInputField('Start Date', _startDate, icon: Icons.calendar_today),
+                  ),
+                  const SizedBox(height: 20),
+                  // End Date Selection
+                  GestureDetector(
+                    onTap: _selectEndDate,
+                    child: _buildReadOnlyInputField('End Date', _endDate, icon: Icons.calendar_today),
+                  ),
+                  const SizedBox(height: 20),
+                  // Total Price Display
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total Price',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            _totalPrice > 0 ? '\$${_totalPrice.toStringAsFixed(2)}' : 'Select dates',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black, // Changed from deepPurple
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  // Confirm and Book Button
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black,
+                          Colors.grey.shade800,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // "Pay" Button
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (isPaid) {
+                              // If already paid, proceed with booking
+                              await _submitBooking();
+                            } else {
+                              // If not paid, trigger the payment process
+                              await _pay();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE),
+                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 80),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              
+                            ),
+                          ),
+                          child: Text(
+                            isPaid ? 'Confirmed Booking' : 'Pay Now',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode? Colors.black: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildLegendItem(Color color, String text) {
     return Row(

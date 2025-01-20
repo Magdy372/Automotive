@@ -165,6 +165,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   content: const Text('Notification deleted'),
                   action: SnackBarAction(
                     label: 'Undo',
+                    textColor:isDarkMode? Colors.black:Colors.white,
                     onPressed: () async {
                       // Re-insert the notification into the database
                       await NotificationService.saveNotification(
