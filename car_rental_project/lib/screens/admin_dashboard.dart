@@ -4,6 +4,7 @@ import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart'; // Import the UserModel
+import '../models/car_model.dart'; // Import CarModel
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -14,7 +15,7 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   List<UserModel> lastTwoUsers = [];
-  int totalUsers = 0; // To store the real number of users
+  int totalUsers = 0;
   int totalCars = 0;
   bool isDataLoaded = false;
 
@@ -35,7 +36,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         fetchTotalCars(),
       ]);
       setState(() {
-        isDataLoaded = true; // Ensure isDataLoaded is set after fetching data
+        isDataLoaded = true;
       });
     } catch (e) {
       print("Error fetching data: $e");
@@ -46,7 +47,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Future<void> fetchTotalCars() async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Cars').get();
-      print("Total cars fetched: ${snapshot.docs.length}");
       setState(() {
         totalCars = snapshot.docs.length;
       });
@@ -60,7 +60,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .orderBy('createdAt', descending: true) // Assuming you have a 'createdAt' field
+          .orderBy('createdAt', descending: true)
           .limit(6)
           .get();
 
@@ -79,7 +79,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('users').get();
       setState(() {
-        totalUsers = snapshot.docs.length; // Get the total count of documents in the 'users' collection
+        totalUsers = snapshot.docs.length;
       });
     } catch (e) {
       print("Error fetching total users: $e");
@@ -144,10 +144,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     },
                     child: StatsCard(
                       title: 'Total Cars',
-                      count: totalCars.toString(), // Display the actual number of cars
+                      count: totalCars.toString(),
                       icon: Icons.directions_car,
                       textColor: Colors.white,
-                      backgroundColor: const Color(0xFF2D3748), // Updated background color
+                      backgroundColor: const Color(0xFF2D3748),
                       iconColor: Colors.orange,
                     ),
                   ),
@@ -162,7 +162,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     },
                     child: StatsCard(
                       title: 'Total Users',
-                      count: totalUsers.toString(), // Dynamic user count
+                      count: totalUsers.toString(),
                       icon: Icons.group,
                       textColor: Colors.white,
                       backgroundColor: const Color(0xFF2D3748),
@@ -180,20 +180,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   color: Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
+             
               const SizedBox(height: 10),
               lastTwoUsers.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : Container(
-                      width: double.infinity, // Full width of the page
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         color: const Color(0xFF2D3748),
                       ),
                       child: DataTable(
-                        headingRowHeight: 48, // Consistent height for the heading row
-                        dataRowHeight: 48, // Consistent height for data rows
-                        horizontalMargin: 16, // Consistent padding
-                        columnSpacing: 24, // Space between columns
+                        headingRowHeight: 48,
+                        dataRowHeight: 48,
+                        horizontalMargin: 16,
+                        columnSpacing: 24,
                         columns: const [
                           DataColumn(
                             label: Text(
@@ -211,24 +212,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         rows: lastTwoUsers.map((user) {
                           return DataRow(
                             cells: [
-                              DataCell(
-                                Text(
-                                  user.name,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  user.email,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
+                              DataCell(Text(user.name, style: const TextStyle(color: Colors.white))),
+                              DataCell(Text(user.email, style: const TextStyle(color: Colors.white))),
                             ],
                           );
                         }).toList(),
                       ),
                     ),
-              Align(
+                      Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
@@ -239,11 +230,81 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   },
                   child: const Text(
                     'View All',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'All Cars',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // StreamBuilder for Cars
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('Cars').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final cars = snapshot.data!.docs.map((doc) {
+                    return Car.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
+                  }).toList();
+
+                  return Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFF2D3748),
                     ),
+                    child: DataTable(
+                      headingRowHeight: 48,
+                      dataRowHeight: 48,
+                      horizontalMargin: 16,
+                      columnSpacing: 24,
+                      columns: const [
+                        DataColumn(
+                          label: Text(
+                            'Car Name',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Brand',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                      rows: cars.map((car) {
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(car.name, style: const TextStyle(color: Colors.white))),
+                            DataCell(Text(car.brand.toString().split('.').last, style: const TextStyle(color: Colors.white))),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CarListingScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'View All',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
                   ),
                 ),
               ),
