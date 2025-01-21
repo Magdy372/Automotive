@@ -1,6 +1,7 @@
 import 'package:car_rental_project/screens/LocationPickerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
@@ -308,20 +309,31 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Upload Car", style: TextStyle(color: Colors.white)),
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
+
+        title: Text(
+          "Upload Car", 
+        style: GoogleFonts.poppins(
+        color:isDarkMode? Colors.grey[300]:Colors.black,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ), 
+    ),
+       centerTitle: true, 
+
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(left: 16.0,right: 16.0,bottom: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
-                const Text('Upload a Car for Rent',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                
                 const SizedBox(height: 20),
                 // Form fields
                 Column(
@@ -347,7 +359,7 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     "Tap to select image",
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.grey[600],
                                       fontSize: 14,
                                     ),
@@ -488,45 +500,82 @@ class _CarUploadScreenState extends State<CarUploadScreen> {
                     const SizedBox(height: 20),
                     // Available from Date Picker
                     ListTile(
+                      tileColor: isDarkMode?Colors.grey[900]:Color(0XFF97B3AE),
                       title: const Text('Available From:'),
                       subtitle: Text(_availableFrom != null
                           ? _availableFrom!.toLocal().toString().split(' ')[0]
-                          : 'Not selected'),
+                          : 'Not selected',
+                          ),
                       onTap: () => _selectDate(context, true),
+                      textColor: Colors.white,
                     ),
                     const SizedBox(height: 20),
                     // Available to Date Picker
                     ListTile(
+                      tileColor: isDarkMode?Colors.grey[900]:Color(0XFF97B3AE),
                       title: const Text('Available To:'),
                       subtitle: Text(_availableTo != null
                           ? _availableTo!.toLocal().toString().split(' ')[0]
                           : 'Not selected'),
                       onTap: () => _selectDate(context, false),
+                      textColor: Colors.white,
+                     
                     ),
                     const SizedBox(height: 20),
                     // Latitude field
-                    ListTile(
-                      title: const Text('Select Location'),
-                      subtitle: Text(latitudeController.text.isNotEmpty
-                          ? 'Latitude: ${latitudeController.text}, Longitude: ${longitudeController.text}'
-                          : 'Location not selected'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.location_on),
-                        onPressed: _pickLocation, // Trigger location detection
+                ListTile(
+                  tileColor: isDarkMode ? Colors.grey[900] : const Color(0XFF97B3AE),
+                  title: const Text(
+                    'Select Location',
+                    style: TextStyle(color: Colors.white), // Text color for better visibility
+                  ),
+                  subtitle: Text(
+                    latitudeController.text.isNotEmpty
+                        ? 'Latitude: ${latitudeController.text}, Longitude: ${longitudeController.text}'
+                        : 'Location not selected',
+                    style: TextStyle(color: Colors.white), // Subtitle color for visibility
+                  ),
+                  trailing: GestureDetector(
+                    onTap: _pickLocation, // Trigger location detection
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                      padding: const EdgeInsets.all(8.0), // Add padding for better spacing
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.white, // Icon color
                       ),
                     ),
+                  ),
+                ),
+
                     const SizedBox(height: 20),
                     // Upload Button
-                    Align(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _uploadCarForRent(context);
-                        },
-                        child: const Text("Upload Car",
-                            style: TextStyle(fontSize: 16)),
+                   Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0XFF97B3AE), // Set the background color
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Optional: Adjust padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20), // Optional: Rounded corners
                       ),
                     ),
+                    onPressed: () {
+                      _uploadCarForRent(context);
+                    },
+                    child: Text(
+                      "Upload Car",
+                      style: GoogleFonts.poppins(
+                        color: isDarkMode ? Colors.grey[300] : Colors.white, // Text color based on theme
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+
                     const SizedBox(height: 20),
                   ],
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -67,13 +68,24 @@ class _OpenStreetMapPickerState extends State<OpenStreetMapPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       appBar: widget.isEditable ? AppBar(
-        title: const Text('Select Location'),
+        title:  Text('Select Location',
+        style: GoogleFonts.poppins(
+        color:isDarkMode? Colors.grey[300]:Colors.black,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ), 
+      
+    ),
+    centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -110,9 +122,9 @@ class _OpenStreetMapPickerState extends State<OpenStreetMapPicker> {
                   width: 40.0,
                   height: 40.0,
                   point: selectedLocation!,
-                  child: const Icon(
+                  child:  Icon(
                     Icons.location_pin,
-                    color: Colors.red,
+                    color: isDarkMode? Colors.black:Color(0XFF97B3AE),
                     size: 40,
                   ),
                 ),

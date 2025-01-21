@@ -31,27 +31,26 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            // Icon from Flutter's Icons library
-            Icon(
-              Icons.directions_car, // Use a car icon or any other icon
-              color: isDarkMode ? Colors.white : Colors.black,
-              size: 30,
-            ),
-            const SizedBox(width: 10), // Add spacing between icon and title
-            Text(
-              ' My Cars',
-              style: GoogleFonts.poppins(
-                color: isDarkMode ? Colors.white : Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+      title: Row(
+        children: [
+          const SizedBox(width: 10), // Add spacing between icon and title
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                ' My Cars',
+                style: GoogleFonts.poppins(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
+
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        centerTitle: false, // Set to false to align the title with the icon
         actions: [
           // Add Car Button
           IconButton(
@@ -132,7 +131,7 @@ class _UserCarListingScreenState extends State<UserCarListingScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.list, color: Colors.blue),
+                        icon: Icon(Icons.list, color: isDarkMode?Colors.grey[300]:Color(0XFF97B3AE)),
                         onPressed: () async {
                           // Fetch rentals for this car
                           final rentalProvider = Provider.of<RentalProvider>(context, listen: false);

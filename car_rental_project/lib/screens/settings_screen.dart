@@ -1,6 +1,5 @@
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
-import 'package:car_rental_project/screens/my_bookings_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -59,24 +58,7 @@ class SettingsScreen extends StatelessWidget {
                   },
                   isDarkMode: isDarkMode,
                 ),
-                Divider(
-                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-                ),
-                _buildListTile(
-                  icon: Icons.car_rental,
-                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-                  label: 'My bookings',
-                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MyBookingsScreen(),
-                      ),
-                    );
-                  },
-                  isDarkMode: isDarkMode,
-                ),
+               
                 Divider(
                   color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
                 ),
@@ -95,21 +77,7 @@ class SettingsScreen extends StatelessWidget {
                   },
                   isDarkMode: isDarkMode,
                 ),
-                Divider(
-                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-                ),
-                _buildListTile(
-                  icon: Icons.visibility,
-                  iconColor: isDarkMode ? Colors.grey[300]! : const Color(0xFF97B3AE),
-                  label: 'Appearance',
-                  labelColor: isDarkMode ? Colors.grey[300]! : Colors.black,
-                  onTap: () {},
-                  isDarkMode: isDarkMode,
-                ),
-                Divider(
-                  color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
-                ),
-
+               
                 Divider(
                   color: isDarkMode ? Colors.grey[900]! : const Color(0xFF97B3AE),
                 ),

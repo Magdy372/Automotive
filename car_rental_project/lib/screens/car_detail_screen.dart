@@ -183,9 +183,9 @@ Widget _buildLocation() {
               Icon(Icons.location_on, 
                 color: Theme.of(context).primaryColor),
               const SizedBox(width: 8),
-              const Text(
+               Text(
                 'Location',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -212,6 +212,8 @@ Widget _buildLocation() {
 }
  // Build the seller info widget
   Widget _buildSellerInfo() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -241,11 +243,11 @@ Widget _buildLocation() {
                 },
                 child: Row(
                   children: [
-                    const Icon(Icons.phone, color: Colors.blue),
+                    Icon(Icons.phone, color: isDarkMode? Colors.grey[300]:Color(0XFF97B3AE)),
                     const SizedBox(width: 8),
                     Text(
                       sellerPhone,
-                      style: GoogleFonts.poppins(color: Colors.blue, fontSize: 16),
+                      style: GoogleFonts.poppins(color:isDarkMode? Colors.grey[300]:Color(0XFF97B3AE), fontSize: 16,decoration: TextDecoration.underline),
                     ),
                   ],
                 ),

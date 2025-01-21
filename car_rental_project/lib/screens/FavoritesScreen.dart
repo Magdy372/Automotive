@@ -33,11 +33,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Favorites'),
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        foregroundColor: isDarkMode ? Colors.white : Colors.black,
-      ),
+   appBar: AppBar(
+    backgroundColor: isDarkMode? Colors.black:Colors.white,
+    title: Text(
+      "Favorites",
+      style: GoogleFonts.poppins(
+        color:isDarkMode? Colors.grey[300]:Colors.black,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ), 
+    ),
+    centerTitle: true, 
+  ),
+
       body: _favorites.isEmpty
           ? Center(
               child: Text(

@@ -290,10 +290,10 @@ Widget _buildFilters(bool isDarkMode) {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode ? Colors.grey[700] : Colors.blue, // Background color
+                    backgroundColor: isDarkMode ? Colors.grey[800] : Color(0XFF97B3AE), // Background color
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10), // Padding
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                      borderRadius: BorderRadius.circular(16), // Rounded corners
                     ),
                   ),
                   child: Text(

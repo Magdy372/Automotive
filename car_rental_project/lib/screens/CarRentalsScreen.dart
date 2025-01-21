@@ -1,6 +1,7 @@
 import 'package:car_rental_project/screens/BuyerCarListing.dart';
 import 'package:car_rental_project/screens/UserCarListingScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/rental_model.dart';
 
@@ -12,10 +13,21 @@ class CarRentalsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Rentals for Car'),
-      ),
+        backgroundColor: isDarkMode? Colors.black:Colors.white,
+        title: Text(
+          "Car rentals",
+          style: GoogleFonts.poppins(
+            color:isDarkMode? Colors.grey[300]:Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ), 
+        ),
+      centerTitle: true, 
+     ),
       body: rentals.isEmpty
           ? Center(
               child: Text(

@@ -1,6 +1,7 @@
 import 'package:car_rental_project/screens/car_detail_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/car_model.dart';
 import '../providers/car_provider.dart';
@@ -10,10 +11,20 @@ class NearestCarsScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Nearest Cars'),
-      ),
+     appBar: AppBar(
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      title: Text(
+        "Nearest cars",
+        style: GoogleFonts.poppins(
+          color: isDarkMode ? Colors.grey[300] : Colors.black,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ), 
+      centerTitle: true,
+     ),
       body: FutureBuilder(
         future: _loadNearestCars(context),
         builder: (context, snapshot) {
@@ -29,31 +40,38 @@ class NearestCarsScreen extends StatelessWidget {
                 final car = nearestCars[index];
                 return ListTile(
                   leading: car.image != null && car.image!.isNotEmpty
-    ? ClipOval(
-        child: Image.network(
-          car.image!,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Icon(Icons.error, size: 50); // Fallback icon in case of error
-          },
-        ),
-      )
-    : Icon(Icons.image, size: 50),
-
-                  title: Text('${car.brand.toString().split('.').last} ${car.name}'),
-                  subtitle: Text('${car.price.toStringAsFixed(2)} per day'),
-                  trailing: Text('${car.distance!.toStringAsFixed(1)} km'),
+                      ? ClipOval(
+                          child: Image.network(
+                            car.image!,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.error, size: 50); // Fallback icon in case of error
+                            },
+                          ),
+                        )
+                      : Icon(Icons.image, size: 50),
+                  title: Text(
+                    '${car.brand.toString().split('.').last} ${car.name}',
+                    style: GoogleFonts.poppins(), // Apply Google Fonts to title
+                  ),
+                  subtitle: Text(
+                    '${car.price.toStringAsFixed(2)} per day',
+                    style: GoogleFonts.poppins(), // Apply Google Fonts to subtitle
+                  ),
+                  trailing: Text(
+                    '${car.distance!.toStringAsFixed(1)} km',
+                    style: GoogleFonts.poppins(), // Apply Google Fonts to trailing text
+                  ),
                   onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CarDetailScreen(car: car),
-    ),
-  );
-},
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CarDetailScreen(car: car),
+                      ),
+                    );
+                  },
                 );
               },
             );
