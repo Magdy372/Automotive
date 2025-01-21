@@ -262,7 +262,6 @@ class UserProvider with ChangeNotifier {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
       _showSuccess(context, 'Password reset email sent. Check your inbox!');
-      Navigator.pop(context);
     } catch (e) {
       _showError(context, 'Error: $e');
     }

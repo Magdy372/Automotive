@@ -174,7 +174,7 @@ Future<List<Car>> getNearestCars(Position userLocation) async {
     if (_recentlyDeletedCar != null) {
       try {
         // Restore the car to Firestore
-        final sellerRef =  FirebaseFirestore.instance.collection('Users').doc(user.id);
+        final sellerRef =  FirebaseFirestore.instance.collection('users').doc(user.id);
         _recentlyDeletedCar?.seller = sellerRef;
         addCar(_recentlyDeletedCar!);
         _carsbysuser.add(_recentlyDeletedCar!);
@@ -269,5 +269,22 @@ Future<void> rateCar(String carId, double rating) async {
   void clearFilters() {
     _filteredCars = [];
     notifyListeners();
+  }
+
+   Future<bool> isCarInRental(String carId) async {
+    try {
+      // Create a DocumentReference for the car
+      final carRef = FirebaseFirestore.instance.collection('Cars').doc(carId);
+
+      // Query rentals where carRef matches the provided car reference
+      QuerySnapshot snapshot = await _firestore
+          .collection('Rentals')
+          .where('carRef', isEqualTo: carRef) // Use DocumentReference
+          .get();
+      return snapshot.docs.isNotEmpty; // True if car is found in rentals
+    } catch (e) {
+      print("Error checking car rentals: $e");
+      return false;
+    }
   }
 }
