@@ -2,6 +2,7 @@ import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:car_rental_project/screens/notification_screen.dart';
 import 'package:car_rental_project/screens/profile_screen.dart';
+import 'package:car_rental_project/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -114,10 +115,12 @@ class SettingsScreen extends StatelessWidget {
                               child: Text("Yes", style: GoogleFonts.poppins(color: Colors.red)),
                               onPressed: () {
                                 userProvider.logout(context);
+                                //SystemNavigator.pop();
+
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => LoginScreen(),
+                                    builder: (context) => SignupScreen(),
                                   ),
                                 );
                               },

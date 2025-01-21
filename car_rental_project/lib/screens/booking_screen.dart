@@ -6,6 +6,7 @@ import 'package:car_rental_project/services/NotificationService.dart';
 import 'package:car_rental_project/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -29,17 +30,16 @@ class _BookingScreenState extends State<BookingScreen> {
 
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
   Future<void> _pay() async {
-       PaymobManager().getPaymentKey(
-      _totalPrice, "EGP"
-    ).then((String paymentKey) {
+    PaymobManager().getPaymentKey(_totalPrice, "EGP").then((String paymentKey) {
       launchUrl(Uri.parse(
-        "https://accept.paymob.com/api/acceptance/iframes/895291?payment_token=$paymentKey"
-      )).then((_) {
-        // After successful payment, mark it as paid
-        setState(() {
-          isPaid = true;  // Update isPaid to true after successful payment
-        });
-      });
+          "https://accept.paymob.com/api/acceptance/iframes/895291?payment_token=$paymentKey"));
+      // .then((_) {
+      //   // // After successful payment, mark it as paid
+      //   // setState(() {
+      //   //   isPaid = true;  // Update isPaid to true after successful payment
+      //   // });
+      // }
+      // );
     });
   }
 
@@ -350,8 +350,10 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    final buyerRef = FirebaseFirestore.instance.collection('users').doc(user.id);
-    final carRef = FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
+    final buyerRef =
+        FirebaseFirestore.instance.collection('users').doc(user.id);
+    final carRef =
+        FirebaseFirestore.instance.collection('Cars').doc(widget.car.id);
     final rentalProvider = Provider.of<RentalProvider>(context, listen: false);
 
     try {
@@ -379,196 +381,223 @@ class _BookingScreenState extends State<BookingScreen> {
         SnackBar(content: Text('Booking failed: ${e.toString()}')),
       );
     }
-  
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-     return Scaffold(
-    appBar: AppBar(
-      title: const Text('Book Your Rental'),
-      backgroundColor: Colors.black, // Changed from deepPurple to black
-    ),
-    body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Car details card
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Book: ${widget.car.name}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black, // Changed from deepPurple
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Icon(Icons.car_rental, color: Colors.black), // Changed from deepPurple
-                        const SizedBox(width: 10),
-                        Text(
-                          '\$${widget.car.price}/day',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black87,
-                          ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        title: Text(
+          "Book",
+          style: GoogleFonts.poppins(
+            color: isDarkMode ? Colors.grey[300] : Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Car details card
+              Card(
+                elevation: 5,
+                color: isDarkMode ? Colors.grey[900] : Color(0XFF97B3AE),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Book: ${widget.car.name}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode
+                              ? Colors.grey[300]
+                              : Colors.white, // Changed from deepPurple
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Color legend
-            Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildLegendItem(Colors.blueGrey, 'Today'),
-                    _buildLegendItem(
-                      const Color.fromARGB(255, 210, 48, 48), 
-                      'Booked'
-                    ),
-                    _buildLegendItem(Colors.green.shade400, 'Available'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Date selection and pricing
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // Start Date Selection
-                  GestureDetector(
-                    onTap: _selectStartDate,
-                    child: _buildReadOnlyInputField('Start Date', _startDate, icon: Icons.calendar_today),
-                  ),
-                  const SizedBox(height: 20),
-                  // End Date Selection
-                  GestureDetector(
-                    onTap: _selectEndDate,
-                    child: _buildReadOnlyInputField('End Date', _endDate, icon: Icons.calendar_today),
-                  ),
-                  const SizedBox(height: 20),
-                  // Total Price Display
-                  Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
                         children: [
-                          const Text(
-                            'Total Price',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Icon(Icons.car_rental,
+                              color: isDarkMode
+                                  ? Colors.grey[300]
+                                  : Colors.white), // Changed from deepPurple
+                          const SizedBox(width: 10),
                           Text(
-                            _totalPrice > 0 ? '\$${_totalPrice.toStringAsFixed(2)}' : 'Select dates',
-                            style: const TextStyle(
+                            '\$${widget.car.price}/day',
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black, // Changed from deepPurple
+                              color:
+                                  isDarkMode ? Colors.grey[300] : Colors.white,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  // Confirm and Book Button
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.black,
-                          Colors.grey.shade800,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // "Pay" Button
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (isPaid) {
-                              // If already paid, proceed with booking
-                              await _submitBooking();
-                            } else {
-                              // If not paid, trigger the payment process
-                              await _pay();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDarkMode?Colors.grey[300]: Color(0XFF97B3AE),
-                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 80),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              
-                            ),
-                          ),
-                          child: Text(
-                            isPaid ? 'Confirmed Booking' : 'Pay Now',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode? Colors.black: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              // Color legend
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildLegendItem(Colors.blueGrey, 'Today'),
+                      _buildLegendItem(
+                          const Color.fromARGB(255, 210, 48, 48), 'Booked'),
+                      _buildLegendItem(Colors.green.shade400, 'Available'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Date selection and pricing
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // Start Date Selection
+                    GestureDetector(
+                      onTap: _selectStartDate,
+                      child: _buildReadOnlyInputField('Start Date', _startDate,
+                          icon: (Icons.calendar_today)),
+                    ),
+                    const SizedBox(height: 20),
+                    // End Date Selection
+                    GestureDetector(
+                      onTap: _selectEndDate,
+                      child: _buildReadOnlyInputField('End Date', _endDate,
+                          icon: Icons.calendar_today),
+                    ),
+                    const SizedBox(height: 20),
+                    // Total Price Display
+                    Card(
+                      color: isDarkMode ? Colors.grey[900] : Color(0XFF97B3AE),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Price',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.grey[300]
+                                    : Colors.white, // Changed from deepPurple
+                              ),
+                            ),
+                            Text(
+                              _totalPrice > 0
+                                  ? '\$${_totalPrice.toStringAsFixed(2)}'
+                                  : 'Select dates',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.grey[300]
+                                    : Colors.white, // Changed from deepPurple
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Confirm and Book Button
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black,
+                            Colors.grey.shade800,
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          // "Pay" Button
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (isPaid) {
+                                // If already paid, proceed with booking
+                                await _submitBooking();
+                              } else {
+                                // If not paid, trigger the payment process
+                                await _pay();
+                                await Future.delayed(Duration(seconds: 15));
+                                setState(() {
+                                  isPaid = true;
+                                });
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDarkMode
+                                  ? Colors.grey[300]
+                                  : Color(0XFF97B3AE),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 80),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              isPaid ? 'Confirmed Booking' : 'Pay Now',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.black : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildLegendItem(Color color, String text) {
     return Row(
