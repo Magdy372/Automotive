@@ -3,6 +3,7 @@ import 'package:car_rental_project/screens/login_screen.dart';
 import 'package:car_rental_project/screens/user_listing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/user_model.dart'; // Import the UserModel
 import '../models/car_model.dart'; // Import CarModel
 
@@ -88,6 +89,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     if (!isDataLoaded) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -95,9 +98,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A202C),
+      
+      backgroundColor: isDarkMode? Colors.black:Colors.white,
       appBar: AppBar(
-        title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        title:  Text('Admin Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.bold,color: isDarkMode? Colors.grey[300]:Colors.black)),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -116,12 +121,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+               Text(
                 'App data',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
+                  color: isDarkMode? Colors.grey[300]:Colors.black,
                 ),
               ),
               const SizedBox(height: 20),
@@ -147,8 +152,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       count: totalCars.toString(),
                       icon: Icons.directions_car,
                       textColor: Colors.white,
-                      backgroundColor: const Color(0xFF2D3748),
-                      iconColor: Colors.orange,
+                   backgroundColor: isDarkMode
+              ? const Color(0xFF333333) // Example dark mode background color
+           : const Color(0xFF97B3AE), // Light mode background color
+            back2: isDarkMode
+      ? const Color(0xFF222222) // Example dark mode back2 color
+      : const Color(0xFF97B3AE),                      
+      iconColor: Colors.white,
                     ),
                   ),
                   GestureDetector(
@@ -165,8 +175,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       count: totalUsers.toString(),
                       icon: Icons.group,
                       textColor: Colors.white,
-                      backgroundColor: const Color(0xFF2D3748),
-                      iconColor: Colors.blue,
+                     backgroundColor: isDarkMode
+              ? const Color(0xFF333333) // Example dark mode background color
+      : const Color(0xFF97B3AE), // Light mode background color
+  back2: isDarkMode
+      ? const Color(0xFF222222) // Example dark mode back2 color
+      : const Color(0xFF97B3AE), // Light mode back2 color
+                      iconColor: Colors.white,
                     ),
                   ),
                 ],
@@ -188,32 +203,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xFF2D3748),
+                        color: isDarkMode? Colors.grey[900]:Color(0XFF97B3AE),
                       ),
                       child: DataTable(
                         headingRowHeight: 48,
                         dataRowHeight: 48,
                         horizontalMargin: 16,
                         columnSpacing: 24,
-                        columns: const [
+                        columns:  [
                           DataColumn(
                             label: Text(
                               'User',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: isDarkMode? Colors.grey[300]:Colors.white),
                             ),
                           ),
                           DataColumn(
                             label: Text(
                               'Email',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: isDarkMode? Colors.grey[300]:Colors.white),
                             ),
                           ),
                         ],
                         rows: lastTwoUsers.map((user) {
                           return DataRow(
                             cells: [
-                              DataCell(Text(user.name, style: const TextStyle(color: Colors.white))),
-                              DataCell(Text(user.email, style: const TextStyle(color: Colors.white))),
+                              DataCell(Text(user.name, style:  TextStyle(color:isDarkMode? Colors.grey[300]:Colors.white))),
+                              DataCell(Text(user.email, style:  TextStyle(color: isDarkMode? Colors.grey[300]:Colors.white))),
                             ],
                           );
                         }).toList(),
@@ -222,25 +237,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
+                  
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const UserListingScreen()),
                     );
                   },
-                  child: const Text(
+                  child:  Text(
                     'View All',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color:isDarkMode? Colors.grey[300]:Colors.black),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+               Text(
                 'All Cars',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
+                  color: isDarkMode? Colors.grey[300]:Colors.black,
                 ),
               ),
               const SizedBox(height: 10),
@@ -260,32 +276,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: const Color(0xFF2D3748),
+                        color: isDarkMode? Colors.grey[900]:Color(0XFF97B3AE),
                     ),
                     child: DataTable(
                       headingRowHeight: 48,
                       dataRowHeight: 48,
                       horizontalMargin: 16,
                       columnSpacing: 24,
-                      columns: const [
+                      columns: [
                         DataColumn(
                           label: Text(
                             'Car Name',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: isDarkMode? Colors.grey[300]:Colors.white),
                           ),
                         ),
-                        DataColumn(
+                         DataColumn(
                           label: Text(
                             'Brand',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: isDarkMode? Colors.grey[300]:Colors.white),
                           ),
                         ),
                       ],
                       rows: cars.map((car) {
                         return DataRow(
                           cells: [
-                            DataCell(Text(car.name, style: const TextStyle(color: Colors.white))),
-                            DataCell(Text(car.brand.toString().split('.').last, style: const TextStyle(color: Colors.white))),
+                            DataCell(Text(car.name, style:  GoogleFonts.poppins(color: isDarkMode? Colors.grey[300]:Colors.white))),
+                            DataCell(Text(car.brand.toString().split('.').last, style:  GoogleFonts.poppins(color: isDarkMode? Colors.grey[300]:Colors.white))),
                           ],
                         );
                       }).toList(),
@@ -302,9 +318,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       MaterialPageRoute(builder: (context) => const CarListingScreen()),
                     );
                   },
-                  child: const Text(
+                  child:  Text(
                     'View All',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode? Colors.grey[300]:Colors.black),
                   ),
                 ),
               ),
@@ -323,6 +339,8 @@ class StatsCard extends StatelessWidget {
   final Color textColor;
   final Color backgroundColor;
   final Color iconColor;
+  
+  final Color back2;
 
   const StatsCard({
     super.key,
@@ -331,6 +349,7 @@ class StatsCard extends StatelessWidget {
     required this.icon,
     required this.textColor,
     required this.backgroundColor,
+    required this.back2,
     required this.iconColor,
   });
 
@@ -353,7 +372,7 @@ class StatsCard extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: textColor,
                   ),
@@ -361,7 +380,7 @@ class StatsCard extends StatelessWidget {
                 Text(
                   count,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: textColor,
                   ),
