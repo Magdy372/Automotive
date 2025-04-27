@@ -39,7 +39,7 @@ This is a mobile app developed using Flutter, allowing users to browse, rent, an
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/Magdy372/Graduation_Mobile.git
+    git clone https://github.com/Magdy372/Automotive.git
     ```
 
 2. Install dependencies:
