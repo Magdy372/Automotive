@@ -10,6 +10,15 @@ This is a mobile app developed using Flutter, allowing users to browse, rent, an
 - **Car Rental**: Rent cars directly from the app and track rental information.
 - **User Profile**: View and update user profile information such as name, email, address, and phone number.
 - **Internet Connection Checker**: Displays an error screen when no internet connection is available.
+- **Wishlist/Favorites**: Users can add cars to their favorites or wishlist for future rentals.
+- **Search and Filter**: Allow users to search for cars based on price range, brand, or rating.
+- **Car Details Page**: View detailed information about each car, including specifications and rental options.
+- **Booking History**: Users can view their past car rental history.
+- **Payment Integration**: Integration with a payment gateway like Stripe or PayPal for rentals.
+- **Push Notifications**: Receive notifications about booking confirmations, special offers, and reminders.
+- **Rating and Reviews**: Users can rate and leave reviews for cars after rentals.
+- **Admin Panel**: Admins can manage car listings, users, and rental bookings.
+- **Car Availability**: Check real-time availability of cars for rental.
 
 ## Project Structure
 
@@ -47,7 +56,3 @@ This is a mobile app developed using Flutter, allowing users to browse, rent, an
     ```bash
     flutter run
     ```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
