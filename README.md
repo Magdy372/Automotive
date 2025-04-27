@@ -19,11 +19,14 @@ This is a mobile app developed using Flutter, allowing users to browse, rent, an
 - **Rating and Reviews**: Users can rate and leave reviews for cars after rentals.
 - **Admin Panel**: Admins can manage car listings, users, and rental bookings.
 - **Car Availability**: Check real-time availability of cars for rental.
+- **Car Location**: Display the location of each car, either on a map or as an address.
+- **Suggest Cars Based on Proximity**: Suggest cars based on the user's current location, showing cars that are nearest to them.
+- **Dark Mode & Light Mode**: Users can switch between dark mode and light mode based on their preferences.
 
 ## Project Structure
 
 - **Car Model**: 
-  - Fields: `name`, `brand`, `price`, `image`, `rating`.
+  - Fields: `name`, `brand`, `price`, `image`, `rating`, `location`.
   - Methods: `fromMap()` (converts Firestore data to Car object), `toMap()` (converts Car object to Firestore data).
   - Includes an `enum` for listing car features.
   
@@ -56,3 +59,7 @@ This is a mobile app developed using Flutter, allowing users to browse, rent, an
     ```bash
     flutter run
     ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
